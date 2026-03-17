@@ -1,0 +1,112 @@
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import AuthProvider, { useAuth } from './contexts/AuthContext';
+import ToastProvider from './contexts/ToastContext';
+import AppLayout from './components/AppLayout';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import PersonnelList from './pages/personnel/PersonnelList';
+import PersonnelForm from './pages/personnel/PersonnelForm';
+import ExcelImport from './pages/personnel/ExcelImport';
+import UnitSetup from './pages/admin/UnitSetup';
+import AttendanceRegister from './pages/attendance/AttendanceRegister';
+import NaukariChittha from './pages/chittha/NaukariChittha';
+import LeaveRegister from './pages/leave/LeaveRegister';
+import LeaveApply from './pages/leave/LeaveApply';
+import ReportsDashboard from './pages/reports/ReportsDashboard';
+import FIRForm from './pages/reports/FIRForm';
+import GrievanceList from './pages/alerts/GrievanceList';
+import GrievanceApply from './pages/alerts/GrievanceApply';
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner spinner-lg"></div>
+        <p>Loading OASI Portal...</p>
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  return children || <Outlet />;
+}
+
+function PublicRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (user) return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
+function StateAdminRoute({ children }) {
+  const { user, loading, isStateAdmin } = useAuth();
+  if (loading) return null;
+  if (!user || !isStateAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+}
+
+// Placeholder pages for Phase 2+
+function ComingSoon({ title }) {
+  return (
+    <div className="empty-state" style={{ minHeight: '50vh' }}>
+      <h4>{title}</h4>
+      <p>This module will be available in the next phase.</p>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <ToastProvider>
+          <Routes>
+            {/* Public */}
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+
+            {/* Protected */}
+            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<Dashboard />} />
+
+              {/* Personnel */}
+              <Route path="/personnel" element={<PersonnelList />} />
+              <Route path="/personnel/add" element={<PersonnelForm />} />
+              <Route path="/personnel/import" element={<ExcelImport />} />
+              <Route path="/personnel/:id" element={<PersonnelForm />} />
+              <Route path="/personnel/:id/edit" element={<PersonnelForm />} />
+
+              {/* Unit Setup - Restricted to State Admin/Super Admin */}
+              <Route path="/units" element={<StateAdminRoute><UnitSetup /></StateAdminRoute>} />
+
+              {/* Phase 2: Attendance & Chittha */}
+              <Route path="/attendance" element={<AttendanceRegister />} />
+              <Route path="/chittha" element={<NaukariChittha />} />
+
+              {/* Phase 3: Leave Management */}
+              <Route path="/leave" element={<LeaveRegister />} />
+              <Route path="/leave/apply" element={<LeaveApply />} />
+
+              {/* Phase 4: Reports & Analytics */}
+              <Route path="/reports/fir" element={<ReportsDashboard />} />
+              <Route path="/reports/fir/add" element={<FIRForm />} />
+
+              {/* Phase 5: Alerts & Grievances */}
+              <Route path="/grievances" element={<GrievanceList />} />
+              <Route path="/grievances/new" element={<GrievanceApply />} />
+
+              {/* Phase 5+ placeholders */}
+              <Route path="/admin/roles" element={<ComingSoon title="Role Management" />} />
+              <Route path="/admin/settings" element={<ComingSoon title="Settings" />} />
+            </Route>
+
+            {/* Redirect root */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </ToastProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}

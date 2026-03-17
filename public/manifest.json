@@ -1,0 +1,17 @@
+{
+  "name": "OASI Portal",
+  "short_name": "OASI",
+  "description": "Haryana Police Digital Records Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#161654",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
