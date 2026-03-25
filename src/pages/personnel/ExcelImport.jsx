@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
-import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
 import {
   Upload, FileSpreadsheet, ArrowLeft, ArrowRight, Check,
@@ -256,7 +256,7 @@ export default function ExcelImport() {
     setStep(2);
   }
 
-  // Step 4: Import to Firestore
+  // Step 4: Import to Firestore using writeBatch for performance and atomicity
   async function startImport() {
     if (!validationResults?.validRows?.length) return;
 
@@ -266,31 +266,47 @@ export default function ExcelImport() {
     let successCount = 0;
     let errorCount = 0;
     const errorRows = [];
+    const BATCH_LIMIT = 500;
+    const rows = validationResults.validRows;
 
-    for (let i = 0; i < validationResults.validRows.length; i++) {
+    for (let batchStart = 0; batchStart < rows.length; batchStart += BATCH_LIMIT) {
+      const chunk = rows.slice(batchStart, batchStart + BATCH_LIMIT);
+      const batch = writeBatch(db);
+
+      chunk.forEach((row) => {
+        try {
+          const docRef = doc(collection(db, 'personnel'));
+          const data = {
+            ...row,
+            personnelId: docRef.id,
+            serviceStatus: row.serviceStatus || 'Active',
+            stateId: row.stateId || user.stateId || '',
+            rangeId: row.rangeId || user.rangeId || '',
+            districtId: row.districtId || user.districtId || '',
+            unitType: row.unitType || '',
+            currentUnitId: row.currentUnitId || user.unitId || '',
+            currentSubUnitId: row.currentSubUnitId || user.subUnitId || '',
+            createdAt: serverTimestamp(),
+            createdByUserId: user.uid,
+            updatedAt: serverTimestamp(),
+            updatedByUserId: user.uid,
+          };
+          batch.set(docRef, data);
+          successCount++;
+        } catch (err) {
+          errorCount++;
+          errorRows.push({ row: batchStart + chunk.indexOf(row) + 1, error: err.message });
+        }
+      });
+
       try {
-        const row = validationResults.validRows[i];
-        const docRef = doc(collection(db, 'personnel'));
-        const data = {
-          ...row,
-          personnelId: docRef.id,
-          serviceStatus: row.serviceStatus || 'Active',
-          stateId: row.stateId || user.stateId || '',
-          rangeId: row.rangeId || user.rangeId || '',
-          districtId: row.districtId || user.districtId || '',
-          unitType: row.unitType || '',
-          currentUnitId: row.currentUnitId || user.unitId || '',
-          currentSubUnitId: row.currentSubUnitId || user.subUnitId || '',
-          createdAt: serverTimestamp(),
-          createdByUserId: user.uid,
-          updatedAt: serverTimestamp(),
-          updatedByUserId: user.uid,
-        };
-        await setDoc(docRef, data);
-        successCount++;
+        await batch.commit();
       } catch (err) {
-        errorCount++;
-        errorRows.push({ row: i + 1, error: err.message });
+        // If the entire batch fails, count all rows in it as errors
+        errorCount += chunk.length - errorRows.filter(e => e.row >= batchStart + 1 && e.row <= batchStart + chunk.length).length;
+        successCount = Math.max(0, successCount - chunk.length);
+        errorRows.push({ row: batchStart + 1, error: `Batch commit failed: ${err.message}` });
+        if (import.meta.env.DEV) console.error('Batch import error:', err);
       }
     }
 

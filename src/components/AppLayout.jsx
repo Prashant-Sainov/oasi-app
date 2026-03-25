@@ -51,7 +51,9 @@ export default function AppLayout() {
 
   const getPageTitle = () => {
     const flat = NAV_ITEMS.flatMap(s => s.items);
-    const match = flat.find(i => location.pathname.startsWith(i.to));
+    // Sort by path length descending so more specific paths match before shorter ones (e.g. /personnel/import before /personnel)
+    const sorted = [...flat].sort((a, b) => b.to.length - a.to.length);
+    const match = sorted.find(i => location.pathname.startsWith(i.to));
     return match?.label || 'OASI Portal';
   };
 
@@ -149,11 +151,11 @@ export default function AppLayout() {
                 onClick={() => setAlertsOpen(!alertsOpen)}
               >
                 <Bell size={18} />
-                <span className="badge">3</span>
+                {import.meta.env.DEV && <span className="badge">3</span>}
               </button>
 
-              {/* Alerts Dropdown Simulator (Phase 5) */}
-              {alertsOpen && (
+              {/* Alerts Dropdown — DEV ONLY placeholder until Phase 5 is implemented */}
+              {import.meta.env.DEV && alertsOpen && (
                 <div style={{
                   position: 'absolute',
                   top: '100%',

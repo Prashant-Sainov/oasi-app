@@ -4,7 +4,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
 import {
   collection, query, where, getDocs, doc, setDoc, updateDoc,
-  serverTimestamp, deleteDoc
+  serverTimestamp, writeBatch
 } from 'firebase/firestore';
 import {
   CalendarCheck, Search, Save, ChevronLeft, ChevronRight,
@@ -161,17 +161,67 @@ export default function AttendanceRegister() {
     }
   }
 
-  // Bulk mark all visible
+  // Bulk mark all visible personnel using writeBatch for performance
   async function handleBulkAction() {
     if (!bulkAction) return;
     setSaving(true);
     try {
+      const BATCH_LIMIT = 500;
+      let batch = writeBatch(db);
+      let opCount = 0;
+
       for (const person of filteredPersonnel) {
-        await markAttendance(person.id, bulkAction);
+        const existing = attendanceMap[person.id];
+        if (existing) {
+          const docRef = doc(db, 'attendanceRegister', existing.id);
+          batch.update(docRef, {
+            attendanceType: bulkAction,
+            updatedAt: serverTimestamp(),
+            markedByUserId: user.uid || user.userId,
+          });
+        } else {
+          const newRef = doc(collection(db, 'attendanceRegister'));
+          batch.set(newRef, {
+            attendanceId: newRef.id,
+            personnelId: person.id,
+            date: selectedDate,
+            attendanceType: bulkAction,
+            attendanceSource: 'Register',
+            stateId: person.stateId || user.stateId || '',
+            rangeId: person.rangeId || user.rangeId || '',
+            districtId: person.districtId || user.districtId || '',
+            unitId: person.currentUnitId || user.unitId || '',
+            subUnitId: person.currentSubUnitId || user.subUnitId || '',
+            markedByUserId: user.uid || user.userId,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+        }
+
+        opCount++;
+        // Firestore batch limit is 500 writes
+        if (opCount === BATCH_LIMIT) {
+          await batch.commit();
+          batch = writeBatch(db);
+          opCount = 0;
+        }
       }
+
+      if (opCount > 0) await batch.commit();
+
+      // Update local state
+      setAttendanceMap(prev => {
+        const updated = { ...prev };
+        filteredPersonnel.forEach(p => {
+          updated[p.id] = { ...(prev[p.id] || {}), personnelId: p.id, attendanceType: bulkAction };
+        });
+        return updated;
+      });
+
       toast.success(`Marked ${filteredPersonnel.length} personnel as "${bulkAction}".`);
       setBulkAction('');
     } catch (err) {
+      if (import.meta.env.DEV) console.error('Bulk action error:', err);
       toast.error('Bulk action failed.');
     } finally {
       setSaving(false);

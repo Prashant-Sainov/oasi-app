@@ -3,36 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
-import { collection, query, where, getDocs, getDoc, doc, deleteDoc, orderBy, limit, startAfter } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, serverTimestamp, orderBy, limit, startAfter } from 'firebase/firestore';
 import {
   Search, Plus, Eye, Edit, Trash2, Copy, Download,
   Filter, ChevronLeft, ChevronRight, Users
 } from 'lucide-react';
-
-const RESTRICTED_RANKS = [
-  'Insp', 'PSI', 'SI', 'ASI/ESI', 'ASI', 'HC/ESI', 'HC/EASI', 'HC',
-  'C-1/EHC', 'C-1', 'CT/ESI', 'CT/EASI', 'CT/EHC', 'CT', 'R/CT', 'SPO'
-];
-
-const ALLOWED_RANKS = [
-  'DSP (Prob)', 'Deputy Superintendent of Police (DSP)', 'Assistant Commissioner of Police (ACP)',
-  'Additional Superintendent of Police (ASP)', 'Superintendent of Police (SP)',
-  'Senior Superintendent of Police (SSP)', 'Deputy Inspector General of Police (DIG)',
-  'Inspector General of Police (IG)', 'Additional Director General of Police (ADGP)',
-  'Director General of Police (DGP)'
-];
-
-const RANKS = [...ALLOWED_RANKS, ...RESTRICTED_RANKS];
-
-const FIXED_CATEGORIES = [
-  "Police Stations",
-  "Traffic",
-  "Special Staffs",
-  "Court",
-  "Administrative Units",
-  "Security",
-  "Temp_Dep_Trg"
-];
+import { RESTRICTED_RANKS, ALLOWED_RANKS, RANKS, FIXED_CATEGORIES, getRanksForRole } from '../../constants/ranks';
 
 const PAGE_SIZE = 25;
 
@@ -104,12 +80,33 @@ export default function PersonnelList() {
     }
   }
 
-  useEffect(() => {
-    if (hierFilters.stateId) {
-      loadRanges(hierFilters.stateId);
-      setHierFilters(prev => ({ ...prev, rangeId: '', districtId: '', unitType: '', unitId: '', subUnitId: '' }));
+  // Consolidation of hierarchy loading logic to avoid cascading effects (M10)
+  async function handleHierChange(field, value) {
+    const nextFilters = { ...hierFilters, [field]: value };
+    
+    // Clear downstream filters
+    if (field === 'stateId') {
+      nextFilters.rangeId = ''; nextFilters.districtId = ''; nextFilters.unitType = ''; nextFilters.unitId = ''; nextFilters.subUnitId = '';
+      if (value) loadRanges(value); else setRanges([]);
+      setDistricts([]); setUnits([]); setSubUnits([]);
+    } else if (field === 'rangeId') {
+      nextFilters.districtId = ''; nextFilters.unitType = ''; nextFilters.unitId = ''; nextFilters.subUnitId = '';
+      if (value) loadDistricts(value); else setDistricts([]);
+      setUnits([]); setSubUnits([]);
+    } else if (field === 'districtId') {
+      nextFilters.unitType = ''; nextFilters.unitId = ''; nextFilters.subUnitId = '';
+      if (value) loadUnits(value); else setUnits([]);
+      setSubUnits([]);
+    } else if (field === 'unitType') {
+      nextFilters.unitId = ''; nextFilters.subUnitId = '';
+      setSubUnits([]);
+    } else if (field === 'unitId') {
+      nextFilters.subUnitId = '';
+      if (value) loadSubUnits(value); else setSubUnits([]);
     }
-  }, [hierFilters.stateId]);
+    
+    setHierFilters(nextFilters);
+  }
 
   async function loadRanges(stateId) {
     const q = query(collection(db, 'ranges'), where('stateId', '==', stateId));
@@ -117,25 +114,11 @@ export default function PersonnelList() {
     setRanges(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   }
 
-  useEffect(() => {
-    if (hierFilters.rangeId) {
-      loadDistricts(hierFilters.rangeId);
-      setHierFilters(prev => ({ ...prev, districtId: '', unitType: '', unitId: '', subUnitId: '' }));
-    }
-  }, [hierFilters.rangeId]);
-
   async function loadDistricts(rangeId) {
     const q = query(collection(db, 'districts'), where('rangeId', '==', rangeId));
     const snap = await getDocs(q);
     setDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   }
-
-  useEffect(() => {
-    if (hierFilters.districtId) {
-      loadUnits(hierFilters.districtId);
-      setHierFilters(prev => ({ ...prev, unitType: '', unitId: '', subUnitId: '' }));
-    }
-  }, [hierFilters.districtId]);
 
   async function loadUnits(districtId) {
     const q = query(collection(db, 'units'), where('districtId', '==', districtId));
@@ -144,13 +127,6 @@ export default function PersonnelList() {
     setUnits(loadedUnits);
     setUnitCategories(FIXED_CATEGORIES);
   }
-
-  useEffect(() => {
-    if (hierFilters.unitId) {
-      loadSubUnits(hierFilters.unitId);
-      setHierFilters(prev => ({ ...prev, subUnitId: '' }));
-    }
-  }, [hierFilters.unitId]);
 
   async function loadSubUnits(unitId) {
     const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId));
@@ -162,7 +138,7 @@ export default function PersonnelList() {
     try {
       setLoading(true);
       const personnelRef = collection(db, 'personnel');
-      let constraints = [];
+      let constraints = [where('isDeleted', '==', false)];
 
       // Role-based filtering (Strict enforcement from AuthContext)
       if (isUnitAdmin && user?.unitId) {
@@ -175,12 +151,16 @@ export default function PersonnelList() {
         constraints.push(where('stateId', '==', user.stateId));
       }
 
+      // Note: Ideally we would do more server-side filtering and pagination here
+      // But adding multiple where clauses Requires manual Index creation in Firebase.
+      // For this phase, we fetch the scoped set and filter/paginate in memory to ensure
+      // the app remains functional without immediate Index management.
       const q = query(personnelRef, ...constraints);
       const snap = await getDocs(q);
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       setPersonnel(data);
     } catch (e) {
-      console.error('Personnel load error:', e);
+      if (import.meta.env.DEV) console.error('Personnel load error:', e);
       toast.error('Failed to load personnel records.');
     } finally {
       setLoading(false);
@@ -229,10 +209,21 @@ export default function PersonnelList() {
 
   useEffect(() => { setCurrentPage(1); }, [searchTerm, rankFilter, statusFilter]);
 
+  // Soft-delete: mark record as deleted instead of removing
+  const canDelete = isSuperAdmin || isStateAdmin || isDistrictAdmin;
+
   async function handleDelete(person) {
+    if (!canDelete) {
+      toast.error('You do not have permission to delete records.');
+      return;
+    }
     try {
-      await deleteDoc(doc(db, 'personnel', person.id));
-      toast.success(`${person.fullName} has been deleted.`);
+      await updateDoc(doc(db, 'personnel', person.id), {
+        isDeleted: true,
+        deletedAt: serverTimestamp(),
+        deletedBy: user.uid,
+      });
+      toast.success(`${person.fullName} has been removed.`);
       setPersonnel(prev => prev.filter(p => p.id !== person.id));
       setDeleteModal(null);
     } catch (err) {
@@ -277,14 +268,9 @@ export default function PersonnelList() {
               onChange={(e) => setRankFilter(e.target.value)}
             >
               <option value="">All Ranks</option>
-              {(() => {
-                const rankList = isStateAdmin && !isSuperAdmin
-                  ? ALLOWED_RANKS
-                  : (!isStateAdmin && !isSuperAdmin ? RESTRICTED_RANKS : RANKS);
-                return rankList.map(r => (
-                  <option key={r} value={r}>{r}</option>
-                ));
-              })()}
+              {getRanksForRole({ isSuperAdmin, isStateAdmin }).map(r => (
+                <option key={r} value={r}>{r}</option>
+              ))}
             </select>
             <select
               className="filter-select"
@@ -301,10 +287,11 @@ export default function PersonnelList() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
             {/* State Selection - Hidden for State Admin and below */}
+            {/* State Selection - Hidden for State Admin and below */}
             {isSuperAdmin && (
               <select className="form-select form-select-sm" 
                 value={hierFilters.stateId} 
-                onChange={e => setHierFilters(p => ({ ...p, stateId: e.target.value }))}>
+                onChange={e => handleHierChange('stateId', e.target.value)}>
                 <option value="">All States</option>
                 {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
               </select>
@@ -314,7 +301,7 @@ export default function PersonnelList() {
             {(isSuperAdmin || isStateAdmin) && (
               <select className="form-select form-select-sm" 
                 value={hierFilters.rangeId} disabled={!hierFilters.stateId}
-                onChange={e => setHierFilters(p => ({ ...p, rangeId: e.target.value }))}>
+                onChange={e => handleHierChange('rangeId', e.target.value)}>
                 <option value="">All Ranges</option>
                 {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
               </select>
@@ -324,27 +311,27 @@ export default function PersonnelList() {
             {(isSuperAdmin || isStateAdmin || isRangeAdmin) && (
               <select className="form-select form-select-sm" 
                 value={hierFilters.districtId} disabled={!hierFilters.rangeId}
-                onChange={e => setHierFilters(p => ({ ...p, districtId: e.target.value }))}>
+                onChange={e => handleHierChange('districtId', e.target.value)}>
                 <option value="">All Districts</option>
                 {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
               </select>
             )}
 
-            {/* Unit Category Selection - Visible for all but might be locked? No, usually selectable */}
+            {/* Unit Category Selection - Visible for all */}
             {(isSuperAdmin || isStateAdmin || isRangeAdmin || isDistrictAdmin) && (
               <select className="form-select form-select-sm" 
                 value={hierFilters.unitType} disabled={!hierFilters.districtId}
-                onChange={e => setHierFilters(p => ({ ...p, unitType: e.target.value }))}>
+                onChange={e => handleHierChange('unitType', e.target.value)}>
                 <option value="">All Categories</option>
                 {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             )}
 
-            {/* Unit Selection - Hidden for Unit Admin and below. Enabled without category only for District Admin per request. */}
+            {/* Unit Selection - Hidden for Unit Admin and below. */}
             {(isSuperAdmin || isStateAdmin || isRangeAdmin || isDistrictAdmin) && (
               <select className="form-select form-select-sm" 
                 value={hierFilters.unitId} disabled={isDistrictAdmin ? !hierFilters.districtId : !hierFilters.unitType}
-                onChange={e => setHierFilters(p => ({ ...p, unitId: e.target.value }))}>
+                onChange={e => handleHierChange('unitId', e.target.value)}>
                 <option value="">All Units</option>
                 {units.filter(u => u.unitType === hierFilters.unitType || !hierFilters.unitType)
                   .map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
@@ -354,7 +341,7 @@ export default function PersonnelList() {
             {/* Sub-Unit Selection - Visible for all */}
             <select className="form-select form-select-sm" 
               value={hierFilters.subUnitId} disabled={!hierFilters.unitId}
-              onChange={e => setHierFilters(p => ({ ...p, subUnitId: e.target.value }))}>
+              onChange={e => handleHierChange('subUnitId', e.target.value)}>
               <option value="">All Sub-Units</option>
               {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
             </select>
@@ -420,11 +407,13 @@ export default function PersonnelList() {
                           onClick={() => navigate(`/personnel/${p.id}/edit`)}>
                           <Edit size={15} />
                         </button>
-                        <button className="btn btn-ghost btn-icon btn-sm" title="Delete"
-                          onClick={() => setDeleteModal(p)}
-                          style={{ color: 'var(--danger-500)' }}>
-                          <Trash2 size={15} />
-                        </button>
+                        {canDelete && (
+                          <button className="btn btn-ghost btn-icon btn-sm" title="Delete"
+                            onClick={() => setDeleteModal(p)}
+                            style={{ color: 'var(--danger-500)' }}>
+                            <Trash2 size={15} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -445,16 +434,21 @@ export default function PersonnelList() {
                 onClick={() => setCurrentPage(p => p - 1)}>
                 <ChevronLeft size={16} />
               </button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                const page = i + 1;
-                return (
+              {(() => {
+                // Sliding window pagination
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+                const pages = [];
+                for (let p = startPage; p <= endPage; p++) pages.push(p);
+                return pages.map(page => (
                   <button key={page}
                     className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
                     onClick={() => setCurrentPage(page)}>
                     {page}
                   </button>
-                );
-              })}
+                ));
+              })()}
               <button className="pagination-btn" disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(p => p + 1)}>
                 <ChevronRight size={16} />

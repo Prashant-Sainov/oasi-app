@@ -4,10 +4,14 @@ import { db } from '../firebase';
 import { collection, query, where, getDocs, getCountFromServer, onSnapshot } from 'firebase/firestore';
 import { Users, UserCheck, UserX, Building2, ClipboardList, AlertTriangle, TrendingUp, FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
+import { Database, Trash2 } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
+  const [resetting, setResetting] = useState(false);
   const [stats, setStats] = useState({
     totalPersonnel: 0,
     presentToday: 0,
@@ -32,36 +36,33 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
+
     loadDashboardData();
-    
-    // Automatic update for Hierarchy card
-    if (user) {
-      const q = query(collection(db, 'ranges'), where('stateId', '==', user.stateId || 'haryana'));
-      const unsubscribe = onSnapshot(q, (snap) => {
-        const counts = { ranges: 0, commissionerates: 0, others: 0 };
-        snap.docs.forEach(doc => {
-          const name = doc.data().rangeName || '';
-          if (name.toLowerCase().includes('commissionerate')) counts.commissionerates++;
-          else if (name.toLowerCase().includes('range')) counts.ranges++;
-          else counts.others++;
-        });
-        setHierarchyStats(counts);
-      }, (err) => console.error("Real-time hierarchy error:", err));
-      
-      // Real-time listener for Super Admin Districts
-      if (user.role === 'super_admin') {
-        const distUnsub = onSnapshot(collection(db, 'districts'), (snap) => {
-          const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          setAllDistricts(list);
-        });
-        return () => {
-          unsubscribe();
-          distUnsub();
-        };
-      }
-      return () => unsubscribe();
+
+    // Real-time hierarchy stats
+    const q = query(collection(db, 'ranges'), where('stateId', '==', user.stateId || 'haryana'));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const counts = { ranges: 0, commissionerates: 0, others: 0 };
+      snap.docs.forEach(doc => {
+        const name = doc.data().rangeName || '';
+        if (name.toLowerCase().includes('commissionerate')) counts.commissionerates++;
+        else if (name.toLowerCase().includes('range')) counts.ranges++;
+        else counts.others++;
+      });
+      setHierarchyStats(counts);
+    }, (err) => { if (import.meta.env.DEV) console.error('Real-time hierarchy error:', err); });
+
+    // Real-time district listener for Super Admin
+    if (user.role === 'super_admin') {
+      const distUnsub = onSnapshot(collection(db, 'districts'), (snap) => {
+        setAllDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      });
+      return () => { unsubscribe(); distUnsub(); };
     }
-  }, [user]);
+
+    return () => unsubscribe();
+  }, [user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin]);
 
   async function loadDashboardData() {
     try {
@@ -134,13 +135,13 @@ export default function Dashboard() {
       }
       
     } catch (err) {
-      console.error('Dashboard load error:', err);
+      if (import.meta.env.DEV) console.error('Dashboard load error:', err);
     } finally {
       setLoading(false);
     }
   }
 
-  const vacancy = Math.max(0, stats.totalUnits * 30 - stats.totalPersonnel); // Estimated
+  // M3: Removed dead 'vacancy' variable — stats.totalUnits was never populated
 
   return (
     <div className="dashboard-content">
@@ -150,6 +151,33 @@ export default function Dashboard() {
           <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>
             {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
+        </div>
+        <div className="page-header-actions">
+          {import.meta.env.DEV && isSuperAdmin && (
+            <button 
+              className="btn btn-secondary" 
+              style={{ color: 'var(--danger-500)', borderColor: 'var(--danger-200)' }}
+              disabled={resetting}
+              onClick={async () => {
+                if (!window.confirm('EXTREME DANGER: This will delete ALL personnel, attendance, and leave records. Administrative hierarchy will be preserved. Proceed?')) return;
+                setResetting(true);
+                try {
+                  const { purgeAllPersonnelData } = await import('../scripts/seedData.js');
+                  await purgeAllPersonnelData();
+                  toast.success('All personnel and records cleared successfully!');
+                  loadDashboardData(); // Refresh stats
+                } catch (err) {
+                  if (import.meta.env.DEV) console.error('Purge error:', err);
+                  toast.error('Purge failed: ' + err.message);
+                } finally {
+                  setResetting(false);
+                }
+              }}
+            >
+              {resetting ? <span className="spinner spinner-sm"></span> : <Trash2 size={16} />} 
+              Reset Personnel Data
+            </button>
+          )}
         </div>
       </div>
 

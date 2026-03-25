@@ -4,7 +4,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
 import {
   collection, query, where, getDocs, doc, setDoc, updateDoc,
-  deleteDoc, serverTimestamp
+  deleteDoc, serverTimestamp, getCountFromServer
 } from 'firebase/firestore';
 import {
   Plus, Edit, Trash2, Building2, ChevronDown, ChevronRight,
@@ -43,6 +43,13 @@ export default function UnitSetup() {
   const [editingSubUnit, setEditingSubUnit] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [subUnitParentId, setSubUnitParentId] = useState(null);
+
+  // Range & District modals
+  const [showRangeModal, setShowRangeModal] = useState(false);
+  const [rangeForm, setRangeForm] = useState({ rangeName: '' });
+  
+  const [showDistrictModal, setShowDistrictModal] = useState(false);
+  const [districtForm, setDistrictForm] = useState({ districtName: '' });
 
   // Form states
   const [unitForm, setUnitForm] = useState({ 
@@ -326,22 +333,130 @@ export default function UnitSetup() {
   async function handleDelete() {
     if (!deleteModal) return;
     if (!isStateAdmin || isSuperAdmin) {
-      toast.error('Only State Admins can delete hierarchy records.');
+      setDeleteModal(prev => ({ ...prev, error: 'Only State Admins can delete hierarchy records.' }));
       return;
     }
     
     try {
       setSaving(true);
+      setDeleteModal(prev => ({ ...prev, error: '' }));
+
+      // Inline Dependency Validations
+      if (deleteModal.type === 'Range') {
+        const q = query(collection(db, 'districts'), where('rangeId', '==', deleteModal.id));
+        const snap = await getCountFromServer(q);
+        if (snap.data().count > 0) {
+          setDeleteModal(prev => ({ ...prev, error: `Deletion blocked: This Range contains ${snap.data().count} District(s). Delete them first.` }));
+          return;
+        }
+      } else if (deleteModal.type === 'District') {
+        const q = query(collection(db, 'units'), where('districtId', '==', deleteModal.id));
+        const snap = await getCountFromServer(q);
+        if (snap.data().count > 0) {
+          setDeleteModal(prev => ({ ...prev, error: `Deletion blocked: This District contains ${snap.data().count} Unit(s). Delete them first.` }));
+          return;
+        }
+      } else if (deleteModal.type === 'Unit') {
+        const q = query(collection(db, 'subUnits'), where('unitId', '==', deleteModal.id));
+        const snap = await getCountFromServer(q);
+        if (snap.data().count > 0) {
+          setDeleteModal(prev => ({ ...prev, error: `Deletion blocked: This Unit contains ${snap.data().count} Sub-Unit(s). Delete them first.` }));
+          return;
+        }
+      }
+
       await deleteDoc(doc(db, deleteModal.collection, deleteModal.id));
       toast.success(`${deleteModal.type} deleted.`);
+      
+      const type = deleteModal.type;
+      const parentId = deleteModal.parentId;
+      
       setDeleteModal(null);
-      if (deleteModal.type === 'Unit') {
+      
+      if (type === 'Unit') {
         loadUnits();
-      } else {
-        loadSubUnits(deleteModal.parentId);
+      } else if (type === 'Sub-Unit') {
+        loadSubUnits(parentId);
+      } else if (type === 'Range') {
+        setExplorerRange('');
+        loadRanges(user.stateId);
+      } else if (type === 'District') {
+        setExplorerDistrict('');
+        loadDistricts(explorerRange);
       }
+      
     } catch (err) {
-      toast.error(`Failed to delete ${deleteModal.type}.`);
+      setDeleteModal(prev => ({ ...prev, error: `Backend Error: ${err.message || 'Failed to delete record.'}` }));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // --- Range & District Management (State Admin Only) ---
+  
+  async function saveRange() {
+    if (!rangeForm.rangeName.trim()) {
+      toast.warning('Range Name is required.');
+      return;
+    }
+    const isDuplicate = ranges.some(r => r.rangeName.trim().toLowerCase() === rangeForm.rangeName.trim().toLowerCase());
+    if (isDuplicate) {
+      toast.warning('A Range with this name already exists.');
+      return;
+    }
+    
+    try {
+      setSaving(true);
+      const newRef = doc(collection(db, 'ranges'));
+      await setDoc(newRef, {
+        rangeId: newRef.id,
+        stateId: user.stateId,
+        rangeName: rangeForm.rangeName.trim(),
+        createdAt: serverTimestamp(),
+      });
+      toast.success('Range created successfully.');
+      setShowRangeModal(false);
+      setRangeForm({ rangeName: '' });
+      loadRanges(user.stateId);
+    } catch (err) {
+      toast.error('Failed to create Range.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveDistrict() {
+    if (!districtForm.districtName.trim()) {
+      toast.warning('District Name is required.');
+      return;
+    }
+    const targetRangeId = explorerRange;
+    if (!targetRangeId) {
+      toast.warning('Please select a Range first.');
+      return;
+    }
+
+    const isDuplicate = districts.some(d => d.districtName.trim().toLowerCase() === districtForm.districtName.trim().toLowerCase());
+    if (isDuplicate) {
+      toast.warning('A District with this name already exists in this Range.');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const newRef = doc(collection(db, 'districts'));
+      await setDoc(newRef, {
+        districtId: newRef.id,
+        rangeId: targetRangeId,
+        districtName: districtForm.districtName.trim(),
+        createdAt: serverTimestamp(),
+      });
+      toast.success('District created successfully.');
+      setShowDistrictModal(false);
+      setDistrictForm({ districtName: '' });
+      loadDistricts(targetRangeId);
+    } catch (err) {
+      toast.error('Failed to create District.');
     } finally {
       setSaving(false);
     }
@@ -380,21 +495,59 @@ export default function UnitSetup() {
           <h3>Hierarchy Master</h3>
         </div>
         <div className="panel-body" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-          <div className="form-group">
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
             <label className="form-label">Range</label>
-            <select className="form-select" value={explorerRange} 
-              onChange={e => { setExplorerRange(e.target.value); setExplorerDistrict(''); }}>
-              <option value="">Select Range</option>
-              {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
-            </select>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <select className="form-select" value={explorerRange} style={{ flex: 1 }}
+                onChange={e => { setExplorerRange(e.target.value); setExplorerDistrict(''); }}>
+                <option value="">Select Range</option>
+                {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
+              </select>
+              {isStateAdmin && (
+                <>
+                  <button className="btn btn-secondary btn-icon" onClick={() => setShowRangeModal(true)} title="Add Range">
+                    <Plus size={18} />
+                  </button>
+                  <button className="btn btn-secondary btn-icon" 
+                    onClick={() => {
+                      const rangeName = ranges.find(r => r.id === explorerRange)?.rangeName;
+                      setDeleteModal({ id: explorerRange, collection: 'ranges', type: 'Range', name: rangeName, error: '' });
+                    }} 
+                    disabled={!explorerRange || saving} 
+                    title="Delete Selected Range" 
+                    style={{ color: 'var(--danger-500)' }}>
+                    <Trash2 size={18} />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
             <label className="form-label">District</label>
-            <select className="form-select" value={explorerDistrict} disabled={!explorerRange}
-              onChange={e => setExplorerDistrict(e.target.value)}>
-              <option value="">Select District</option>
-              {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
-            </select>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <select className="form-select" value={explorerDistrict} disabled={!explorerRange} style={{ flex: 1 }}
+                onChange={e => setExplorerDistrict(e.target.value)}>
+                <option value="">Select District</option>
+                {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
+              </select>
+              {isStateAdmin && (
+                <>
+                  <button className="btn btn-secondary btn-icon" onClick={() => setShowDistrictModal(true)} disabled={!explorerRange} title="Add District">
+                    <Plus size={18} />
+                  </button>
+                  <button className="btn btn-secondary btn-icon" 
+                    onClick={() => {
+                      const distName = districts.find(d => d.id === explorerDistrict)?.districtName;
+                      setDeleteModal({ id: explorerDistrict, collection: 'districts', type: 'District', name: distName, error: '' });
+                    }} 
+                    disabled={!explorerDistrict || saving} 
+                    title="Delete Selected District" 
+                    style={{ color: 'var(--danger-500)' }}>
+                    <Trash2 size={18} />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -649,17 +802,64 @@ export default function UnitSetup() {
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowSubUnitModal(false)} disabled={saving}>Cancel</button>
               <button className="btn btn-primary" onClick={saveSubUnit} disabled={saving}>
-                {saving ? (
-                  <>
-                    <div className="spinner spinner-sm mr-2" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Check size={16} className="mr-2" />
-                    Save
-                  </>
-                )}
+                {saving ? <span className="spinner spinner-sm" /> : <Check size={16} className="mr-2" />}
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Range Create Modal */}
+      {showRangeModal && (
+        <div className="modal-overlay" onClick={() => setShowRangeModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
+            <div className="modal-header">
+              <h3>Add New Range</h3>
+              <p className="text-sm text-gray-500">Creating Range for State</p>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">Range Name <span className="required">*</span></label>
+                <input className="form-input" value={rangeForm.rangeName}
+                  onChange={e => setRangeForm({ rangeName: e.target.value })}
+                  placeholder="e.g. Hisar Range" autoFocus />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setShowRangeModal(false)} disabled={saving}>Cancel</button>
+              <button className="btn btn-primary" onClick={saveRange} disabled={saving}>
+                {saving ? <span className="spinner spinner-sm" /> : <Check size={16} className="mr-2" />}
+                Save Range
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* District Create Modal */}
+      {showDistrictModal && (
+        <div className="modal-overlay" onClick={() => setShowDistrictModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
+            <div className="modal-header">
+              <h3>Add New District</h3>
+              <p className="text-sm text-gray-500">
+                Adding to: {ranges.find(r => r.id === explorerRange)?.rangeName}
+              </p>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">District Name <span className="required">*</span></label>
+                <input className="form-input" value={districtForm.districtName}
+                  onChange={e => setDistrictForm({ districtName: e.target.value })}
+                  placeholder="e.g. Fatehabad" autoFocus />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setShowDistrictModal(false)} disabled={saving}>Cancel</button>
+              <button className="btn btn-primary" onClick={saveDistrict} disabled={saving}>
+                {saving ? <span className="spinner spinner-sm" /> : <Check size={16} className="mr-2" />}
+                Save District
               </button>
             </div>
           </div>
@@ -668,19 +868,34 @@ export default function UnitSetup() {
 
       {/* Delete Confirmation */}
       {deleteModal && (
-        <div className="modal-overlay" onClick={() => setDeleteModal(null)}>
+        <div className="modal-overlay" onClick={() => !saving && setDeleteModal(null)}>
           <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
             <div className="modal-body">
               <div className="confirm-dialog">
                 <div className="icon danger"><Trash2 size={24} /></div>
                 <h4>Delete {deleteModal.type}?</h4>
-                <p>Delete <strong>{deleteModal.name}</strong>? This cannot be undone.</p>
+                <p>Are you sure you want to delete this?</p>
+                <p className="text-sm text-gray-500 mt-1">({deleteModal.name})</p>
               </div>
             </div>
+            
+            {deleteModal.error && (
+              <div style={{ padding: '0 20px', marginBottom: '15px' }}>
+                <div style={{ padding: '10px 15px', background: 'var(--danger-50)', color: 'var(--danger-600)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <span>{deleteModal.error}</span>
+                </div>
+              </div>
+            )}
+
             <div className="modal-footer" style={{ justifyContent: 'center' }}>
               <button className="btn btn-secondary" onClick={() => setDeleteModal(null)} disabled={saving}>Cancel</button>
               <button className="btn btn-danger" onClick={handleDelete} disabled={saving}>
-                {saving ? 'Deleting...' : 'Delete'}
+                {saving ? (
+                  <><span className="spinner spinner-sm mr-2" /> Deleting...</>
+                ) : (
+                  'Confirm'
+                )}
               </button>
             </div>
           </div>

@@ -1,0 +1,177 @@
+// Firestore Security Rules for OASI Portal
+// Deploy: firebase deploy --only firestore:rules
+//
+// ⚠️  CRITICAL: These rules MUST be deployed before going to production.
+// Without them, ANY user with the Firebase config can read/write ALL data.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ───
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+
+    function isStateAdmin() {
+      return hasRole('state_admin') || hasRole('super_admin');
+    }
+
+    function isDistrictAdmin() {
+      return hasRole('district_admin') || isStateAdmin();
+    }
+
+    function isUnitAdmin() {
+      return hasRole('unit_admin') || isDistrictAdmin();
+    }
+
+    function isSameState(stateId) {
+      return isAuthenticated() && getUserData().stateId == stateId;
+    }
+
+    function isSameDistrict(districtId) {
+      return isAuthenticated() && getUserData().districtId == districtId;
+    }
+
+    function isSameUnit(unitId) {
+      return isAuthenticated() && getUserData().unitId == unitId;
+    }
+
+    // ─── Users Collection ───
+    match /users/{userId} {
+      // Users can read their own document
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // State admins can read all users in their state
+      allow read: if isStateAdmin() && isSameState(resource.data.stateId);
+      // Super admins can read all users
+      allow read: if hasRole('super_admin');
+      // Only super admin can create/update users
+      allow create, update: if hasRole('super_admin') || isStateAdmin();
+      // Users cannot modify their own role
+      allow update: if isAuthenticated()
+        && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role;
+      // No one can delete users (soft-delete only)
+      allow delete: if false;
+    }
+
+    // ─── Personnel Collection ───
+    match /personnel/{personnelId} {
+      // Read: scoped to hierarchy
+      allow read: if isAuthenticated() && (
+        hasRole('super_admin') ||
+        (isStateAdmin() && isSameState(resource.data.stateId)) ||
+        (hasRole('range_admin') && getUserData().rangeId == resource.data.rangeId) ||
+        (hasRole('district_admin') && isSameDistrict(resource.data.districtId)) ||
+        (hasRole('unit_admin') && isSameUnit(resource.data.currentUnitId))
+      );
+      // Write: admins within their scope
+      allow create: if isUnitAdmin();
+      allow update: if isAuthenticated() && (
+        hasRole('super_admin') ||
+        (isStateAdmin() && isSameState(resource.data.stateId)) ||
+        (hasRole('district_admin') && isSameDistrict(resource.data.districtId)) ||
+        (hasRole('unit_admin') && isSameUnit(resource.data.currentUnitId))
+      );
+      // Hard delete: state admin only
+      allow delete: if isStateAdmin();
+    }
+
+    // ─── Attendance Collection ───
+    match /attendanceRegister/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isUnitAdmin();
+      allow delete: if isStateAdmin();
+    }
+
+    // ─── Leave Register ───
+    match /leaveRegister/{leaveId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isUnitAdmin(); // approve/reject
+      allow delete: if isStateAdmin();
+    }
+
+    // ─── Hierarchy collections (read-only for most) ───
+    match /states/{stateId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+
+    match /ranges/{rangeId} {
+      allow read: if isAuthenticated();
+      allow write: if isStateAdmin();
+    }
+
+    match /districts/{districtId} {
+      allow read: if isAuthenticated();
+      allow write: if isStateAdmin();
+    }
+
+    match /units/{unitId} {
+      allow read: if isAuthenticated();
+      allow write: if isStateAdmin();
+    }
+
+    match /subUnits/{subUnitId} {
+      allow read: if isAuthenticated();
+      allow write: if isStateAdmin();
+    }
+
+    // ─── Master data (read-only) ───
+    match /roles/{roleId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+
+    match /attendanceTypes/{typeId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+
+    match /dutyTypes/{typeId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+
+    match /ranks/{rankId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+
+    // ─── Chitthas ───
+    match /chitthas/{chitthaId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isUnitAdmin();
+      allow delete: if isStateAdmin();
+    }
+
+    // ─── FIR Reports ───
+    match /firReports/{firId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isUnitAdmin();
+      allow delete: if isStateAdmin();
+    }
+
+    // ─── Grievances ───
+    match /grievances/{grievanceId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isDistrictAdmin();
+      allow delete: if isStateAdmin();
+    }
+
+    // ─── Deny everything else ───
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -6,35 +6,12 @@ import { db, storage } from '../../firebase';
 import { collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Save, ArrowLeft, Camera, X } from 'lucide-react';
-
-const RESTRICTED_RANKS = [
-  'Insp', 'PSI', 'SI', 'ASI/ESI', 'ASI', 'HC/ESI', 'HC/EASI', 'HC',
-  'C-1/EHC', 'C-1', 'CT/ESI', 'CT/EASI', 'CT/EHC', 'CT', 'R/CT', 'SPO'
-];
-
-const ALLOWED_RANKS = [
-  'DSP (Prob)', 'Deputy Superintendent of Police (DSP)', 'Assistant Commissioner of Police (ACP)',
-  'Additional Superintendent of Police (ASP)', 'Superintendent of Police (SP)',
-  'Senior Superintendent of Police (SSP)', 'Deputy Inspector General of Police (DIG)',
-  'Inspector General of Police (IG)', 'Additional Director General of Police (ADGP)',
-  'Director General of Police (DGP)'
-];
-
-const RANKS = [...ALLOWED_RANKS, ...RESTRICTED_RANKS];
-const FIXED_CATEGORIES = [
-  "Police Stations",
-  "Traffic",
-  "Special Staffs",
-  "Court",
-  "Administrative Units",
-  "Security",
-  "Temp_Dep_Trg"
-];
-
-const CATEGORIES = ['General', 'OBC', 'SC', 'ST', 'EWS'];
-const GENDERS = ['Male', 'Female', 'Other'];
-const SERVICE_STATUSES = ['Active', 'Retired', 'Deceased', 'Suspended'];
-const SERVICE_TYPES = ['Regular', 'Home Guard', 'SPO', 'Contractual'];
+import {
+  RESTRICTED_RANKS, ALLOWED_RANKS, RANKS, FIXED_CATEGORIES,
+  CATEGORIES, GENDERS, SERVICE_STATUSES, SERVICE_TYPES, getRanksForRole
+} from '../../constants/ranks';
+import { validateMobile, validateAadhar, validatePAN, validateDateOfBirth, validateDateOrder, maskAadhar, maskPAN } from '../../utils/validators';
+import { useLocation } from 'react-router-dom';
 
 const EMPTY_FORM = {
   beltNumber: '', payCode: '', rank: '', fullName: '', fatherName: '',
@@ -52,7 +29,10 @@ const EMPTY_FORM = {
 export default function PersonnelForm() {
   const [showPosting, setShowPosting] = useState(false);
   const { id } = useParams();
-  const isEdit = !!id && id !== 'add';
+  const location = useLocation();
+  const isEdit = !!id && id !== 'add' && location.pathname.endsWith('/edit');
+  const isView = !!id && id !== 'add' && !location.pathname.endsWith('/edit');
+  
   const navigate = useNavigate();
   const { user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
   const toast = useToast();
@@ -73,7 +53,7 @@ export default function PersonnelForm() {
 
   useEffect(() => {
     loadStates();
-    if (isEdit) {
+    if (isEdit || isView) {
       loadPersonnel();
       setShowPosting(true);
     } else {
@@ -99,9 +79,7 @@ export default function PersonnelForm() {
   useEffect(() => {
     if (form.stateId) {
       loadRanges(form.stateId);
-      // Only reset children if the user has permission to change them
-      // (State Admin moving fields dynamically). If District Admin, it should stay auto-filled.
-      if (!isEdit && isStateAdmin) {
+      if (!isEdit && !isView && isStateAdmin) {
         setForm(prev => ({ ...prev, rangeId: '', districtId: '', unitType: '', currentUnitId: '', currentSubUnitId: '' }));
       }
     }
@@ -116,7 +94,7 @@ export default function PersonnelForm() {
   useEffect(() => {
     if (form.rangeId) {
       loadDistricts(form.rangeId);
-      if (!isEdit && isStateAdmin) {
+      if (!isEdit && !isView && isStateAdmin) {
         setForm(prev => ({ ...prev, districtId: '', unitType: '', currentUnitId: '', currentSubUnitId: '' }));
       }
     }
@@ -131,7 +109,7 @@ export default function PersonnelForm() {
   useEffect(() => {
     if (form.districtId) {
       loadUnits(form.districtId);
-      if (!isEdit && (isStateAdmin || isRangeAdmin || isDistrictAdmin)) {
+      if (!isEdit && !isView && (isStateAdmin || isRangeAdmin || isDistrictAdmin)) {
          // District admin can change unit, so we might want to let them, but usually they just select unit.
          // Let's only reset unitType here if it's changing *after* initial mount or if they are state admin.
          // Since they only control unitType, it's safer to not auto-clear it on initial mount.
@@ -140,12 +118,15 @@ export default function PersonnelForm() {
   }, [form.districtId]);
 
   async function loadUnits(districtId) {
-    const q = query(collection(db, 'units'), where('districtId', '==', districtId));
-    const snap = await getDocs(q);
-    const loadedUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    setUnits(loadedUnits);
-    
-    // Derived unit categories are now fixed
+    if (!districtId) return;
+    try {
+      const q = query(collection(db, 'units'), where('districtId', '==', districtId));
+      const snap = await getDocs(q);
+      const loadedUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setUnits(loadedUnits);
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Failed to load units:', err);
+    }
     setUnitCategories(FIXED_CATEGORIES);
   }
 
@@ -157,9 +138,14 @@ export default function PersonnelForm() {
   }, [form.currentUnitId]);
 
   async function loadSubUnits(unitId) {
-    const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId));
-    const snap = await getDocs(q);
-    setSubUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    if (!unitId) return;
+    try {
+      const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId));
+      const snap = await getDocs(q);
+      setSubUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Failed to load sub-units:', err);
+    }
   }
 
   async function loadPersonnel() {
@@ -174,7 +160,7 @@ export default function PersonnelForm() {
         navigate('/personnel');
       }
     } catch (e) {
-      console.error('Personnel load error:', e);
+      if (import.meta.env.DEV) console.error('Personnel load error:', e);
       toast.error('Failed to load personnel details.');
     } finally {
       setLoading(false);
@@ -183,12 +169,44 @@ export default function PersonnelForm() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    
+    setForm(prev => {
+      let updated = { ...prev, [name]: value };
+      
+      // Hierarchy dependency cleaning
+      if (name === 'stateId') {
+        updated.rangeId = '';
+        updated.districtId = '';
+        updated.unitType = '';
+        updated.currentUnitId = '';
+        updated.currentSubUnitId = '';
+      }
+      if (name === 'rangeId') {
+        updated.districtId = '';
+        updated.unitType = '';
+        updated.currentUnitId = '';
+        updated.currentSubUnitId = '';
+      }
+      if (name === 'districtId') {
+        updated.unitType = '';
+        updated.currentUnitId = '';
+        updated.currentSubUnitId = '';
+      }
+      if (name === 'unitType') {
+        updated.currentUnitId = '';
+        updated.currentSubUnitId = '';
+      }
+      if (name === 'currentUnitId') {
+        updated.currentSubUnitId = '';
+      }
+      
+      // Auto-fill PayCode from MobileNumber if PayCode is empty
+      if (name === 'mobileNumber' && !prev.payCode) {
+        updated.payCode = value;
+      }
 
-    // Auto-fill PayCode from MobileNumber if PayCode is empty
-    if (name === 'mobileNumber' && !form.payCode) {
-      setForm(prev => ({ ...prev, payCode: value }));
-    }
+      return updated;
+    });
   }
 
   function handlePhotoChange(e) {
@@ -214,18 +232,48 @@ export default function PersonnelForm() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validation
+    // Required fields
     if (!form.fullName.trim()) { toast.warning('Full Name is required.'); return; }
     if (!form.mobileNumber.trim()) { toast.warning('Mobile Number is required.'); return; }
     if (!form.rank) { toast.warning('Rank is required.'); return; }
 
-    // Backend Enforcement: State Admin rank restriction
+    // Mobile validation
+    const mobileCheck = validateMobile(form.mobileNumber.trim());
+    if (!mobileCheck.valid) { toast.error(mobileCheck.message); return; }
+
+    // Aadhar validation (optional field)
+    if (form.aadharNumber) {
+      const aadharCheck = validateAadhar(form.aadharNumber);
+      if (!aadharCheck.valid) { toast.error(aadharCheck.message); return; }
+    }
+
+    // PAN validation (optional field)
+    if (form.pan) {
+      const panCheck = validatePAN(form.pan);
+      if (!panCheck.valid) { toast.error(panCheck.message); return; }
+    }
+
+    // Date of birth validation
+    if (form.dateOfBirth) {
+      const dobCheck = validateDateOfBirth(form.dateOfBirth);
+      if (!dobCheck.valid) { toast.error(dobCheck.message); return; }
+    }
+
+    // Date logic validations
+    if (form.dateOfBirth && form.dateOfEnlistment) {
+      const order = validateDateOrder(form.dateOfBirth, form.dateOfEnlistment, 'Date of Birth', 'Date of Enlistment');
+      if (!order.valid) { toast.error(order.message); return; }
+    }
+    if (form.dateOfEnlistment && form.retirementDate) {
+      const order = validateDateOrder(form.dateOfEnlistment, form.retirementDate, 'Date of Enlistment', 'Retirement Date');
+      if (!order.valid) { toast.error(order.message); return; }
+    }
+
+    // Rank restriction enforcement
     if (isStateAdmin && !isSuperAdmin && !ALLOWED_RANKS.includes(form.rank)) {
       toast.error('State Admins can only assign ranks of DSP and above.');
       return;
     }
-
-    // Backend Enforcement: District Admin/Unit Admin rank restriction
     if (!isStateAdmin && !isSuperAdmin && !RESTRICTED_RANKS.includes(form.rank)) {
       toast.error('You only have permission to assign ranks below DSP (Prob).');
       return;
@@ -265,6 +313,7 @@ export default function PersonnelForm() {
       if (isEdit) {
         await updateDoc(doc(db, 'personnel', id), data);
         toast.success('Personnel record updated successfully.');
+        navigate(`/personnel/${id}`); // Go back to view
       } else {
         const newDocRef = doc(collection(db, 'personnel'));
         data.personnelId = newDocRef.id;
@@ -275,7 +324,7 @@ export default function PersonnelForm() {
       }
       navigate('/personnel');
     } catch (err) {
-      console.error('Save error:', err);
+      if (import.meta.env.DEV) console.error('Save error:', err);
       toast.error('Failed to save personnel record.');
     } finally {
       setSaving(false);
@@ -298,8 +347,13 @@ export default function PersonnelForm() {
           <button className="btn btn-ghost btn-icon" onClick={() => navigate('/personnel')}>
             <ArrowLeft size={20} />
           </button>
-          <h2>{isEdit ? 'Edit Personnel' : 'Add New Personnel'}</h2>
+          <h2>{isEdit ? 'Edit Personnel' : (isView ? 'Personnel Details' : 'Add New Personnel')}</h2>
         </div>
+        {isView && (
+          <button className="btn btn-secondary" onClick={() => navigate(`/personnel/${id}/edit`)}>
+            <Edit size={16} /> Edit Record
+          </button>
+        )}
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -343,16 +397,11 @@ export default function PersonnelForm() {
                   </div>
                   <div className="form-group">
                 <label className="form-label">Rank <span className="required">*</span></label>
-                <select className="form-select" name="rank" value={form.rank} onChange={handleChange} required>
+                  <select className="form-select" name="rank" value={form.rank} onChange={handleChange} required>
                   <option value="">Select</option>
-                  {(() => {
-                    const rankList = isStateAdmin && !isSuperAdmin
-                      ? ALLOWED_RANKS
-                      : (!isStateAdmin && !isSuperAdmin ? RESTRICTED_RANKS : RANKS);
-                    return rankList.map(r => (
-                      <option key={r} value={r}>{r}</option>
-                    ));
-                  })()}
+                  {getRanksForRole({ isSuperAdmin, isStateAdmin }).map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
                 </select>
               </div>
                 </div>
@@ -469,15 +518,19 @@ export default function PersonnelForm() {
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Aadhar Number</label>
-                <input className="form-input" name="aadharNumber" value={form.aadharNumber} onChange={handleChange} placeholder="XXXX-XXXX-XXXX" />
+                <input className="form-input" name="aadharNumber" 
+                  value={isView ? maskAadhar(form.aadharNumber) : form.aadharNumber} 
+                  onChange={handleChange} placeholder="XXXX-XXXX-XXXX" disabled={isView} />
               </div>
               <div className="form-group">
                 <label className="form-label">PAN</label>
-                <input className="form-input" name="pan" value={form.pan} onChange={handleChange} />
+                <input className="form-input" name="pan" 
+                  value={isView ? maskPAN(form.pan) : form.pan} 
+                  onChange={handleChange} disabled={isView} />
               </div>
               <div className="form-group">
                 <label className="form-label">Alternate Contact</label>
-                <input className="form-input" name="alternateContact" value={form.alternateContact} onChange={handleChange} type="tel" />
+                <input className="form-input" name="alternateContact" value={form.alternateContact} onChange={handleChange} type="tel" disabled={isView} />
               </div>
             </div>
           </div>
@@ -493,11 +546,11 @@ export default function PersonnelForm() {
               <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">State</label>
-                  <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange} disabled={!isSuperAdmin}>
+                  <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange} disabled={!isSuperAdmin && !isStateAdmin}>
                     <option value="">Select State</option>
                     {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
                     {/* Fallback for disabled state to ensure name is visible */}
-                    {!isSuperAdmin && user?.stateId === form.stateId && user?.stateName && !states.find(s => s.id === form.stateId) && (
+                    {!isSuperAdmin && !isStateAdmin && user?.stateId === form.stateId && user?.stateName && !states.find(s => s.id === form.stateId) && (
                       <option value={user.stateId}>{user.stateName}</option>
                     )}
                   </select>
@@ -505,11 +558,11 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">Range</label>
-                  <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!isSuperAdmin || !form.stateId}>
-                    <option value="">Select Range</option>
+                  <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin) || !form.stateId}>
+                    <option value="">{ranges.length === 0 && form.stateId ? 'No Ranges Found' : 'Select Range'}</option>
                     {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
                     {/* Fallback for disabled range */}
-                    {!isSuperAdmin && user?.rangeId === form.rangeId && user?.rangeName && !ranges.find(r => r.id === form.rangeId) && (
+                    {!isSuperAdmin && !isStateAdmin && user?.rangeId === form.rangeId && user?.rangeName && !ranges.find(r => r.id === form.rangeId) && (
                       <option value={user.rangeId}>{user.rangeName}</option>
                     )}
                   </select>
@@ -517,11 +570,11 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">District</label>
-                  <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!isSuperAdmin || !form.rangeId}>
-                    <option value="">Select District</option>
+                  <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin) || !form.rangeId}>
+                    <option value="">{districts.length === 0 && form.rangeId ? 'No Districts Found' : 'Select District'}</option>
                     {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
                     {/* Use District Name from Admin user profile as requested */}
-                    {!isSuperAdmin && user?.districtId === form.districtId && user?.districtName && !districts.find(d => d.id === form.districtId) && (
+                    {!isSuperAdmin && !isStateAdmin && user?.districtId === form.districtId && user?.districtName && !districts.find(d => d.id === form.districtId) && (
                       <option value={user.districtId}>{user.districtName}</option>
                     )}
                   </select>
@@ -531,7 +584,7 @@ export default function PersonnelForm() {
               <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                 <div className="form-group">
                   <label className="form-label">Unit Category</label>
-                  <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={(!isSuperAdmin && !isDistrictAdmin) || !form.districtId}>
+                  <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isDistrictAdmin) || !form.districtId}>
                     <option value="">Select Category</option>
                     {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -539,8 +592,8 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">Unit</label>
-                  <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isDistrictAdmin) || !form.unitType}>
-                    <option value="">Select Unit</option>
+                  <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isDistrictAdmin) || !form.unitType}>
+                    <option value="">{units.filter(u => u.unitType === form.unitType || !form.unitType).length === 0 && form.unitType ? 'No Units Found' : 'Select Unit'}</option>
                     {units.filter(u => u.unitType === form.unitType || !form.unitType).map(u => (
                       <option key={u.id} value={u.id}>{u.unitName}</option>
                     ))}
@@ -553,8 +606,8 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">Sub-Unit</label>
-                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isDistrictAdmin && !isUnitAdmin) || !form.currentUnitId}>
-                    <option value="">Select Sub-Unit</option>
+                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isDistrictAdmin && !isUnitAdmin) || !form.currentUnitId}>
+                    <option value="">{subUnits.length === 0 && form.currentUnitId ? 'No Sub-Units Found' : 'Select Sub-Unit'}</option>
                     {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
                   </select>
                 </div>

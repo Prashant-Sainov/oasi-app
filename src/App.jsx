@@ -18,6 +18,7 @@ import ReportsDashboard from './pages/reports/ReportsDashboard';
 import FIRForm from './pages/reports/FIRForm';
 import GrievanceList from './pages/alerts/GrievanceList';
 import GrievanceApply from './pages/alerts/GrievanceApply';
+import ComingSoon from './components/ComingSoon';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -40,6 +41,7 @@ function PublicRoute({ children }) {
   return children;
 }
 
+// StateAdminRoute remains internal for now as it's simple
 function StateAdminRoute({ children }) {
   const { user, loading, isStateAdmin } = useAuth();
   if (loading) return null;
@@ -47,16 +49,6 @@ function StateAdminRoute({ children }) {
     return <Navigate to="/dashboard" replace />;
   }
   return children;
-}
-
-// Placeholder pages for Phase 2+
-function ComingSoon({ title }) {
-  return (
-    <div className="empty-state" style={{ minHeight: '50vh' }}>
-      <h4>{title}</h4>
-      <p>This module will be available in the next phase.</p>
-    </div>
-  );
 }
 
 export default function App() {

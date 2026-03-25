@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { db } from '../firebase';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -58,10 +58,10 @@ export default function AuthProvider({ children }) {
             setUser(updatedUser);
           } else {
             // User deleted or disabled
-            logout();
+            logoutRef.current();
           }
         } catch (err) {
-          console.error('Session sync failed:', err);
+          if (import.meta.env.DEV) console.error('Session sync failed:', err);
           localStorage.removeItem('oasi_user');
           setUser(null);
         }
@@ -117,10 +117,29 @@ export default function AuthProvider({ children }) {
       throw new Error('Invalid credentials. No active user found with this Belt Number.');
     }
 
+    // Guard against multiple users with same belt number
+    if (snap.docs.length > 1) {
+      console.warn('Multiple active users found with belt number:', beltNumber);
+    }
+
     const userDoc = snap.docs[0];
     const userData = userDoc.data();
 
-    // Simple password check (in production, use bcrypt via Cloud Functions)
+    /**
+     * ⚠️  SECURITY WARNING — PLAINTEXT PASSWORD COMPARISON
+     * 
+     * This is NOT safe for production. Passwords are stored in plaintext in Firestore.
+     * 
+     * MIGRATION PLAN:
+     * 1. Create a Firebase Cloud Function that accepts (beltNumber, password)
+     * 2. Use bcrypt.compare() in the Cloud Function to validate
+     * 3. Return a Firebase Custom Token on success
+     * 4. Use signInWithCustomToken() on the client
+     * 5. Delete all plaintext passwords from Firestore
+     * 
+     * Alternatively, migrate to Firebase Auth (email/password) by generating
+     * email addresses like beltNumber@oasi-portal.internal
+     */
     if (userData.password !== password) {
       throw new Error('Invalid credentials. Password does not match.');
     }
@@ -156,6 +175,10 @@ export default function AuthProvider({ children }) {
     localStorage.removeItem('oasi_user');
     setUser(null);
   }, []);
+
+  // Stable ref for use in effects without dependency issues
+  const logoutRef = useRef(logout);
+  logoutRef.current = logout;
 
   // Permission helpers
   const isSuperAdmin = user?.role === 'super_admin';

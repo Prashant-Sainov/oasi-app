@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { X } from 'lucide-react';
 
 const ToastContext = createContext(null);
@@ -9,13 +9,12 @@ export function useToast() {
   return ctx;
 }
 
-let toastId = 0;
-
 export default function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
+  const toastIdRef = useRef(0);
 
   const addToast = useCallback((message, type = 'info', duration = 4000) => {
-    const id = ++toastId;
+    const id = ++toastIdRef.current;
     setToasts(prev => [...prev, { id, message, type }]);
     if (duration > 0) {
       setTimeout(() => {

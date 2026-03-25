@@ -20,7 +20,7 @@ const LEAVE_STATUSES = [
 ];
 
 export default function LeaveRegister() {
-  const { user, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
+  const { user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -51,7 +51,7 @@ export default function LeaveRegister() {
       const snap = await getDocs(q);
       setLeaves(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) {
-      console.error('Load leaves error:', err);
+      if (import.meta.env.DEV) console.error('Load leaves error:', err);
       toast.error('Failed to load leave records.');
     } finally {
       setLoading(false);
@@ -73,19 +73,31 @@ export default function LeaveRegister() {
     });
   }, [leaves, searchTerm, statusFilter]);
 
-  async function updateLeaveStatus(leaveId, newStatus) {
+  async function updateLeaveStatus(leave, newStatus) {
+    // Permission check: only admins in the same hierarchy can approve/reject
+    const canApprove =
+      (isUnitAdmin && user.unitId && leave.unitId === user.unitId) ||
+      (isDistrictAdmin && user.districtId && leave.districtId === user.districtId) ||
+      (isRangeAdmin && user.rangeId && leave.rangeId === user.rangeId) ||
+      isSuperAdmin || isStateAdmin;
+
+    if (!canApprove) {
+      toast.error('You do not have permission to approve/reject this leave.');
+      return;
+    }
+
     try {
-      const leaveDoc = doc(db, 'leaveRegister', leaveId);
+      const leaveDoc = doc(db, 'leaveRegister', leave.id);
       await updateDoc(leaveDoc, {
         status: newStatus,
         updatedAt: serverTimestamp(),
         approvedBy: user.uid || user.userId,
         approvedAt: serverTimestamp(),
       });
-      setLeaves(prev => prev.map(l => l.id === leaveId ? { ...l, status: newStatus } : l));
+      setLeaves(prev => prev.map(l => l.id === leave.id ? { ...l, status: newStatus } : l));
       toast.success(`Leave ${newStatus.toLowerCase()} successfully.`);
     } catch (err) {
-      console.error('Update leave error:', err);
+      if (import.meta.env.DEV) console.error('Update leave error:', err);
       toast.error('Failed to update leave status.');
     }
   }
@@ -204,7 +216,7 @@ export default function LeaveRegister() {
                             <button
                               className="btn btn-ghost btn-icon btn-sm"
                               style={{ color: 'var(--success-500)' }}
-                              onClick={() => updateLeaveStatus(l.id, 'Approved')}
+                              onClick={() => updateLeaveStatus(l, 'Approved')}
                               title="Approve"
                             >
                               <CheckCircle size={16} />
@@ -212,7 +224,7 @@ export default function LeaveRegister() {
                             <button
                               className="btn btn-ghost btn-icon btn-sm"
                               style={{ color: 'var(--danger-500)' }}
-                              onClick={() => updateLeaveStatus(l.id, 'Rejected')}
+                              onClick={() => updateLeaveStatus(l, 'Rejected')}
                               title="Reject"
                             >
                               <XCircle size={16} />

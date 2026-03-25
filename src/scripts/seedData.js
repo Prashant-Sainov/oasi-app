@@ -18,7 +18,7 @@
  */
 
 import { db } from '../firebase.js';
-import { doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, collection, getDocs, writeBatch, query, limit } from 'firebase/firestore';
 
 // ==================== SEED DATA ====================
 
@@ -195,7 +195,53 @@ export async function seedAll() {
 
     return true;
   } catch (err) {
-    console.error('❌ Seeding failed:', err);
+    if (import.meta.env.DEV) console.error('❌ Seeding failed:', err);
+    throw err;
+  }
+}
+
+/**
+ * PURGE FUNCTION: Deletes all personnel and transactional data
+ * Safe: Keeps States, Ranges, Districts, Units, Roles, and Ranks.
+ */
+export async function purgeAllPersonnelData() {
+  const COLLECTIONS_TO_PURGE = [
+    'personnel', 'attendance', 'leaves', 'chitthas', 
+    'firs', 'grievances', 'dutyAssignments'
+  ];
+
+  if (import.meta.env.DEV) console.log('🧹 Starting bulk data purge...');
+
+  try {
+    for (const collName of COLLECTIONS_TO_PURGE) {
+      if (import.meta.env.DEV) console.log(`  Deleting from: ${collName}...`);
+      
+      let deletedCount = 0;
+      // Fetch documents in batches to avoid memory issues
+      const snap = await getDocs(collection(db, collName));
+      
+      if (snap.empty) continue;
+
+      const chunks = [];
+      const docs = snap.docs;
+      for (let i = 0; i < docs.length; i += 500) {
+        chunks.push(docs.slice(i, i + 500));
+      }
+
+      for (const chunk of chunks) {
+        const batch = writeBatch(db);
+        chunk.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        deletedCount += chunk.length;
+      }
+      
+      if (import.meta.env.DEV) console.log(`  ✅ Removed ${deletedCount} records from ${collName}`);
+    }
+    
+    if (import.meta.env.DEV) console.log('🎉 Bulk purge complete! Hierarchy is preserved.');
+    return true;
+  } catch (err) {
+    if (import.meta.env.DEV) console.error('❌ Purge failed:', err);
     throw err;
   }
 }

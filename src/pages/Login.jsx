@@ -104,22 +104,25 @@ export default function Login() {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <button 
-            type="button" 
-            className="btn btn-ghost" 
-            style={{ fontSize: '0.8rem', color: 'var(--primary-400)' }}
-            onClick={async () => {
-              try {
-                const { seedAll } = await import('../scripts/seedData');
-                await seedAll();
-                toast.success('Database seeded successfully! Try logging in with ADMIN / oasi@2026');
-              } catch (err) {
-                toast.error('Seeding failed: ' + err.message);
-              }
-            }}
-          >
-            Seed Initial Database Data
-          </button>
+          {import.meta.env.DEV && (
+            <button 
+              type="button" 
+              className="btn btn-ghost" 
+              style={{ fontSize: '0.8rem', color: 'var(--primary-400)' }}
+              onClick={async () => {
+                try {
+                  const { seedAll } = await import('../scripts/seedData.js');
+                  await seedAll();
+                  toast.success('Database seeded successfully! Try logging in with ADMIN / oasi@2026');
+                } catch (err) {
+                  if (import.meta.env.DEV) console.error('Seeding error:', err);
+                  toast.error('Seeding failed: ' + err.message);
+                }
+              }}
+            >
+              ⚠️ DEV: Seed Initial Structure
+            </button>
+          )}
           <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 10 }}>
             © 2026 OASI Portal — Haryana Police
           </p>
