@@ -496,6 +496,10 @@ export default function PersonnelForm() {
                   <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange} disabled={!isSuperAdmin}>
                     <option value="">Select State</option>
                     {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
+                    {/* Fallback for disabled state to ensure name is visible */}
+                    {!isSuperAdmin && user?.stateId === form.stateId && user?.stateName && !states.find(s => s.id === form.stateId) && (
+                      <option value={user.stateId}>{user.stateName}</option>
+                    )}
                   </select>
                 </div>
 
@@ -504,6 +508,10 @@ export default function PersonnelForm() {
                   <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!isSuperAdmin || !form.stateId}>
                     <option value="">Select Range</option>
                     {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
+                    {/* Fallback for disabled range */}
+                    {!isSuperAdmin && user?.rangeId === form.rangeId && user?.rangeName && !ranges.find(r => r.id === form.rangeId) && (
+                      <option value={user.rangeId}>{user.rangeName}</option>
+                    )}
                   </select>
                 </div>
 
@@ -512,6 +520,10 @@ export default function PersonnelForm() {
                   <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!isSuperAdmin || !form.rangeId}>
                     <option value="">Select District</option>
                     {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
+                    {/* Use District Name from Admin user profile as requested */}
+                    {!isSuperAdmin && user?.districtId === form.districtId && user?.districtName && !districts.find(d => d.id === form.districtId) && (
+                      <option value={user.districtId}>{user.districtName}</option>
+                    )}
                   </select>
                 </div>
               </div>
@@ -532,6 +544,10 @@ export default function PersonnelForm() {
                     {units.filter(u => u.unitType === form.unitType || !form.unitType).map(u => (
                       <option key={u.id} value={u.id}>{u.unitName}</option>
                     ))}
+                    {/* Fallback for unit name if locked */}
+                    {isUnitAdmin && user?.unitId === form.currentUnitId && user?.unitName && !units.find(u => u.id === form.currentUnitId) && (
+                      <option value={user.unitId}>{user.unitName}</option>
+                    )}
                   </select>
                 </div>
 

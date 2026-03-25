@@ -36,6 +36,10 @@ export default function AuthProvider({ children }) {
           const userDoc = await getDoc(doc(db, 'users', parsed.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
+            
+            // Fetch hierarchy names
+            const names = await fetchHierarchyNames(userData);
+
             const updatedUser = {
               ...parsed,
               name: userData.name,
@@ -48,6 +52,7 @@ export default function AuthProvider({ children }) {
               unitId: userData.unitId || null,
               subUnitId: userData.subUnitId || null,
               personnelId: userData.personnelId || null,
+              ...names,
             };
             localStorage.setItem('oasi_user', JSON.stringify(updatedUser));
             setUser(updatedUser);
@@ -65,6 +70,42 @@ export default function AuthProvider({ children }) {
     }
     syncSession();
   }, []);
+
+  async function fetchHierarchyNames(userData) {
+    const names = {
+      stateName: '',
+      rangeName: '',
+      districtName: '',
+      unitName: '',
+      subUnitName: ''
+    };
+
+    try {
+      if (userData.stateId) {
+        const s = await getDoc(doc(db, 'states', userData.stateId));
+        if (s.exists()) names.stateName = s.data().stateName;
+      }
+      if (userData.rangeId) {
+        const r = await getDoc(doc(db, 'ranges', userData.rangeId));
+        if (r.exists()) names.rangeName = r.data().rangeName;
+      }
+      if (userData.districtId) {
+        const d = await getDoc(doc(db, 'districts', userData.districtId));
+        if (d.exists()) names.districtName = d.data().districtName;
+      }
+      if (userData.unitId) {
+        const u = await getDoc(doc(db, 'units', userData.unitId));
+        if (u.exists()) names.unitName = u.data().unitName;
+      }
+      if (userData.subUnitId) {
+        const su = await getDoc(doc(db, 'subUnits', userData.subUnitId));
+        if (su.exists()) names.subUnitName = su.data().subUnitName;
+      }
+    } catch (e) {
+      console.error('Error fetching hierarchy names:', e);
+    }
+    return names;
+  }
 
   const login = useCallback(async (beltNumber, password) => {
     // Query users collection by beltNumber
@@ -98,6 +139,10 @@ export default function AuthProvider({ children }) {
       subUnitId: userData.subUnitId || null,
       personnelId: userData.personnelId || null,
     };
+
+    // Fetch hierarchy names for login
+    const names = await fetchHierarchyNames(userData);
+    Object.assign(sessionUser, names);
 
     // Update last login
     await updateDoc(doc(db, 'users', userDoc.id), { lastLogin: serverTimestamp() });
