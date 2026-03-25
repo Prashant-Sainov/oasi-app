@@ -484,16 +484,16 @@ export default function PersonnelForm() {
         </div>
 
         {/* Posting Details Restricted per Role - Removed for all admins per request */}
-        {isSuperAdmin && (
-          <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
+        {/* Current Posting Section - Restored for all admins with role-based locking */}
+        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
             <div className="panel-header">
-              <h3>Current Posting (Super Admin Only)</h3>
+              <h3>Current Posting</h3>
             </div>
             <div className="panel-body">
               <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">State</label>
-                  <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange}>
+                  <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange} disabled={!isSuperAdmin}>
                     <option value="">Select State</option>
                     {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
                   </select>
@@ -501,7 +501,7 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">Range</label>
-                  <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!form.stateId}>
+                  <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!isSuperAdmin || !form.stateId}>
                     <option value="">Select Range</option>
                     {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
                   </select>
@@ -509,7 +509,7 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">District</label>
-                  <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!form.rangeId}>
+                  <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!isSuperAdmin || !form.rangeId}>
                     <option value="">Select District</option>
                     {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
                   </select>
@@ -519,7 +519,7 @@ export default function PersonnelForm() {
               <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                 <div className="form-group">
                   <label className="form-label">Unit Category</label>
-                  <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={!form.districtId}>
+                  <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={(!isSuperAdmin && !isDistrictAdmin) || !form.districtId}>
                     <option value="">Select Category</option>
                     {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -527,7 +527,7 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">Unit</label>
-                  <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={!form.unitType}>
+                  <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isDistrictAdmin) || !form.unitType}>
                     <option value="">Select Unit</option>
                     {units.filter(u => u.unitType === form.unitType || !form.unitType).map(u => (
                       <option key={u.id} value={u.id}>{u.unitName}</option>
@@ -537,7 +537,7 @@ export default function PersonnelForm() {
 
                 <div className="form-group">
                   <label className="form-label">Sub-Unit</label>
-                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={!form.currentUnitId}>
+                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isDistrictAdmin && !isUnitAdmin) || !form.currentUnitId}>
                     <option value="">Select Sub-Unit</option>
                     {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
                   </select>
@@ -545,7 +545,7 @@ export default function PersonnelForm() {
               </div>
             </div>
           </div>
-        )}
+
 
         {/* Duty/Role Information */}
         <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
