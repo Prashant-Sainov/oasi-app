@@ -27,7 +27,7 @@ const NAV_ITEMS = [
     section: 'Registers',
     items: [
       { to: '/attendance', label: 'Attendance', icon: CalendarCheck, roles: ['state_admin', 'district_admin', 'unit_admin'] },
-      { to: '/chittha', label: 'Naukari Chittha', icon: ClipboardList, roles: ['state_admin', 'district_admin', 'unit_admin'] },
+      { to: '/chitthas', label: 'Naukari Chittha', icon: ClipboardList, roles: ['state_admin', 'district_admin', 'unit_admin'] },
       { to: '/leave', label: 'Leave Register', icon: Clock, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin'] },
       { to: '/transfer', label: 'Transfers', icon: ArrowRightLeft, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin'] },
       { to: '/reports/fir', label: 'FIR & Reports', icon: FileText, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin'] },

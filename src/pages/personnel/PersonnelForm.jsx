@@ -50,6 +50,7 @@ const EMPTY_FORM = {
 };
 
 export default function PersonnelForm() {
+  const [showPosting, setShowPosting] = useState(false);
   const { id } = useParams();
   const isEdit = !!id && id !== 'add';
   const navigate = useNavigate();
@@ -74,17 +75,21 @@ export default function PersonnelForm() {
     loadStates();
     if (isEdit) {
       loadPersonnel();
+      setShowPosting(true);
     } else {
-      // Auto-fill scope based on role but respect existing selection if any
-      setForm(prev => ({
-        ...prev,
-        stateId: user?.stateId || '',
-        rangeId: user?.rangeId || '',
-        districtId: user?.districtId || '',
-        currentUnitId: user?.unitId || '',
-      }));
+      // Auto-fill scope based on role for NEW personnel
+      if (user) {
+        setForm(prev => ({
+          ...prev,
+          stateId: user.stateId || '',
+          rangeId: user.rangeId || '',
+          districtId: user.districtId || '',
+          currentUnitId: user.unitId || '',
+        }));
+      }
+      setShowPosting(true);
     }
-  }, [id, user]);
+  }, [id, user, isEdit]);
 
   async function loadStates() {
     const snap = await getDocs(collection(db, 'states'));
@@ -168,7 +173,8 @@ export default function PersonnelForm() {
         toast.error('Personnel record not found.');
         navigate('/personnel');
       }
-    } catch (err) {
+    } catch (e) {
+      console.error('Personnel load error:', e);
       toast.error('Failed to load personnel details.');
     } finally {
       setLoading(false);
@@ -477,14 +483,14 @@ export default function PersonnelForm() {
           </div>
         </div>
 
-        {/* Posting Details */}
-        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
-          <div className="panel-header">
-            <h3>Current Posting {user?.stateId && form.stateId ? `in ${states.find(s => s.id === form.stateId)?.stateName || 'Haryana'}` : ''}</h3>
-          </div>
-          <div className="panel-body">
-            <div className="form-row" style={{ gridTemplateColumns: user?.stateId ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', marginBottom: '1rem' }}>
-              {!user?.stateId ? (
+        {/* Posting Details Restricted per Role - Removed for all admins per request */}
+        {isSuperAdmin && (
+          <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
+            <div className="panel-header">
+              <h3>Current Posting (Super Admin Only)</h3>
+            </div>
+            <div className="panel-body">
+              <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">State</label>
                   <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange}>
@@ -492,50 +498,54 @@ export default function PersonnelForm() {
                     {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
                   </select>
                 </div>
-              ) : null}
-              <div className="form-group">
-                <label className="form-label">Range</label>
-                <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={isRangeAdmin || isDistrictAdmin || isUnitAdmin || !form.stateId}>
-                  <option value="">Select Range</option>
-                  {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
-                </select>
+
+                <div className="form-group">
+                  <label className="form-label">Range</label>
+                  <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!form.stateId}>
+                    <option value="">Select Range</option>
+                    {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">District</label>
+                  <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!form.rangeId}>
+                    <option value="">Select District</option>
+                    {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
+                  </select>
+                </div>
               </div>
-              <div className="form-group">
-                <label className="form-label">District</label>
-                <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={isDistrictAdmin || isUnitAdmin || !form.rangeId}>
-                  <option value="">Select District</option>
-                  {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
-                </select>
-              </div>
-            </div>
-            
-            <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-              <div className="form-group">
-                <label className="form-label">Unit Category</label>
-                <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={!form.districtId}>
-                  <option value="">Select Category</option>
-                  {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Unit</label>
-                <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={isUnitAdmin || !form.unitType}>
-                  <option value="">Select Unit</option>
-                  {units.filter(u => u.unitType === form.unitType || !form.unitType).map(u => (
-                    <option key={u.id} value={u.id}>{u.unitName}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Sub-Unit</label>
-                <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={!form.currentUnitId}>
-                  <option value="">Select Sub-Unit</option>
-                  {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
-                </select>
+              
+              <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                <div className="form-group">
+                  <label className="form-label">Unit Category</label>
+                  <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={!form.districtId}>
+                    <option value="">Select Category</option>
+                    {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Unit</label>
+                  <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={!form.unitType}>
+                    <option value="">Select Unit</option>
+                    {units.filter(u => u.unitType === form.unitType || !form.unitType).map(u => (
+                      <option key={u.id} value={u.id}>{u.unitName}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Sub-Unit</label>
+                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={!form.currentUnitId}>
+                    <option value="">Select Sub-Unit</option>
+                    {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Duty/Role Information */}
         <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>

@@ -3,16 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
-import { collection, query, where, getDocs, doc, deleteDoc, orderBy, limit, startAfter } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, deleteDoc, orderBy, limit, startAfter } from 'firebase/firestore';
 import {
   Search, Plus, Eye, Edit, Trash2, Copy, Download,
   Filter, ChevronLeft, ChevronRight, Users
 } from 'lucide-react';
 
-const RANKS = [
-  'DGP', 'ADGP', 'IGP', 'DIG', 'SSP', 'SP', 'DSP', 'Inspector',
-  'Sub Inspector', 'ASI', 'Head Constable', 'Constable', 'Home Guard'
+const RESTRICTED_RANKS = [
+  'Insp', 'PSI', 'SI', 'ASI/ESI', 'ASI', 'HC/ESI', 'HC/EASI', 'HC',
+  'C-1/EHC', 'C-1', 'CT/ESI', 'CT/EASI', 'CT/EHC', 'CT', 'R/CT', 'SPO'
 ];
+
+const ALLOWED_RANKS = [
+  'DSP (Prob)', 'Deputy Superintendent of Police (DSP)', 'Assistant Commissioner of Police (ACP)',
+  'Additional Superintendent of Police (ASP)', 'Superintendent of Police (SP)',
+  'Senior Superintendent of Police (SSP)', 'Deputy Inspector General of Police (DIG)',
+  'Inspector General of Police (IG)', 'Additional Director General of Police (ADGP)',
+  'Director General of Police (DGP)'
+];
+
+const RANKS = [...ALLOWED_RANKS, ...RESTRICTED_RANKS];
 
 const FIXED_CATEGORIES = [
   "Police Stations",
@@ -27,7 +37,7 @@ const FIXED_CATEGORIES = [
 const PAGE_SIZE = 25;
 
 export default function PersonnelList() {
-  const { user, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
+  const { user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -57,9 +67,41 @@ export default function PersonnelList() {
   }, [user]);
 
   async function loadHierarchyCounts() {
-    // Initial load for State Admin
-    const sSnap = await getDocs(collection(db, 'states'));
-    setStates(sSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+    // Initial load restricted by role
+    if (isSuperAdmin) {
+      const sSnap = await getDocs(collection(db, 'states'));
+      setStates(sSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } else {
+      // For other admins, State is fixed
+      if (user?.stateId) {
+        setHierFilters(p => ({ ...p, stateId: user.stateId }));
+        // We don't need to load all states, just the one assigned
+        // But we might want the name for the label if we show it (though we'll hide it)
+        const sDoc = await getDoc(doc(db, 'states', user.stateId));
+        if (sDoc.exists()) setStates([{ id: sDoc.id, ...sDoc.data() }]);
+        
+        // Auto-load ranges for State Admin
+        if (isStateAdmin) loadRanges(user.stateId);
+        
+        // For Range Admin+, even Range is fixed
+        if (user?.rangeId) {
+          setHierFilters(p => ({ ...p, rangeId: user.rangeId }));
+          if (isRangeAdmin) loadDistricts(user.rangeId);
+        }
+
+        // For District Admin+, even District is fixed
+        if (user?.districtId) {
+          setHierFilters(p => ({ ...p, districtId: user.districtId }));
+          if (isDistrictAdmin) loadUnits(user.districtId);
+        }
+
+        // For Unit Admin, everything is fixed except Sub-Unit
+        if (user?.unitId) {
+          setHierFilters(p => ({ ...p, unitId: user.unitId }));
+          if (isUnitAdmin) loadSubUnits(user.unitId);
+        }
+      }
+    }
   }
 
   useEffect(() => {
@@ -122,7 +164,7 @@ export default function PersonnelList() {
       const personnelRef = collection(db, 'personnel');
       let constraints = [];
 
-      // Role-based filtering
+      // Role-based filtering (Strict enforcement from AuthContext)
       if (isUnitAdmin && user?.unitId) {
         constraints.push(where('currentUnitId', '==', user.unitId));
       } else if (isDistrictAdmin && user?.districtId) {
@@ -137,8 +179,8 @@ export default function PersonnelList() {
       const snap = await getDocs(q);
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       setPersonnel(data);
-    } catch (err) {
-      console.error('Personnel load error:', err);
+    } catch (e) {
+      console.error('Personnel load error:', e);
       toast.error('Failed to load personnel records.');
     } finally {
       setLoading(false);
@@ -203,12 +245,16 @@ export default function PersonnelList() {
       <div className="page-header">
         <h2>Personnel Records</h2>
         <div className="page-header-actions">
-          <button className="btn btn-secondary" onClick={() => navigate('/personnel/import')}>
-            <Download size={16} /> Import
-          </button>
-          <button className="btn btn-primary" onClick={() => navigate('/personnel/add')}>
-            <Plus size={16} /> Add Personnel
-          </button>
+          {!isUnitAdmin && (
+            <>
+              <button className="btn btn-secondary" onClick={() => navigate('/personnel/import')}>
+                <Download size={16} /> Import
+              </button>
+              <button className="btn btn-primary" onClick={() => navigate('/personnel/add')}>
+                <Plus size={16} /> Add Personnel
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -231,7 +277,14 @@ export default function PersonnelList() {
               onChange={(e) => setRankFilter(e.target.value)}
             >
               <option value="">All Ranks</option>
-              {RANKS.map(r => <option key={r} value={r}>{r}</option>)}
+              {(() => {
+                const rankList = isStateAdmin && !isSuperAdmin
+                  ? ALLOWED_RANKS
+                  : (!isStateAdmin && !isSuperAdmin ? RESTRICTED_RANKS : RANKS);
+                return rankList.map(r => (
+                  <option key={r} value={r}>{r}</option>
+                ));
+              })()}
             </select>
             <select
               className="filter-select"
@@ -247,37 +300,58 @@ export default function PersonnelList() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-            <select className="form-select form-select-sm" 
-              value={hierFilters.stateId} 
-              onChange={e => setHierFilters(p => ({ ...p, stateId: e.target.value }))}>
-              <option value="">All States</option>
-              {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
-            </select>
-            <select className="form-select form-select-sm" 
-              value={hierFilters.rangeId} disabled={!hierFilters.stateId}
-              onChange={e => setHierFilters(p => ({ ...p, rangeId: e.target.value }))}>
-              <option value="">All Ranges</option>
-              {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
-            </select>
-            <select className="form-select form-select-sm" 
-              value={hierFilters.districtId} disabled={!hierFilters.rangeId}
-              onChange={e => setHierFilters(p => ({ ...p, districtId: e.target.value }))}>
-              <option value="">All Districts</option>
-              {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
-            </select>
-            <select className="form-select form-select-sm" 
-              value={hierFilters.unitType} disabled={!hierFilters.districtId}
-              onChange={e => setHierFilters(p => ({ ...p, unitType: e.target.value }))}>
-              <option value="">All Categories</option>
-              {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select className="form-select form-select-sm" 
-              value={hierFilters.unitId} disabled={!hierFilters.unitType}
-              onChange={e => setHierFilters(p => ({ ...p, unitId: e.target.value }))}>
-              <option value="">All Units</option>
-              {units.filter(u => u.unitType === hierFilters.unitType || !hierFilters.unitType)
-                .map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
-            </select>
+            {/* State Selection - Hidden for State Admin and below */}
+            {isSuperAdmin && (
+              <select className="form-select form-select-sm" 
+                value={hierFilters.stateId} 
+                onChange={e => setHierFilters(p => ({ ...p, stateId: e.target.value }))}>
+                <option value="">All States</option>
+                {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
+              </select>
+            )}
+
+            {/* Range Selection - Hidden for Range Admin and below */}
+            {(isSuperAdmin || isStateAdmin) && (
+              <select className="form-select form-select-sm" 
+                value={hierFilters.rangeId} disabled={!hierFilters.stateId}
+                onChange={e => setHierFilters(p => ({ ...p, rangeId: e.target.value }))}>
+                <option value="">All Ranges</option>
+                {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
+              </select>
+            )}
+
+            {/* District Selection - Hidden for District Admin and below */}
+            {(isSuperAdmin || isStateAdmin || isRangeAdmin) && (
+              <select className="form-select form-select-sm" 
+                value={hierFilters.districtId} disabled={!hierFilters.rangeId}
+                onChange={e => setHierFilters(p => ({ ...p, districtId: e.target.value }))}>
+                <option value="">All Districts</option>
+                {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
+              </select>
+            )}
+
+            {/* Unit Category Selection - Visible for all but might be locked? No, usually selectable */}
+            {(isSuperAdmin || isStateAdmin || isRangeAdmin || isDistrictAdmin) && (
+              <select className="form-select form-select-sm" 
+                value={hierFilters.unitType} disabled={!hierFilters.districtId}
+                onChange={e => setHierFilters(p => ({ ...p, unitType: e.target.value }))}>
+                <option value="">All Categories</option>
+                {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
+
+            {/* Unit Selection - Hidden for Unit Admin and below. Enabled without category only for District Admin per request. */}
+            {(isSuperAdmin || isStateAdmin || isRangeAdmin || isDistrictAdmin) && (
+              <select className="form-select form-select-sm" 
+                value={hierFilters.unitId} disabled={isDistrictAdmin ? !hierFilters.districtId : !hierFilters.unitType}
+                onChange={e => setHierFilters(p => ({ ...p, unitId: e.target.value }))}>
+                <option value="">All Units</option>
+                {units.filter(u => u.unitType === hierFilters.unitType || !hierFilters.unitType)
+                  .map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
+              </select>
+            )}
+
+            {/* Sub-Unit Selection - Visible for all */}
             <select className="form-select form-select-sm" 
               value={hierFilters.subUnitId} disabled={!hierFilters.unitId}
               onChange={e => setHierFilters(p => ({ ...p, subUnitId: e.target.value }))}>

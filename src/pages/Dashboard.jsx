@@ -180,7 +180,7 @@ export default function Dashboard() {
               </div>
             </div>
             
-            {!isDistrictAdmin && (
+            {!isDistrictAdmin && !isUnitAdmin && (
               <div className="stat-widget">
                 <div className="stat-widget-data" style={{ width: '100%', padding: '0 5px' }}>
                   <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--gray-800)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid var(--gray-100)', paddingBottom: '4px' }}>

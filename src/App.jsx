@@ -9,7 +9,9 @@ import PersonnelForm from './pages/personnel/PersonnelForm';
 import ExcelImport from './pages/personnel/ExcelImport';
 import UnitSetup from './pages/admin/UnitSetup';
 import AttendanceRegister from './pages/attendance/AttendanceRegister';
-import NaukariChittha from './pages/chittha/NaukariChittha';
+import ChitthaList from './pages/chittha/ChitthaList';
+import ChitthaEditor from './pages/chittha/ChitthaEditor';
+import ChitthaPrintView from './pages/chittha/ChitthaPrintView';
 import LeaveRegister from './pages/leave/LeaveRegister';
 import LeaveApply from './pages/leave/LeaveApply';
 import ReportsDashboard from './pages/reports/ReportsDashboard';
@@ -82,7 +84,11 @@ export default function App() {
 
               {/* Phase 2: Attendance & Chittha */}
               <Route path="/attendance" element={<AttendanceRegister />} />
-              <Route path="/chittha" element={<NaukariChittha />} />
+              <Route path="/chitthas" element={<ChitthaList />} />
+              <Route path="/chitthas/new" element={<ChitthaEditor />} />
+              <Route path="/chitthas/edit/:id" element={<ChitthaEditor />} />
+              <Route path="/chitthas/:id" element={<ChitthaPrintView />} />
+              <Route path="/chittha" element={<Navigate to="/chitthas" replace />} />
 
               {/* Phase 3: Leave Management */}
               <Route path="/leave" element={<LeaveRegister />} />
