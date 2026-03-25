@@ -114,24 +114,26 @@ export default function ChitthaPrintView() {
             <table className="print-table" style={{ marginTop: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ width: 40 }}>SN</th>
-                  <th style={{ width: 80 }}>Rank</th>
-                  <th style={{ width: 180 }}>Name</th>
-                  <th style={{ width: 100 }}>Belt No.</th>
-                  <th>Remarks / Duty Point</th>
-                  <th style={{ width: 120 }}>Mobile</th>
+                  <th style={{ width: 36 }}>SN</th>
+                  <th style={{ width: 70 }}>Rank</th>
+                  <th style={{ width: 160 }}>Name</th>
+                  <th style={{ width: 85 }}>Belt No.</th>
+                  <th>Duty Point</th>
+                  <th>Remarks</th>
+                  <th style={{ width: 100 }}>Mobile</th>
                 </tr>
               </thead>
               <tbody>
                  {assignments.filter(a => a.sectionId === sec.id).length === 0 ? (
-                   <tr><td colSpan={6} className="text-center empty-td" style={{ color: '#999', fontSize: '0.75rem', padding: '12px' }}>No personnel assigned</td></tr>
+                   <tr><td colSpan={7} className="text-center empty-td" style={{ color: '#999', fontSize: '0.75rem', padding: '12px' }}>No personnel assigned</td></tr>
                  ) : assignments.filter(a => a.sectionId === sec.id).map((off, idx) => (
                    <tr key={idx}>
                      <td className="text-center">{idx+1}</td>
                      <td className="text-center">{off.personnelRank}</td>
                      <td><strong>{off.personnelName}</strong></td>
                      <td className="text-center">{off.personnelBelt}</td>
-                     <td>{off.remarkText || '—'}</td>
+                     <td>{off.dutyPoint || '—'}</td>
+                     <td>{off.remarks || '—'}</td>
                      <td className="text-center">{off.personnelMobile}</td>
                    </tr>
                  ))}

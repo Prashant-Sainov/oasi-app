@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Plus, Trash2, Search, UserPlus, X, ClipboardList, Clock } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2, X, ClipboardList, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
-import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import OfficerPickerModal from '../../components/chittha/OfficerPickerModal';
+import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const DEFAULT_HEADS = [
   { id: 'head_police', headName: 'Police Official', total: 0, absent: 0, leave: 0, present: 0 },
@@ -15,16 +14,31 @@ const DEFAULT_HEADS = [
   { id: 'head_groupd', headName: 'Group-D (P/Temp)', total: 0, absent: 0, leave: 0, present: 0 },
 ];
 
+const DEFAULT_SECTIONS = [
+  { id: 'sec_sho', title: '1. SHO', officers: [] },
+  { id: 'sec_investigation', title: '2. Investigation Staff', officers: [] },
+  { id: 'sec_mhc', title: '3. MHC Staff', officers: [] },
+  { id: 'sec_mm', title: '4. MM Staff', officers: [] },
+  { id: 'sec_sho_mobile', title: '5. SHO Mobile', officers: [] },
+  { id: 'sec_erv', title: '6. ERV (Emergency Response)', officers: [] },
+  { id: 'sec_rider', title: '7. Rider / Patrol', officers: [] },
+  { id: 'sec_general_duty', title: '8. General Duty', officers: [] },
+  { id: 'sec_groupd_staff', title: '9. Group-D Staff', officers: [] },
+  { id: 'sec_leave_rest', title: '10. Leave / Weekly Rest', officers: [] },
+  { id: 'sec_unallocated', title: '11. Unallocated', officers: [] },
+];
+
 export default function ChitthaEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isDistrictAdmin, isStateAdmin } = useAuth();
+  const { user, isDistrictAdmin, isStateAdmin, isUnitAdmin } = useAuth();
   const toast = useToast();
 
   const [loading, setLoading] = useState(!!id);
   const [saving, setSaving] = useState(false);
   const [units, setUnits] = useState([]);
-  
+  const [allUnitPersonnel, setAllUnitPersonnel] = useState([]); // Full personnel list for selected unit
+
   // Form State
   const [formData, setFormData] = useState({
     unitId: user?.unitId || '',
@@ -35,37 +49,64 @@ export default function ChitthaEditor() {
   });
 
   const [headSummary, setHeadSummary] = useState(DEFAULT_HEADS);
-  const [sections, setSections] = useState([
-    { id: 'sec_sho', title: '1. SHO', officers: [] },
-    { id: 'sec_investigation', title: '2. Investigation Staff', officers: [] },
-    { id: 'sec_mhc', title: '3. MHC Staff', officers: [] },
-    { id: 'sec_mm', title: '4. MM Staff', officers: [] },
-    { id: 'sec_sho_mobile', title: '5. SHO Mobile', officers: [] },
-    { id: 'sec_erv', title: '6. ERV (Emergency Response)', officers: [] },
-    { id: 'sec_rider', title: '7. Rider / Patrol', officers: [] },
-    { id: 'sec_general_duty', title: '8. General Duty', officers: [] },
-    { id: 'sec_groupd_staff', title: '9. Group-D Staff', officers: [] },
-    { id: 'sec_leave_rest', title: '10. Leave / Weekly Rest', officers: [] },
-    { id: 'sec_unallocated', title: '11. Unallocated', officers: [] },
-  ]);
+  const [sections, setSections] = useState(DEFAULT_SECTIONS);
 
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [activeSectionId, setActiveSectionId] = useState(null);
+  // Add-category dialog state
+  const [showAddHead, setShowAddHead] = useState(false);
+  const [newHeadName, setNewHeadName] = useState('');
+
+  // Officer picker state (inline, not modal)
+  const [pickerSectionId, setPickerSectionId] = useState(null);
+  const [pickerSearch, setPickerSearch] = useState('');
+
+  // ---- Data Loading ----
 
   useEffect(() => {
     fetchUnits();
     if (id) fetchChittha();
   }, [id]);
 
+  // When unitId changes (new chittha), fetch that unit's personnel
+  useEffect(() => {
+    if (formData.unitId && !id) {
+      fetchUnitPersonnel(formData.unitId);
+    }
+  }, [formData.unitId]);
+
   async function fetchUnits() {
     try {
       const unitRef = collection(db, 'units');
-      let q = query(unitRef);
-      if (isDistrictAdmin) q = query(unitRef, where('districtId', '==', user.districtId));
+      let q;
+      if (isUnitAdmin && user?.unitId) {
+        // Unit admin can only see their own unit
+        q = query(unitRef, where('__name__', '==', user.unitId));
+      } else if (isDistrictAdmin && user?.districtId) {
+        q = query(unitRef, where('districtId', '==', user.districtId));
+      } else if (isStateAdmin && user?.stateId) {
+        q = query(unitRef, where('stateId', '==', user.stateId));
+      } else {
+        q = query(unitRef);
+      }
       const snap = await getDocs(q);
       setUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  async function fetchUnitPersonnel(unitId) {
+    try {
+      const q = query(collection(db, 'personnel'), where('currentUnitId', '==', unitId), where('serviceStatus', '==', 'Active'));
+      const snap = await getDocs(q);
+      const personnel = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setAllUnitPersonnel(personnel);
+      // Auto-populate section 11 (Unallocated)
+      const officerObjs = personnel.map(p => toOfficerObj(p));
+      setSections(prev => prev.map(s =>
+        s.id === 'sec_unallocated' ? { ...s, officers: officerObjs } : { ...s, officers: [] }
+      ));
+    } catch (err) {
+      console.error('Failed to fetch unit personnel', err);
     }
   }
 
@@ -83,20 +124,15 @@ export default function ChitthaEditor() {
           status: data.status,
         });
         if (data.headSummary) setHeadSummary(data.headSummary);
-        
-        // Fetch assignments for sections
         const assignRef = collection(db, 'chitthaAssignments');
         const aSnap = await getDocs(query(assignRef, where('chitthaId', '==', id)));
         const allAssignments = aSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        
-        // Reconstruct sections if they were saved (or use default)
-        // For this demo, let's assume sections are stored in the chittha document or derived
         if (data.sectionConfigs) {
-           const reconstructed = data.sectionConfigs.map(s => ({
-             ...s,
-             officers: allAssignments.filter(a => a.sectionId === s.id)
-           }));
-           setSections(reconstructed);
+          const reconstructed = data.sectionConfigs.map(s => ({
+            ...s,
+            officers: allAssignments.filter(a => a.sectionId === s.id),
+          }));
+          setSections(reconstructed);
         }
       }
     } catch (err) {
@@ -106,50 +142,159 @@ export default function ChitthaEditor() {
     }
   }
 
-  const handleHeadChange = (id, field, value) => {
+  // ---- Helper: Personnel -> Officer Object ----
+  function toOfficerObj(p) {
+    return {
+      personnelId: p.id || p.personnelId,
+      personnelName: p.fullName,
+      personnelRank: p.rank,
+      personnelBelt: p.beltNumber || '',
+      personnelMobile: p.mobileNumber || '',
+      dutyPoint: '',
+      remarks: '',
+    };
+  }
+
+  // ---- Head Summary Logic ----
+
+  const handleHeadChange = (headId, field, value) => {
     const val = parseInt(value) || 0;
     setHeadSummary(prev => prev.map(h => {
-      if (h.id === id) {
+      if (h.id === headId) {
         const updated = { ...h, [field]: val };
-        if (field !== 'present') {
-           updated.present = updated.total - updated.absent - updated.leave;
-        }
+        if (field !== 'present') updated.present = updated.total - updated.absent - updated.leave;
         return updated;
       }
       return h;
     }));
   };
-  const addHeadRow = () => {
-    const newId = `head_${Date.now()}`;
-    setHeadSummary([...headSummary, { id: newId, headName: 'Custom Category', total: 0, absent: 0, leave: 0, present: 0 }]);
+
+  const confirmAddHead = () => {
+    const name = newHeadName.trim();
+    if (!name) { toast.warning('Category name cannot be empty.'); return; }
+    if (headSummary.some(h => h.headName.toLowerCase() === name.toLowerCase())) {
+      toast.warning('A category with this name already exists.'); return;
+    }
+    setHeadSummary([...headSummary, { id: `head_${Date.now()}`, headName: name, total: 0, absent: 0, leave: 0, present: 0 }]);
+    setNewHeadName('');
+    setShowAddHead(false);
   };
 
-  const deleteHeadRow = (id) => {
-    setHeadSummary(headSummary.filter(h => h.id !== id));
+  const deleteHeadRow = (headId, headName) => {
+    if (!window.confirm(`Are you sure you want to delete the entry "${headName}"?`)) return;
+    setHeadSummary(headSummary.filter(h => h.id !== headId));
   };
+
+  // ---- Section & Officer Logic ----
+
+  // All assigned personnelIds across all sections (except unallocated)
+  const assignedPersonnelIds = useMemo(() => {
+    const ids = new Set();
+    sections.forEach(s => {
+      if (s.id !== 'sec_unallocated') {
+        s.officers.forEach(o => ids.add(o.personnelId));
+      }
+    });
+    return ids;
+  }, [sections]);
+
+  // Available officers for the picker = unit personnel NOT yet assigned anywhere (except unallocated)
+  const availableOfficers = useMemo(() => {
+    return allUnitPersonnel.filter(p => !assignedPersonnelIds.has(p.id || p.personnelId));
+  }, [allUnitPersonnel, assignedPersonnelIds]);
+
+  const filteredPickerOfficers = useMemo(() => {
+    if (!pickerSearch) return availableOfficers;
+    const term = pickerSearch.toLowerCase();
+    return availableOfficers.filter(p =>
+      (p.fullName || '').toLowerCase().includes(term) ||
+      (p.beltNumber || '').toLowerCase().includes(term) ||
+      (p.rank || '').toLowerCase().includes(term)
+    );
+  }, [availableOfficers, pickerSearch]);
+
+  const handleAddOfficerToSection = (secId, officer) => {
+    const officerObj = toOfficerObj(officer);
+    setSections(prev => prev.map(s => {
+      if (s.id === secId) {
+        return { ...s, officers: [...s.officers, officerObj] };
+      }
+      // Remove from unallocated when added to another section
+      if (s.id === 'sec_unallocated') {
+        return { ...s, officers: s.officers.filter(o => o.personnelId !== officerObj.personnelId) };
+      }
+      return s;
+    }));
+    setPickerSearch('');
+  };
+
+  const removeOfficer = (secId, personnelId) => {
+    if (!window.confirm('Are you sure you want to remove this officer from the duty section?')) return;
+    // Find the officer object to return to unallocated
+    const section = sections.find(s => s.id === secId);
+    const officerToReturn = section?.officers.find(o => o.personnelId === personnelId);
+
+    setSections(prev => prev.map(s => {
+      if (s.id === secId) {
+        return { ...s, officers: s.officers.filter(o => o.personnelId !== personnelId) };
+      }
+      // Return officer to unallocated only if it came from this unit's pool
+      if (s.id === 'sec_unallocated' && officerToReturn && secId !== 'sec_unallocated') {
+        // Only add back if it's in the original unit personnel list
+        const isUnitPersonnel = allUnitPersonnel.some(p => (p.id || p.personnelId) === personnelId);
+        if (isUnitPersonnel && !s.officers.some(o => o.personnelId === personnelId)) {
+          return { ...s, officers: [...s.officers, { ...officerToReturn, dutyPoint: '', remarks: '' }] };
+        }
+      }
+      return s;
+    }));
+  };
+
+  const updateSectionTitle = (secId, title) => {
+    setSections(sections.map(s => s.id === secId ? { ...s, title } : s));
+  };
+
+  const addSection = () => {
+    const title = window.prompt('Enter section name:');
+    if (!title?.trim()) return;
+    setSections([...sections, { id: `sec_${Date.now()}`, title: title.trim(), officers: [] }]);
+  };
+
+  const deleteSection = (secId) => {
+    const section = sections.find(s => s.id === secId);
+    if (!window.confirm(`Delete section "${section?.title}" and all its assignments?`)) return;
+    setSections(sections.filter(s => s.id !== secId));
+  };
+
+  const updateOfficerField = (secId, personnelId, field, value) => {
+    setSections(prev => prev.map(s => {
+      if (s.id !== secId) return s;
+      return { ...s, officers: s.officers.map(o => o.personnelId === personnelId ? { ...o, [field]: value } : o) };
+    }));
+  };
+
+  // ---- Save ----
 
   async function handleSave() {
+    if (!formData.unitId) { toast.warning('Please select a Unit before saving.'); return; }
+    if (!window.confirm('Save all changes to this roster?')) return;
+
     try {
-      if (!window.confirm('Do you want to save all changes to this roster?')) return;
       setSaving(true);
       const chitthaId = id || doc(collection(db, 'naukriChittha')).id;
-      
       const payload = {
         id: chitthaId,
         ...formData,
+        districtId: user?.districtId || '',
+        districtName: user?.districtName || '',
         headSummary,
         sectionConfigs: sections.map(s => ({ id: s.id, title: s.title })),
         sectionCount: sections.length,
         updatedAt: serverTimestamp(),
       };
-
       if (!id) payload.createdAt = serverTimestamp();
-
-      // 1. Save main document
       await setDoc(doc(db, 'naukriChittha', chitthaId), payload, { merge: true });
 
-      // 2. Save assignments
-      // Save new/updated assignments
       for (const section of sections) {
         for (const off of section.officers) {
           const assignId = `${chitthaId}_${section.id}_${off.personnelId}`;
@@ -163,8 +308,7 @@ export default function ChitthaEditor() {
           });
         }
       }
-      
-      toast.success('Roster saved successfully');
+      toast.success('Roster saved successfully!');
       navigate('/chitthas');
     } catch (err) {
       console.error(err);
@@ -174,316 +318,265 @@ export default function ChitthaEditor() {
     }
   }
 
-  const addSection = (title = 'New Section') => {
-    if (!window.confirm(`Are you sure you want to add a new section named "${title}"?`)) return;
-    setSections([...sections, { id: `sec_${Date.now()}`, title, officers: [] }]);
-  };
-
-  const deleteSection = (secId) => {
-    const section = sections.find(s => s.id === secId);
-    if (!window.confirm(`Are you sure you want to delete the section "${section?.title}" and all its assignments?`)) return;
-    setSections(sections.filter(s => s.id !== secId));
-  };
-
-  const updateSectionTitle = (secId, title) => {
-    setSections(sections.map(s => s.id === secId ? { ...s, title } : s));
-  };
-
-  const removeOfficer = (secId, personnelId) => {
-    if (!window.confirm('Are you sure you want to remove this officer from the duty section?')) return;
-    setSections(sections.map(s => {
-      if (s.id === secId) {
-        return { ...s, officers: s.officers.filter(o => o.personnelId !== personnelId) };
-      }
-      return s;
-    }));
-  };
-
-  const openPicker = (secId) => {
-    setActiveSectionId(secId);
-    setIsPickerOpen(true);
-  };
-
-  const handleAddOfficers = (selectedOfficers) => {
-    setSections(sections.map(s => {
-      if (s.id === activeSectionId) {
-        // Filter out those already in the section
-        const currentIds = new Set(s.officers.map(o => o.personnelId));
-        const newOfficers = selectedOfficers
-          .filter(o => !currentIds.has(o.id))
-          .map(o => ({
-            personnelId: o.id,
-            personnelName: o.fullName,
-            personnelRank: o.rank,
-            personnelBelt: o.beltNumber,
-            personnelMobile: o.mobileNumber || '',
-            remarkText: '',
-          }));
-        return { ...s, officers: [...s.officers, ...newOfficers] };
-      }
-      return s;
-    }));
-    setIsPickerOpen(false);
-  };
-
-  const getTimeStatus = () => {
-    const now = new Date();
-    const hour = now.getHours();
-    if (hour < 17 || hour >= 21) {
-      return { restricted: true, message: 'Official window: 5:00 PM – 9:00 PM' };
-    }
-    return { restricted: false };
-  };
-
   if (loading) return <div className="spinner-container"><div className="spinner"></div></div>;
-
-  const timeStatus = getTimeStatus();
 
   return (
     <div className="chittha-editor-page">
-      <div className="page-header" style={{ position: 'sticky', top: 0, zIndex: 60, background: 'var(--gray-50)', padding: '16px 0' }}>
+      {/* Sticky Header */}
+      <div className="page-header" style={{ position: 'sticky', top: 0, zIndex: 60, background: 'var(--gray-50)', padding: '12px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="btn btn-ghost" onClick={() => navigate('/chitthas')}>
-            <ArrowLeft size={20} />
-          </button>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ fontSize: '1.25rem', lineHeight: 1 }}>{id ? 'Edit Chittha' : 'New Chittha'}</h2>
-            {timeStatus.restricted && (
-              <span style={{ fontSize: '0.7rem', color: 'var(--danger-600)', fontWeight: 700, marginTop: 4 }}>
-                ⚠️ {timeStatus.message}
-              </span>
-            )}
-          </div>
+          <button className="btn btn-ghost" onClick={() => navigate('/chitthas')}><ArrowLeft size={20} /></button>
+          <h2 style={{ fontSize: '1.25rem' }}>{id ? 'Edit Chittha' : 'New Chittha'}</h2>
         </div>
         <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-          <Save size={18} /> Save
+          <Save size={18} /> {saving ? 'Saving...' : 'Save'}
         </button>
       </div>
 
       <div className="chittha-compact">
-      <div className="editor-content" style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 100 }}>
-        
-        {/* Card 1: Details */}
-        <div className="panel">
-          <div className="panel-header"><h3><ClipboardList size={18} /> Chittha Details</h3></div>
-          <div className="panel-body grid-3">
-            <div className="form-group">
-              <label className="form-label">Unit</label>
-              <select 
-                className="form-select" 
-                value={formData.unitId}
-                onChange={(e) => {
-                  const unit = units.find(u => u.id === e.target.value);
-                  setFormData({ ...formData, unitId: e.target.value, unitName: unit?.unitName || '' });
-                }}
-              >
-                <option value="">Select Unit</option>
-                {units.map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Date</label>
-              <input 
-                type="date" 
-                className="form-input" 
-                value={formData.chitthaDate}
-                onChange={(e) => setFormData({ ...formData, chitthaDate: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Date Label (Optional)</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                placeholder="e.g. 8 AM to 8 AM" 
-                value={formData.dateLabel}
-                onChange={(e) => setFormData({ ...formData, dateLabel: e.target.value })}
-              />
-            </div>
-          </div>
-        </div>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 100 }}>
 
-        <div className="panel summary-panel">
-          <div className="compact-section-header summary-header">Head-wise Summary</div>
-          <div className="panel-header" style={{ padding: '4px 12px', borderBottom: '1px solid #e2e8f0' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>Strength Overview</span>
-            <button className="btn btn-ghost btn-sm" onClick={addHeadRow} style={{ padding: '0 4px' }}><Plus size={12} /> Add</button>
-          </div>
-          <div className="table-container">
-            <table className="data-table summary-table">
-              <thead>
-                <tr>
-                  <th>HEAD CATEGORY</th>
-                  <th style={{ width: 100 }}>TOTAL</th>
-                  <th style={{ width: 100 }}>ABSENT</th>
-                  <th style={{ width: 100 }}>LEAVE</th>
-                  <th style={{ width: 100 }}>PRESENT</th>
-                  <th style={{ width: 40 }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {headSummary.map((head) => (
-                  <tr key={head.id}>
-                    <td>
-                      <input 
-                        type="text" 
-                        className="inline-input bold" 
-                        value={head.headName} 
-                        onChange={(e) => {
-                          setHeadSummary(prev => prev.map(h => h.id === head.id ? { ...h, headName: e.target.value } : h))
-                        }}
-                      />
-                    </td>
-                    <td><input type="number" className="inline-input center" value={head.total} onChange={(e) => handleHeadChange(head.id, 'total', e.target.value)} /></td>
-                    <td><input type="number" className="inline-input center" value={head.absent} onChange={(e) => handleHeadChange(head.id, 'absent', e.target.value)} /></td>
-                    <td><input type="number" className="inline-input center" value={head.leave} onChange={(e) => handleHeadChange(head.id, 'leave', e.target.value)} /></td>
-                    <td className="present-cell">{head.present}</td>
-                    <td>
-                       <button className="btn-icon-text delete" onClick={() => deleteHeadRow(head.id)}><X size={14} /></button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Dynamic Duty Sections */}
-        <div className="sections-container" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {sections.map(section => (
-            <div key={section.id} className="panel duty-section">
-              <div className="compact-section-header">
-                <input 
-                  type="text" 
-                  className="section-title-input" 
-                  style={{ textAlign: 'left', width: '100%', padding: 0 }}
-                  value={section.title} 
-                  onChange={(e) => updateSectionTitle(section.id, e.target.value)}
-                />
-                <button 
-                  className="btn-icon" 
-                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }} 
-                  onClick={() => deleteSection(section.id)}
+          {/* Chittha Details */}
+          <div className="panel">
+            <div className="panel-header"><h3><ClipboardList size={18} /> Chittha Details</h3></div>
+            <div className="panel-body grid-3">
+              <div className="form-group">
+                <label className="form-label">Unit</label>
+                <select
+                  className="form-select"
+                  value={formData.unitId}
+                  onChange={(e) => {
+                    const unit = units.find(u => u.id === e.target.value);
+                    setFormData({ ...formData, unitId: e.target.value, unitName: unit?.unitName || '' });
+                  }}
                 >
-                  <Trash2 size={12} />
-                </button>
+                  <option value="">Select Unit</option>
+                  {units.map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
+                </select>
               </div>
-              
-              <div className="table-container">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th style={{ width: 40 }}>SN</th>
-                      <th style={{ width: 80 }}>Rank</th>
-                      <th style={{ width: 180 }}>Name</th>
-                      <th style={{ width: 100 }}>Belt No.</th>
-                      <th>Remarks / Duty Point</th>
-                      <th style={{ width: 120 }}>Mobile</th>
-                      <th style={{ width: 40 }}></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {section.officers.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} style={{ textAlign: 'center', color: '#999', padding: '12px', fontSize: '0.75rem' }}>
-                          No officers assigned
-                        </td>
-                      </tr>
-                    ) : section.officers.map((off, idx) => (
-                      <tr key={off.personnelId}>
-                        <td style={{ textAlign: 'center' }}>{idx + 1}</td>
-                        <td style={{ textAlign: 'center' }}><span className="badge-compact">{off.personnelRank}</span></td>
-                        <td style={{ fontWeight: 600 }}>{off.personnelName}</td>
-                        <td style={{ textAlign: 'center' }}>{off.personnelBelt}</td>
-                        <td>
-                          <input 
-                            className="inline-input" 
-                            style={{ height: '24px' }}
-                            placeholder="Duty remarks..." 
-                            value={off.remarkText}
-                            onChange={(e) => {
-                              setSections(sections.map(s => {
-                                if (s.id === section.id) {
-                                  return { 
-                                    ...s, 
-                                    officers: s.officers.map(o => o.personnelId === off.personnelId ? { ...o, remarkText: e.target.value } : o) 
-                                  };
-                                }
-                                return s;
-                              }));
-                            }}
-                          />
-                        </td>
-                        <td style={{ textAlign: 'center' }}>{off.personnelMobile || '—'}</td>
-                        <td style={{ textAlign: 'center' }}>
-                          <button className="btn-icon" style={{ color: 'var(--danger-500)', background: 'none', border: 'none' }} onClick={() => removeOfficer(section.id, off.personnelId)}><X size={14} /></button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="form-group">
+                <label className="form-label">Date</label>
+                <input type="date" className="form-input" value={formData.chitthaDate}
+                  onChange={(e) => setFormData({ ...formData, chitthaDate: e.target.value })} />
               </div>
-              <div className="panel-footer" style={{ justifyContent: 'center', background: 'var(--gray-50)', padding: '4px' }}>
-                <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.7rem' }} onClick={() => openPicker(section.id)}>
-                  <Plus size={12} /> Add Officer
-                </button>
+              <div className="form-group">
+                <label className="form-label">Date Label (Optional)</label>
+                <input type="text" className="form-input" placeholder="e.g. 8 AM to 8 AM" value={formData.dateLabel}
+                  onChange={(e) => setFormData({ ...formData, dateLabel: e.target.value })} />
               </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        {/* Footer actions */}
-        <div className="editor-footer-actions" style={{ display: 'flex', gap: 12, alignItems: 'center', background: 'white', padding: '12px 20px', borderRadius: 8, border: '1px solid var(--gray-200)' }}>
-          <input 
-            type="text" 
-            className="form-input" 
-            placeholder="E.g. PCR, Naaka 1..." 
-            id="newSectionTitle" 
-            style={{ maxWidth: 250, height: 32, fontSize: '0.8rem' }}
-          />
-          <button 
-            className="btn btn-secondary btn-sm" 
-            onClick={() => {
-              const input = document.getElementById('newSectionTitle');
-              addSection(input.value || 'New Section');
-              input.value = '';
-            }}
-          >
-            <Plus size={14} /> Add Section
-          </button>
+          {/* Head-wise Summary */}
+          <div className="panel summary-panel">
+            <div className="compact-section-header summary-header">Head-wise Summary</div>
+            <div className="panel-header" style={{ padding: '4px 12px', borderBottom: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>Strength Overview</span>
+              <button className="btn btn-ghost btn-sm" onClick={() => setShowAddHead(true)} style={{ padding: '0 4px' }}>
+                <Plus size={12} /> Add
+              </button>
+            </div>
+
+            {/* Inline Add Category Dialog */}
+            {showAddHead && (
+              <div style={{ padding: '8px 12px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  autoFocus
+                  className="form-input"
+                  style={{ height: 28, fontSize: '0.8rem', maxWidth: 220 }}
+                  placeholder="Enter category name..."
+                  value={newHeadName}
+                  onChange={e => setNewHeadName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') confirmAddHead(); if (e.key === 'Escape') setShowAddHead(false); }}
+                />
+                <button className="btn btn-primary btn-sm" style={{ padding: '2px 10px', height: 28 }} onClick={confirmAddHead}>Save</button>
+                <button className="btn btn-ghost btn-sm" style={{ padding: '2px 8px', height: 28 }} onClick={() => { setShowAddHead(false); setNewHeadName(''); }}>Cancel</button>
+              </div>
+            )}
+
+            <div className="table-container">
+              <table className="data-table summary-table">
+                <thead>
+                  <tr>
+                    <th>HEAD CATEGORY</th>
+                    <th style={{ width: 90 }}>TOTAL</th>
+                    <th style={{ width: 90 }}>ABSENT</th>
+                    <th style={{ width: 90 }}>LEAVE</th>
+                    <th style={{ width: 90 }}>PRESENT</th>
+                    <th style={{ width: 36 }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {headSummary.map((head) => (
+                    <tr key={head.id}>
+                      <td>
+                        <input type="text" className="inline-input bold" value={head.headName}
+                          onChange={(e) => setHeadSummary(prev => prev.map(h => h.id === head.id ? { ...h, headName: e.target.value } : h))} />
+                      </td>
+                      <td><input type="number" className="inline-input center" value={head.total} onChange={(e) => handleHeadChange(head.id, 'total', e.target.value)} /></td>
+                      <td><input type="number" className="inline-input center" value={head.absent} onChange={(e) => handleHeadChange(head.id, 'absent', e.target.value)} /></td>
+                      <td><input type="number" className="inline-input center" value={head.leave} onChange={(e) => handleHeadChange(head.id, 'leave', e.target.value)} /></td>
+                      <td className="present-cell">{head.present}</td>
+                      <td>
+                        <button className="btn-icon-text delete" title="Delete entry" onClick={() => deleteHeadRow(head.id, head.headName)}>
+                          <X size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Duty Sections */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {sections.map(section => (
+              <div key={section.id} className="panel duty-section">
+                <div className="compact-section-header">
+                  <input
+                    type="text"
+                    className="section-title-input"
+                    style={{ textAlign: 'left', width: '100%', padding: 0 }}
+                    value={section.title}
+                    onChange={(e) => updateSectionTitle(section.id, e.target.value)}
+                  />
+                  {/* Don't allow deleting the default fixed sections */}
+                  {!DEFAULT_SECTIONS.some(d => d.id === section.id) && (
+                    <button
+                      style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}
+                      onClick={() => deleteSection(section.id)}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: 36 }}>SN</th>
+                        <th style={{ width: 80 }}>Rank</th>
+                        <th style={{ width: 160 }}>Name</th>
+                        <th style={{ width: 90 }}>Belt No.</th>
+                        <th>Duty Point</th>
+                        <th>Remarks</th>
+                        <th style={{ width: 110 }}>Mobile</th>
+                        <th style={{ width: 36 }}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.officers.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} style={{ textAlign: 'center', color: '#aaa', padding: '12px', fontSize: '0.75rem' }}>
+                            {section.id === 'sec_unallocated' ? 'Select a unit to auto-populate officers.' : 'No officers assigned — use picker below.'}
+                          </td>
+                        </tr>
+                      ) : section.officers.map((off, idx) => (
+                        <tr key={off.personnelId}>
+                          <td style={{ textAlign: 'center' }}>{idx + 1}</td>
+                          <td style={{ textAlign: 'center' }}><span className="badge-compact">{off.personnelRank}</span></td>
+                          <td style={{ fontWeight: 600 }}>{off.personnelName}</td>
+                          <td style={{ textAlign: 'center' }}>{off.personnelBelt}</td>
+                          <td>
+                            <input className="inline-input" style={{ height: 24 }} placeholder="Duty point..."
+                              value={off.dutyPoint || ''}
+                              onChange={(e) => updateOfficerField(section.id, off.personnelId, 'dutyPoint', e.target.value)} />
+                          </td>
+                          <td>
+                            <input className="inline-input" style={{ height: 24 }} placeholder="Remarks..."
+                              value={off.remarks || ''}
+                              onChange={(e) => updateOfficerField(section.id, off.personnelId, 'remarks', e.target.value)} />
+                          </td>
+                          <td style={{ textAlign: 'center', fontSize: '0.75rem' }}>{off.personnelMobile || '—'}</td>
+                          <td style={{ textAlign: 'center' }}>
+                            <button style={{ color: 'var(--danger-500)', background: 'none', border: 'none', cursor: 'pointer' }}
+                              onClick={() => removeOfficer(section.id, off.personnelId)}>
+                              <X size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Inline Officer Picker (not shown for unallocated) */}
+                {section.id !== 'sec_unallocated' && (
+                  <div className="panel-footer" style={{ background: 'var(--gray-50)', padding: '4px 8px', justifyContent: 'flex-start' }}>
+                    {pickerSectionId === section.id ? (
+                      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <Search size={14} style={{ color: '#888', flexShrink: 0 }} />
+                          <input
+                            autoFocus
+                            className="form-input"
+                            style={{ height: 28, fontSize: '0.8rem', flex: 1 }}
+                            placeholder="Search officer by name, belt, rank..."
+                            value={pickerSearch}
+                            onChange={e => setPickerSearch(e.target.value)}
+                          />
+                          <button className="btn btn-ghost btn-sm" onClick={() => { setPickerSectionId(null); setPickerSearch(''); }}>
+                            <X size={14} />
+                          </button>
+                        </div>
+                        {filteredPickerOfficers.length === 0 ? (
+                          <div style={{ fontSize: '0.75rem', color: '#aaa', padding: '4px 8px' }}>
+                            {allUnitPersonnel.length === 0 ? 'No unit selected or no personnel found.' : 'All officers are already assigned.'}
+                          </div>
+                        ) : (
+                          <div style={{ maxHeight: 160, overflowY: 'auto', border: '1px solid var(--gray-200)', borderRadius: 4, background: 'white' }}>
+                            {filteredPickerOfficers.map(p => (
+                              <div
+                                key={p.id}
+                                onClick={() => handleAddOfficerToSection(section.id, p)}
+                                style={{ padding: '5px 10px', cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.8rem', borderBottom: '1px solid var(--gray-100)' }}
+                                onMouseOver={e => e.currentTarget.style.background = 'var(--gray-50)'}
+                                onMouseOut={e => e.currentTarget.style.background = 'white'}
+                              >
+                                <span className="badge-compact" style={{ fontSize: '0.65rem' }}>{p.rank}</span>
+                                <strong>{p.fullName}</strong>
+                                {p.beltNumber && <span style={{ color: '#888' }}>({p.beltNumber})</span>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.7rem' }}
+                        onClick={() => { setPickerSectionId(section.id); setPickerSearch(''); }}>
+                        <Plus size={12} /> Add Officer
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Add Custom Section */}
+          <div style={{ background: 'white', padding: '10px 16px', borderRadius: 8, border: '1px solid var(--gray-200)', display: 'flex', justifyContent: 'center' }}>
+            <button className="btn btn-secondary btn-sm" onClick={addSection}>
+              <Plus size={14} /> Add Custom Section
+            </button>
+          </div>
         </div>
       </div>
-      </div>
-
-      <OfficerPickerModal 
-        isOpen={isPickerOpen} 
-        onClose={() => setIsPickerOpen(false)} 
-        onAdd={handleAddOfficers}
-        unitId={formData.unitId}
-      />
 
       <style jsx>{`
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
-        
         .summary-table th { background: var(--navy); color: white; border: none; }
-        .summary-table td { padding: 8px 12px; }
-        
-        .inline-input { width: 100%; border: 1px solid transparent; background: none; padding: 4px 8px; font-size: 14px; border-radius: 4px; transition: border-color 0.2s; }
+        .inline-input { width: 100%; border: 1px solid transparent; background: none; padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; transition: border-color 0.2s; }
         .inline-input:focus { background: white; border-color: var(--blue-active); outline: none; }
         .inline-input.bold { font-weight: 600; color: var(--navy); }
         .inline-input.center { text-align: center; }
-        
         .present-cell { font-weight: 700; text-align: center; color: var(--success-600); background: var(--success-50); }
-        
-        .section-title-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--navy); border-bottom: none; }
-        .section-title-input { background: none; border: 1px solid transparent; color: white; font-size: 1rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; flex: 1; }
+        .section-title-input { background: none; border: 1px solid transparent; color: white; font-size: 0.85rem; font-weight: 700; border-radius: 4px; flex: 1; }
         .section-title-input:focus { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); outline: none; }
-        
-        .delete-sec { color: rgba(255,255,255,0.7) !important; }
-        .delete-sec:hover { background: rgba(255,255,255,0.1) !important; color: white !important; }
-
-        .btn-icon-text.delete { color: var(--danger-600); }
+        .btn-icon-text.delete { color: var(--danger-600); background: none; border: none; cursor: pointer; }
+        .badge-compact { display: inline-block; font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; background: var(--navy); color: white; white-space: nowrap; }
       `}</style>
     </div>
   );
