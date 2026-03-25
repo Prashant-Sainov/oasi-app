@@ -1396,6 +1396,11 @@ img {
   position: relative;
 }
 
+.chittha-compact .summary-header {
+  text-align: center !important;
+  padding: 4px 0 !important;
+}
+
 /* Compact Data Table */
 .chittha-compact .data-table {
   font-size: 0.8rem;

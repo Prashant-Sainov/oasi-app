@@ -82,7 +82,7 @@ export default function ChitthaPrintView() {
 
         {/* Head-wise Summary */}
         <section className="print-section">
-          <div className="compact-section-header">Head-wise Summary</div>
+          <div className="compact-section-header summary-header">Head-wise Summary</div>
           <table className="print-table summary-table" style={{ marginTop: 0 }}>
             <thead>
               <tr>

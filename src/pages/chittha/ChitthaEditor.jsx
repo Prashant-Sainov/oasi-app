@@ -304,7 +304,7 @@ export default function ChitthaEditor() {
         </div>
 
         <div className="panel summary-panel">
-          <div className="compact-section-header">Head-wise Summary</div>
+          <div className="compact-section-header summary-header">Head-wise Summary</div>
           <div className="panel-header" style={{ padding: '4px 12px', borderBottom: '1px solid #e2e8f0' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>Strength Overview</span>
             <button className="btn btn-ghost btn-sm" onClick={addHeadRow} style={{ padding: '0 4px' }}><Plus size={12} /> Add</button>
