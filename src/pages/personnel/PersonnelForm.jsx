@@ -6,10 +6,6 @@ import { db, storage } from '../../firebase';
 import { collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Save, ArrowLeft, Camera, X } from 'lucide-react';
-import {
-  RESTRICTED_RANKS, ALLOWED_RANKS, RANKS, FIXED_CATEGORIES,
-  CATEGORIES, GENDERS, SERVICE_STATUSES, SERVICE_TYPES, getRanksForRole
-} from '../../constants/ranks';
 import { validateMobile, validateAadhar, validatePAN, validateDateOfBirth, validateDateOrder, maskAadhar, maskPAN } from '../../utils/validators';
 import { useLocation } from 'react-router-dom';
 
@@ -51,8 +47,20 @@ export default function PersonnelForm() {
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
 
+  // Dynamic Dropdown Master
+  const [masterRanks, setMasterRanks] = useState([]);
+  const [masterCategories, setMasterCategories] = useState([]);
+  const [masterGenders, setMasterGenders] = useState([]);
+  const [masterReligions, setMasterReligions] = useState([]);
+  const [masterCastes, setMasterCastes] = useState([]);
+  const [masterCadres, setMasterCadres] = useState([]);
+  const [masterServiceTypes, setMasterServiceTypes] = useState([]);
+  const [masterServiceStatuses, setMasterServiceStatuses] = useState([]);
+
   useEffect(() => {
     loadStates();
+    loadCategories();
+    loadMasterData();
     if (isEdit || isView) {
       loadPersonnel();
       setShowPosting(true);
@@ -72,8 +80,67 @@ export default function PersonnelForm() {
   }, [id, user, isEdit]);
 
   async function loadStates() {
+    if (!isSuperAdmin) return;
     const snap = await getDocs(collection(db, 'states'));
     setStates(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  }
+
+  async function loadCategories() {
+    try {
+      const q = query(collection(db, 'unitCategories'));
+      const snap = await getDocs(q);
+      setUnitCategories(snap.docs.map(d => d.data().name));
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Failed to load categories:', err);
+    }
+  }
+
+  async function loadMasterData() {
+    if (!user?.stateId) return;
+    try {
+      const q = query(
+        collection(db, 'masterData'),
+        where('stateId', '==', user.stateId),
+        where('isActive', '==', true)
+      );
+      const snap = await getDocs(q);
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Access Level Checker
+      const hasAccess = (record) => {
+        const level = record.accessLevel || 'all';
+        if (level === 'all') return true;
+
+        // "Only" - Exact Match
+        if (level === 'super_admin_only') return isSuperAdmin;
+        if (level === 'state_admin_only') return isStateAdmin;
+        if (level === 'range_admin_only') return isRangeAdmin;
+        if (level === 'district_admin_only') return isDistrictAdmin;
+        if (level === 'unit_admin_only') return isUnitAdmin;
+
+        // "Plus" - Hierarchical
+        if (level === 'state_admin_plus') return isStateAdmin || isSuperAdmin;
+        if (level === 'range_admin_plus') return isRangeAdmin || isStateAdmin || isSuperAdmin;
+        if (level === 'district_admin_plus') return isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+        if (level === 'unit_admin_plus') return isUnitAdmin || isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+
+        return true;
+      };
+
+      const sortFn = (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0);
+      const getValues = (type) => all.filter(r => r.fieldType === type && hasAccess(r)).sort(sortFn);
+
+      setMasterRanks(getValues('rank'));
+      setMasterCategories(getValues('category'));
+      setMasterGenders(getValues('gender'));
+      setMasterReligions(getValues('religion'));
+      setMasterCastes(getValues('caste'));
+      setMasterCadres(getValues('cadre'));
+      setMasterServiceTypes(getValues('serviceType'));
+      setMasterServiceStatuses(getValues('serviceStatus'));
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Failed to load dropdown master data:', err);
+    }
   }
 
   useEffect(() => {
@@ -86,6 +153,7 @@ export default function PersonnelForm() {
   }, [form.stateId]);
 
   async function loadRanges(stateId) {
+    if (!isSuperAdmin && !isStateAdmin) return;
     const q = query(collection(db, 'ranges'), where('stateId', '==', stateId));
     const snap = await getDocs(q);
     setRanges(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -101,46 +169,50 @@ export default function PersonnelForm() {
   }, [form.rangeId]);
 
   async function loadDistricts(rangeId) {
+    if (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) return;
     const q = query(collection(db, 'districts'), where('rangeId', '==', rangeId));
     const snap = await getDocs(q);
     setDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   }
 
   useEffect(() => {
-    if (form.districtId) {
-      loadUnits(form.districtId);
-      if (!isEdit && !isView && (isStateAdmin || isRangeAdmin || isDistrictAdmin)) {
-         // District admin can change unit, so we might want to let them, but usually they just select unit.
-         // Let's only reset unitType here if it's changing *after* initial mount or if they are state admin.
-         // Since they only control unitType, it's safer to not auto-clear it on initial mount.
-      }
-    }
+    // Dynamic fetch completes on mount, no need to overwrite category state here
   }, [form.districtId]);
 
-  async function loadUnits(districtId) {
-    if (!districtId) return;
+  useEffect(() => {
+    if (form.districtId && form.unitType) {
+      loadUnits(form.districtId, form.unitType);
+    } else {
+      setUnits([]);
+    }
+  }, [form.districtId, form.unitType]);
+
+  async function loadUnits(districtId, unitType) {
+    if (!districtId || !unitType) return;
+    if (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) return;
     try {
-      const q = query(collection(db, 'units'), where('districtId', '==', districtId));
+      const q = query(collection(db, 'units'), where('districtId', '==', districtId), where('unitType', '==', unitType));
       const snap = await getDocs(q);
       const loadedUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       setUnits(loadedUnits);
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to load units:', err);
     }
-    setUnitCategories(FIXED_CATEGORIES);
   }
 
   useEffect(() => {
-    if (form.currentUnitId) {
-      loadSubUnits(form.currentUnitId);
+    if (form.currentUnitId && form.districtId) {
+      loadSubUnits(form.currentUnitId, form.districtId);
       if (!loading) setForm(prev => ({ ...prev, currentSubUnitId: '' }));
+    } else {
+      setSubUnits([]);
     }
-  }, [form.currentUnitId]);
+  }, [form.currentUnitId, form.districtId]);
 
-  async function loadSubUnits(unitId) {
-    if (!unitId) return;
+  async function loadSubUnits(unitId, districtId) {
+    if (!unitId || !districtId) return;
     try {
-      const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId));
+      const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId), where('districtId', '==', districtId));
       const snap = await getDocs(q);
       setSubUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) {
@@ -269,13 +341,10 @@ export default function PersonnelForm() {
       if (!order.valid) { toast.error(order.message); return; }
     }
 
-    // Rank restriction enforcement
-    if (isStateAdmin && !isSuperAdmin && !ALLOWED_RANKS.includes(form.rank)) {
-      toast.error('State Admins can only assign ranks of DSP and above.');
-      return;
-    }
-    if (!isStateAdmin && !isSuperAdmin && !RESTRICTED_RANKS.includes(form.rank)) {
-      toast.error('You only have permission to assign ranks below DSP (Prob).');
+    // Rank restriction enforcement (dynamic)
+    const isRankAllowed = masterRanks.some(r => r.value === form.rank);
+    if (!isRankAllowed && form.rank) {
+      toast.error('This rank is not permitted for your role.');
       return;
     }
 
@@ -302,10 +371,10 @@ export default function PersonnelForm() {
         fullName: form.fullName.trim(),
         mobileNumber: form.mobileNumber.trim(),
         // Backend enforcement: ensure user cannot bypass UI restrictions
-        stateId: user.stateId || form.stateId,
-        rangeId: user.rangeId || form.rangeId,
-        districtId: user.districtId || form.districtId,
-        currentUnitId: user.unitId || form.currentUnitId,
+        stateId: !isSuperAdmin ? user.stateId : form.stateId,
+        rangeId: (!isSuperAdmin && !isStateAdmin) ? user.rangeId : form.rangeId,
+        districtId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) ? user.districtId : form.districtId,
+        currentUnitId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) ? user.unitId : form.currentUnitId,
         updatedAt: serverTimestamp(),
         updatedByUserId: user.uid,
       };
@@ -399,8 +468,8 @@ export default function PersonnelForm() {
                 <label className="form-label">Rank <span className="required">*</span></label>
                   <select className="form-select" name="rank" value={form.rank} onChange={handleChange} required>
                   <option value="">Select</option>
-                  {getRanksForRole({ isSuperAdmin, isStateAdmin }).map(r => (
-                    <option key={r} value={r}>{r}</option>
+                  {masterRanks.map(r => (
+                    <option key={r.id} value={r.value}>{r.value}</option>
                   ))}
                 </select>
               </div>
@@ -422,7 +491,7 @@ export default function PersonnelForm() {
                 <label className="form-label">Gender</label>
                 <select className="form-select" name="gender" value={form.gender} onChange={handleChange}>
                   <option value="">Select</option>
-                  {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
+                  {masterGenders.map(g => <option key={g.id} value={g.value}>{g.value}</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -449,18 +518,21 @@ export default function PersonnelForm() {
                 <label className="form-label">Service Type</label>
                 <select className="form-select" name="serviceType" value={form.serviceType} onChange={handleChange}>
                   <option value="">Select</option>
-                  {SERVICE_TYPES.map(st => <option key={st} value={st}>{st}</option>)}
+                  {masterServiceTypes.map(st => <option key={st.id} value={st.value}>{st.value}</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Service Status</label>
                 <select className="form-select" name="serviceStatus" value={form.serviceStatus} onChange={handleChange}>
-                  {SERVICE_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                  {masterServiceStatuses.map(s => <option key={s.id} value={s.value}>{s.value}</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Cadre</label>
-                <input className="form-input" name="cadre" value={form.cadre} onChange={handleChange} />
+                <select className="form-select" name="cadre" value={form.cadre} onChange={handleChange}>
+                  <option value="">Select</option>
+                  {masterCadres.map(c => <option key={c.id} value={c.value}>{c.value}</option>)}
+                </select>
               </div>
             </div>
             <div className="form-row">
@@ -501,17 +573,23 @@ export default function PersonnelForm() {
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Religion</label>
-                <input className="form-input" name="religion" value={form.religion} onChange={handleChange} />
+                <select className="form-select" name="religion" value={form.religion} onChange={handleChange}>
+                  <option value="">Select</option>
+                  {masterReligions.map(r => <option key={r.id} value={r.value}>{r.value}</option>)}
+                </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Caste</label>
-                <input className="form-input" name="caste" value={form.caste} onChange={handleChange} />
+                <select className="form-select" name="caste" value={form.caste} onChange={handleChange}>
+                  <option value="">Select</option>
+                  {masterCastes.map(c => <option key={c.id} value={c.value}>{c.value}</option>)}
+                </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Category</label>
                 <select className="form-select" name="category" value={form.category} onChange={handleChange}>
                   <option value="">Select</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {masterCategories.map(c => <option key={c.id} value={c.value}>{c.value}</option>)}
                 </select>
               </div>
             </div>
@@ -546,68 +624,72 @@ export default function PersonnelForm() {
               <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">State</label>
-                  <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange} disabled={!isSuperAdmin && !isStateAdmin}>
-                    <option value="">Select State</option>
-                    {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
-                    {/* Fallback for disabled state to ensure name is visible */}
-                    {!isSuperAdmin && !isStateAdmin && user?.stateId === form.stateId && user?.stateName && !states.find(s => s.id === form.stateId) && (
-                      <option value={user.stateId}>{user.stateName}</option>
-                    )}
-                  </select>
+                  {!isSuperAdmin ? (
+                    <input className="form-input" disabled value={user?.stateName || 'Haryana'} title="Auto-filled & Locked" />
+                  ) : (
+                    <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange}>
+                      <option value="">Select State</option>
+                      {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
+                    </select>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label className="form-label">Range</label>
-                  <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin) || !form.stateId}>
-                    <option value="">{ranges.length === 0 && form.stateId ? 'No Ranges Found' : 'Select Range'}</option>
-                    {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
-                    {/* Fallback for disabled range */}
-                    {!isSuperAdmin && !isStateAdmin && user?.rangeId === form.rangeId && user?.rangeName && !ranges.find(r => r.id === form.rangeId) && (
-                      <option value={user.rangeId}>{user.rangeName}</option>
-                    )}
-                  </select>
+                  {!isSuperAdmin && !isStateAdmin ? (
+                    <input className="form-input" disabled value={user?.rangeName || 'Locked Range'} title="Auto-filled & Locked" />
+                  ) : (
+                    <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!form.stateId}>
+                      <option value="">{ranges.length === 0 && form.stateId ? 'No Ranges Found' : 'Select Range'}</option>
+                      {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
+                    </select>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label className="form-label">District</label>
-                  <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin) || !form.rangeId}>
-                    <option value="">{districts.length === 0 && form.rangeId ? 'No Districts Found' : 'Select District'}</option>
-                    {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
-                    {/* Use District Name from Admin user profile as requested */}
-                    {!isSuperAdmin && !isStateAdmin && user?.districtId === form.districtId && user?.districtName && !districts.find(d => d.id === form.districtId) && (
-                      <option value={user.districtId}>{user.districtName}</option>
-                    )}
-                  </select>
+                  {!isSuperAdmin && !isStateAdmin && !isRangeAdmin ? (
+                    <input className="form-input" disabled value={user?.districtName || 'Locked District'} title="Auto-filled & Locked" />
+                  ) : (
+                    <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!form.rangeId}>
+                      <option value="">{districts.length === 0 && form.rangeId ? 'No Districts Found' : 'Select District'}</option>
+                      {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
+                    </select>
+                  )}
                 </div>
               </div>
               
               <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                 <div className="form-group">
                   <label className="form-label">Unit Category</label>
-                  <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isDistrictAdmin) || !form.districtId}>
-                    <option value="">Select Category</option>
-                    {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  {!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin ? (
+                    <input className="form-input" disabled value="Auto-determined" title="Auto-filled & Locked" />
+                  ) : (
+                    <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={!form.districtId}>
+                      <option value="">Select Category</option>
+                      {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label className="form-label">Unit</label>
-                  <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isDistrictAdmin) || !form.unitType}>
-                    <option value="">{units.filter(u => u.unitType === form.unitType || !form.unitType).length === 0 && form.unitType ? 'No Units Found' : 'Select Unit'}</option>
-                    {units.filter(u => u.unitType === form.unitType || !form.unitType).map(u => (
-                      <option key={u.id} value={u.id}>{u.unitName}</option>
-                    ))}
-                    {/* Fallback for unit name if locked */}
-                    {isUnitAdmin && user?.unitId === form.currentUnitId && user?.unitName && !units.find(u => u.id === form.currentUnitId) && (
-                      <option value={user.unitId}>{user.unitName}</option>
-                    )}
-                  </select>
+                  {!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin ? (
+                    <input className="form-input" disabled value={user?.unitName || 'Locked Unit'} title="Auto-filled & Locked" />
+                  ) : (
+                    <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={!form.unitType || !form.districtId}>
+                      <option value="">{units.length === 0 && form.unitType ? 'No units available for selected category in this district' : 'Select Unit'}</option>
+                      {units.map(u => (
+                        <option key={u.id} value={u.id}>{u.unitName}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label className="form-label">Sub-Unit</label>
-                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isDistrictAdmin && !isUnitAdmin) || !form.currentUnitId}>
-                    <option value="">{subUnits.length === 0 && form.currentUnitId ? 'No Sub-Units Found' : 'Select Sub-Unit'}</option>
+                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin && !isUnitAdmin) || !form.currentUnitId}>
+                    <option value="">{subUnits.length === 0 && form.currentUnitId ? 'No sub-units available' : 'Select Sub-Unit'}</option>
                     {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
                   </select>
                 </div>

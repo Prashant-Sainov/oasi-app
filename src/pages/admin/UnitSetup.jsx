@@ -11,15 +11,8 @@ import {
   MapPin, X, AlertTriangle, Check
 } from 'lucide-react';
 
-const FIXED_CATEGORIES = [
-  "Police Stations",
-  "Traffic",
-  "Special Staffs",
-  "Court",
-  "Administrative Units",
-  "Security",
-  "Temp_Dep_Trg"
-];
+// Removed hardcoded FIXED_CATEGORIES entirely to enforce Dropdown Master principles.
+
 
 export default function UnitSetup() {
   const { user, isSuperAdmin, isStateAdmin, isDistrictAdmin } = useAuth();
@@ -51,6 +44,10 @@ export default function UnitSetup() {
   const [showDistrictModal, setShowDistrictModal] = useState(false);
   const [districtForm, setDistrictForm] = useState({ districtName: '' });
 
+  // Category modal
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categoryForm, setCategoryForm] = useState({ name: '' });
+
   // Form states
   const [unitForm, setUnitForm] = useState({ 
     unitName: '', 
@@ -59,21 +56,37 @@ export default function UnitSetup() {
     stateId: '',
     rangeId: '',
     districtId: '',
+    assignedModule: 'attendance', 
     createSubUnit: false,
     initialSubUnitName: ''
   });
-  const [subUnitForm, setSubUnitForm] = useState({ subUnitName: '' });
+  const [subUnitForm, setSubUnitForm] = useState({ 
+    subUnitName: '',
+    assignedModule: 'attendance' 
+  });
 
   // Hierarchy Data
   const [states, setStates] = useState([]);
   const [ranges, setRanges] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [unitCategories, setUnitCategories] = useState([]);
 
   useEffect(() => {
+    loadCategories();
     if (user?.stateId) {
       loadRanges(user.stateId);
     }
   }, [user]);
+
+  async function loadCategories() {
+    try {
+      const q = query(collection(db, 'unitCategories'));
+      const snap = await getDocs(q);
+      setUnitCategories(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      toast.error('Failed to load categories.');
+    }
+  }
 
   async function loadRanges(stateId) {
     try {
@@ -171,6 +184,7 @@ export default function UnitSetup() {
       stateId: unit.stateId || '',
       rangeId: unit.rangeId || '',
       districtId: unit.districtId || '',
+      assignedModule: unit.assignedModule || 'attendance',
       createSubUnit: false,
       initialSubUnitName: ''
     } : { 
@@ -180,6 +194,7 @@ export default function UnitSetup() {
       stateId: user.stateId || '',
       rangeId: explorerRange || '',
       districtId: explorerDistrict || '',
+      assignedModule: 'attendance',
       createSubUnit: false,
       initialSubUnitName: ''
     });
@@ -222,6 +237,7 @@ export default function UnitSetup() {
           sanctionedStrength: parseInt(unitForm.sanctionedStrength) || 0,
           rangeId: unitForm.rangeId,
           districtId: unitForm.districtId,
+          assignedModule: unitForm.assignedModule || 'attendance',
           updatedAt: serverTimestamp(),
         });
         toast.success('Unit updated successfully.');
@@ -235,6 +251,7 @@ export default function UnitSetup() {
           unitName: unitForm.unitName.trim(),
           unitType: unitForm.unitType,
           sanctionedStrength: parseInt(unitForm.sanctionedStrength) || 0,
+          assignedModule: unitForm.assignedModule || 'attendance',
           createdAt: serverTimestamp(),
         });
 
@@ -265,14 +282,21 @@ export default function UnitSetup() {
   function openSubUnitEdit(subUnit, unitId) {
     setSubUnitParentId(unitId);
     setEditingSubUnit(subUnit);
-    setSubUnitForm({ subUnitName: subUnit.subUnitName || '' });
+    setSubUnitForm({ 
+      subUnitName: subUnit.subUnitName || '',
+      assignedModule: subUnit.assignedModule || 'attendance' 
+    });
     setShowSubUnitModal(true);
   }
 
   function openSubUnitAdd(unitId) {
     setSubUnitParentId(unitId);
     setEditingSubUnit(null);
-    setSubUnitForm({ subUnitName: '' });
+    const parentUnit = units.find(u => u.id === unitId);
+    setSubUnitForm({ 
+      subUnitName: '',
+      assignedModule: parentUnit?.assignedModule || 'attendance'
+    });
     setShowSubUnitModal(true);
   }
 
@@ -305,6 +329,7 @@ export default function UnitSetup() {
       if (editingSubUnit) {
         await updateDoc(doc(db, 'subUnits', editingSubUnit.id), {
           subUnitName: subUnitForm.subUnitName.trim(),
+          assignedModule: subUnitForm.assignedModule || 'attendance',
           updatedAt: serverTimestamp(),
         });
         toast.success('Sub-Unit updated.');
@@ -317,6 +342,7 @@ export default function UnitSetup() {
           rangeId: parentUnit?.rangeId || '',
           districtId: parentUnit?.districtId || '',
           subUnitName: subUnitForm.subUnitName.trim(),
+          assignedModule: subUnitForm.assignedModule || 'attendance',
           createdAt: serverTimestamp(),
         });
         toast.success('Sub-Unit created.');
@@ -325,6 +351,47 @@ export default function UnitSetup() {
       loadSubUnits(subUnitParentId);
     } catch (err) {
       toast.error('Failed to save sub-unit.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function runModuleMigration() {
+    if (!isSuperAdmin) {
+      toast.error('Only Super Admin can run system-wide migration.');
+      return;
+    }
+    try {
+      setSaving(true);
+      const batch = writeBatch(db);
+      let count = 0;
+
+      const unitsSnap = await getDocs(collection(db, 'units'));
+      unitsSnap.docs.forEach(d => {
+        if (!d.data().assignedModule) {
+          batch.update(doc(db, 'units', d.id), { assignedModule: 'attendance' });
+          count++;
+        }
+      });
+
+      const subUnitsSnap = await getDocs(collection(db, 'subUnits'));
+      subUnitsSnap.docs.forEach(d => {
+        if (!d.data().assignedModule) {
+          batch.update(doc(db, 'subUnits', d.id), { assignedModule: 'attendance' });
+          count++;
+        }
+      });
+
+      if (count > 0) {
+        await batch.commit();
+        toast.success(`Successfully migrated ${count} units/sub-units to Attendance module.`);
+        loadUnits();
+      } else {
+        toast.info('No migration needed. All units already assigned.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Migration failed.');
     } finally {
       setSaving(false);
     }
@@ -356,6 +423,13 @@ export default function UnitSetup() {
           setDeleteModal(prev => ({ ...prev, error: `Deletion blocked: This District contains ${snap.data().count} Unit(s). Delete them first.` }));
           return;
         }
+      } else if (deleteModal.type === 'Category') {
+        const q = query(collection(db, 'units'), where('unitType', '==', deleteModal.name));
+        const snap = await getCountFromServer(q);
+        if (snap.data().count > 0) {
+          setDeleteModal(prev => ({ ...prev, error: `Deletion blocked: This Category contains ${snap.data().count} Unit(s). Reassign/delete them first.` }));
+          return;
+        }
       } else if (deleteModal.type === 'Unit') {
         const q = query(collection(db, 'subUnits'), where('unitId', '==', deleteModal.id));
         const snap = await getCountFromServer(q);
@@ -377,6 +451,8 @@ export default function UnitSetup() {
         loadUnits();
       } else if (type === 'Sub-Unit') {
         loadSubUnits(parentId);
+      } else if (type === 'Category') {
+        loadCategories();
       } else if (type === 'Range') {
         setExplorerRange('');
         loadRanges(user.stateId);
@@ -462,23 +538,51 @@ export default function UnitSetup() {
     }
   }
 
+  async function saveCategory() {
+    if (!categoryForm.name.trim()) {
+      toast.warning('Category Name is required.'); return;
+    }
+    const isDup = unitCategories.some(c => c.name.trim().toLowerCase() === categoryForm.name.trim().toLowerCase());
+    if (isDup) {
+      toast.warning('Category already exists.'); return;
+    }
+    try {
+      setSaving(true);
+      const newRef = doc(collection(db, 'unitCategories'));
+      await setDoc(newRef, { name: categoryForm.name.trim(), createdAt: serverTimestamp() });
+      toast.success('Category created successfully.');
+      setShowCategoryModal(false);
+      setCategoryForm({ name: '' });
+      loadCategories();
+    } catch (err) {
+      toast.error('Failed to create Category.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const getGroupedUnits = () => {
     const groups = {};
-    FIXED_CATEGORIES.forEach(cat => groups[cat] = []);
+    unitCategories.forEach(cat => groups[cat.name] = []);
+    groups['Uncategorized Units'] = [];
     units.forEach(unit => {
       const type = unit.unitType;
-      if (groups[type]) {
+      if (groups[type] !== undefined) {
         groups[type].push(unit);
       } else {
-        // Handle legacy or mis-typed units
-        if (!groups['Administrative Units']) groups['Administrative Units'] = [];
-        groups['Administrative Units'].push(unit);
+        groups['Uncategorized Units'].push(unit);
       }
     });
     return groups;
   };
 
   const groupedUnits = getGroupedUnits();
+  
+  // Prepare an array of categories to render accurately, pushing Uncategorized to the end if not empty.
+  const categoriesToRender = [
+    ...unitCategories.map(c => ({ id: c.id, name: c.name })),
+    ...(groupedUnits['Uncategorized Units']?.length > 0 ? [{ id: 'uncategorized', name: 'Uncategorized Units' }] : [])
+  ];
 
   return (
     <div className="unit-setup">
@@ -549,6 +653,23 @@ export default function UnitSetup() {
               )}
             </div>
           </div>
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
+            <label className="form-label">Global Unit Categories</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setShowCategoryModal(true)} 
+                disabled={!isStateAdmin || isSuperAdmin} 
+                style={{ flex: 1, padding: '9px 12px' }}>
+                <Plus size={16} className="mr-2" style={{display:'inline'}} /> Add Category
+              </button>
+              {isSuperAdmin && (
+                <button className="btn btn-ghost" onClick={runModuleMigration} disabled={saving} title="Migration: Set default modules">
+                   🛠️
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -564,34 +685,46 @@ export default function UnitSetup() {
             <p>Loading units for this district...</p>
           </div>
         ) : (
-          FIXED_CATEGORIES.map(category => (
-            <div key={category} className="panel mb-4 overflow-hidden">
+          categoriesToRender.map(cat => (
+            <div key={cat.id} className="panel mb-4 overflow-hidden">
               <div 
                 className="panel-header" 
                 style={{ 
                   background: 'var(--gray-50)', 
                   cursor: 'pointer',
-                  borderBottom: expandedCategories[category] ? '1px solid var(--gray-200)' : 'none' 
+                  borderBottom: expandedCategories[cat.name] ? '1px solid var(--gray-200)' : 'none' 
                 }}
-                onClick={() => toggleCategory(category)}
+                onClick={() => toggleCategory(cat.name)}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                  {expandedCategories[category] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                  {expandedCategories[cat.name] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                   <h3 style={{ margin: 0, color: 'var(--gray-700)' }}>
-                    {category}
-                    <span className="badge badge-info ml-2">{groupedUnits[category].length}</span>
+                    {cat.name}
+                    <span className="badge badge-info ml-2">{groupedUnits[cat.name].length}</span>
                   </h3>
                 </div>
-                {isStateAdmin && (
-                  <button className="btn btn-primary btn-sm" onClick={(e) => { e.stopPropagation(); openUnitModal(category); }}>
-                    <Plus size={14} /> Add Unit
-                  </button>
+                {isStateAdmin && cat.id !== 'uncategorized' && (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn btn-primary btn-sm" onClick={(e) => { e.stopPropagation(); openUnitModal(cat.name); }}>
+                      <Plus size={14} /> Add Unit
+                    </button>
+                    {groupedUnits[cat.name].length === 0 && (
+                      <button className="btn btn-ghost btn-sm" 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setDeleteModal({ id: cat.id, collection: 'unitCategories', type: 'Category', name: cat.name, error: '' }); 
+                        }} 
+                        style={{ color: 'var(--danger-500)' }} title="Delete Empty Category">
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
               
-              {expandedCategories[category] && (
+              {expandedCategories[cat.name] && (
                 <div className="table-container">
-                  {groupedUnits[category].length === 0 ? (
+                  {groupedUnits[cat.name].length === 0 ? (
                     <p style={{ padding: '20px', textAlign: 'center', color: 'var(--gray-400)', fontSize: '0.9rem' }}>
                       No units created in this category yet.
                     </p>
@@ -607,7 +740,7 @@ export default function UnitSetup() {
                         </tr>
                       </thead>
                       <tbody>
-                        {groupedUnits[category].map(unit => (
+                        {groupedUnits[cat.name].map(unit => (
                           <React.Fragment key={unit.id}>
                             <tr>
                               <td>
@@ -616,7 +749,12 @@ export default function UnitSetup() {
                                   {expandedUnit === unit.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                 </button>
                               </td>
-                              <td style={{ fontWeight: 600 }}>{unit.unitName}</td>
+                              <td style={{ fontWeight: 600 }}>
+                                <span style={{ marginRight: 8 }}>
+                                  {unit.assignedModule === 'chittha' ? '📝' : '📅'}
+                                </span>
+                                {unit.unitName}
+                              </td>
                               <td>{unit.sanctionedStrength || '—'}</td>
                               <td>{subUnits[unit.id]?.length ?? '—'}</td>
                               <td>
@@ -628,7 +766,7 @@ export default function UnitSetup() {
                                         <Plus size={14} /> Sub-Unit
                                       </button>
                                       <button className="btn btn-ghost btn-icon btn-sm" title="Edit"
-                                        onClick={() => openUnitModal(category, unit)}>
+                                        onClick={() => openUnitModal(cat.name, unit)}>
                                         <Edit size={15} />
                                       </button>
                                       <button className="btn btn-ghost btn-icon btn-sm" title="Delete"
@@ -743,6 +881,25 @@ export default function UnitSetup() {
                     onChange={e => setUnitForm(prev => ({ ...prev, sanctionedStrength: e.target.value }))}
                     placeholder="0" min="0" />
                 </div>
+
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label className="form-label">Assigned Module <span className="required">*</span></label>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '8px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                      <input type="radio" name="assignedModule" value="attendance" 
+                        checked={unitForm.assignedModule === 'attendance'} 
+                        onChange={e => setUnitForm(prev => ({ ...prev, assignedModule: e.target.value }))} />
+                      <span>📅 Attendance Register</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                      <input type="radio" name="assignedModule" value="chittha" 
+                        checked={unitForm.assignedModule === 'chittha'} 
+                        onChange={e => setUnitForm(prev => ({ ...prev, assignedModule: e.target.value }))} />
+                      <span>📝 Naukari Chittha</span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Determines which module this unit's personnel will appear in.</p>
+                </div>
               </div>
 
               {!editingUnit && (
@@ -784,6 +941,31 @@ export default function UnitSetup() {
         </div>
       )}
 
+      {/* Category Create Modal */}
+      {showCategoryModal && (
+        <div className="modal-overlay" onClick={() => setShowCategoryModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
+            <div className="modal-header">
+              <h3>Add Unit Category</h3>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">Category Name <span className="required">*</span></label>
+                <input className="form-input" value={categoryForm.name}
+                  onChange={e => setCategoryForm({ name: e.target.value })}
+                  placeholder="e.g. Cyber Security" autoFocus />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setShowCategoryModal(false)} disabled={saving}>Cancel</button>
+              <button className="btn btn-primary" onClick={saveCategory} disabled={saving}>
+                {saving ? 'Creating...' : 'Create Category'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SubUnit Create/Edit Modal */}
       {showSubUnitModal && (
         <div className="modal-overlay" onClick={() => setShowSubUnitModal(false)}>
@@ -795,8 +977,26 @@ export default function UnitSetup() {
               <div className="form-group">
                 <label className="form-label">Sub-Unit Name <span className="required">*</span></label>
                 <input className="form-input" value={subUnitForm.subUnitName}
-                  onChange={e => setSubUnitForm({ subUnitName: e.target.value })}
+                  onChange={e => setSubUnitForm(prev => ({ ...prev, subUnitName: e.target.value }))}
                   placeholder="e.g. Desk 1" autoFocus />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Assigned Module <span className="required">*</span></label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input type="radio" name="suAssignedModule" value="attendance" 
+                      checked={subUnitForm.assignedModule === 'attendance'} 
+                      onChange={e => setSubUnitForm(prev => ({ ...prev, assignedModule: e.target.value }))} />
+                    <span>📅 Attendance Register</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input type="radio" name="suAssignedModule" value="chittha" 
+                      checked={subUnitForm.assignedModule === 'chittha'} 
+                      onChange={e => setSubUnitForm(prev => ({ ...prev, assignedModule: e.target.value }))} />
+                    <span>📝 Naukari Chittha</span>
+                  </label>
+                </div>
               </div>
             </div>
             <div className="modal-footer">

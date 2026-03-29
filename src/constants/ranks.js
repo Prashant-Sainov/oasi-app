@@ -21,16 +21,6 @@ export const RESTRICTED_RANKS = [
 // All ranks combined
 export const RANKS = [...ALLOWED_RANKS, ...RESTRICTED_RANKS];
 
-// Fixed unit categories
-export const FIXED_CATEGORIES = [
-  "Police Stations",
-  "Traffic",
-  "Special Staffs",
-  "Court",
-  "Administrative Units",
-  "Security",
-  "Temp_Dep_Trg"
-];
 
 // Personnel form enums
 export const CATEGORIES = ['General', 'OBC', 'SC', 'ST', 'EWS'];

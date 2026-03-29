@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, Building2, ClipboardList,
   CalendarCheck, FileText, LogOut, Menu, X,
   Bell, UserCircle, Upload, Settings, ChevronRight,
-  Shield, Clock, ArrowRightLeft, MessageSquare, AlertCircle
+  Shield, Clock, ArrowRightLeft, MessageSquare, AlertCircle, Database
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
     section: 'Management',
     items: [
       { to: '/units', label: 'Unit Setup', icon: Building2, roles: ['state_admin'] },
+      { to: '/master-data', label: 'Dropdown Master', icon: Database, roles: ['state_admin'] },
       { to: '/personnel', label: 'Personnel', icon: Users, roles: ['state_admin', 'district_admin', 'unit_admin'] },
       { to: '/personnel/import', label: 'Import Data', icon: Upload, roles: ['state_admin', 'district_admin', 'unit_admin'] },
     ],

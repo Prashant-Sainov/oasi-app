@@ -1444,6 +1444,26 @@ img {
   text-align: center;
 }
 
+/* Attendance Register Enhancements */
+.date-field {
+  max-width: 200px;
+  width: 100%;
+}
+
+.search-box {
+  max-width: 220px;
+}
+
+.dropdown-field {
+  max-width: 170px;
+}
+
+.card-container {
+  /* overflow: hidden; Removed to ensure dropdowns aren't clipped */
+  padding: 16px;
+  /* display: flex; Gap/Alignment handled by search-filter-bar */
+}
+
 /* Remove gaps between panels in the editor */
 .chittha-compact .sections-container {
   gap: 8px !important;
@@ -1462,4 +1482,59 @@ img {
   margin-top: 16px;
   padding: 12px;
   border-top: 1px solid #e2e8f0;
+}
+
+/* --- Government-Style Dropdown Menu --- */
+.dropdown-item-gov {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  clear: both;
+  font-weight: 500;
+  color: white;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.85rem;
+}
+
+.dropdown-item-gov:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  text-decoration: none;
+}
+
+.text-danger-light {
+  color: #ff8a8a !important;
+}
+
+.text-danger-light:hover {
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 767px) {
+  .dropdown-menu-gov-mobile {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding-bottom: 20px !important;
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.2) !important;
+  }
 }

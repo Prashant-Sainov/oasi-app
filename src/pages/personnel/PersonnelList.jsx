@@ -4,11 +4,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { db } from '../../firebase';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, serverTimestamp, orderBy, limit, startAfter } from 'firebase/firestore';
-import {
-  Search, Plus, Eye, Edit, Trash2, Copy, Download,
+import { Search, Plus, Eye, Edit, Trash2, Copy, Download,
   Filter, ChevronLeft, ChevronRight, Users
 } from 'lucide-react';
-import { RESTRICTED_RANKS, ALLOWED_RANKS, RANKS, FIXED_CATEGORIES, getRanksForRole } from '../../constants/ranks';
 
 const PAGE_SIZE = 25;
 
@@ -36,11 +34,63 @@ export default function PersonnelList() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteModal, setDeleteModal] = useState(null);
+  const [masterRanks, setMasterRanks] = useState([]);
 
   useEffect(() => {
+    loadCategories();
+    loadMasterRanks();
     loadHierarchyCounts();
     loadPersonnel();
   }, [user]);
+
+  async function loadMasterRanks() {
+    if (!user?.stateId) return;
+    try {
+      const q = query(
+        collection(db, 'masterData'),
+        where('fieldType', '==', 'rank'),
+        where('stateId', '==', user.stateId),
+        where('isActive', '==', true)
+      );
+      const snap = await getDocs(q);
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Access Level Checker
+      const hasAccess = (record) => {
+        const level = record.accessLevel || 'all';
+        if (level === 'all') return true;
+
+        if (level === 'super_admin_only') return isSuperAdmin;
+        if (level === 'state_admin_only') return isStateAdmin;
+        if (level === 'range_admin_only') return isRangeAdmin;
+        if (level === 'district_admin_only') return isDistrictAdmin;
+        if (level === 'unit_admin_only') return isUnitAdmin;
+
+        if (level === 'state_admin_plus') return isStateAdmin || isSuperAdmin;
+        if (level === 'range_admin_plus') return isRangeAdmin || isStateAdmin || isSuperAdmin;
+        if (level === 'district_admin_plus') return isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+        if (level === 'unit_admin_plus') return isUnitAdmin || isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+
+        return true;
+      };
+
+      const data = all.filter(hasAccess);
+      data.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+      setMasterRanks(data);
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Failed to load ranks:', err);
+    }
+  }
+
+  async function loadCategories() {
+    try {
+      const q = query(collection(db, 'unitCategories'));
+      const snap = await getDocs(q);
+      setUnitCategories(snap.docs.map(d => d.data().name));
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('Failed to load categories:', err);
+    }
+  }
 
   async function loadHierarchyCounts() {
     // Initial load restricted by role
@@ -68,13 +118,13 @@ export default function PersonnelList() {
         // For District Admin+, even District is fixed
         if (user?.districtId) {
           setHierFilters(p => ({ ...p, districtId: user.districtId }));
-          if (isDistrictAdmin) loadUnits(user.districtId);
+          // Do not load units here because unitType is not selected yet
         }
 
         // For Unit Admin, everything is fixed except Sub-Unit
         if (user?.unitId) {
           setHierFilters(p => ({ ...p, unitId: user.unitId }));
-          if (isUnitAdmin) loadSubUnits(user.unitId);
+          if (isUnitAdmin) loadSubUnits(user.unitId, user.districtId);
         }
       }
     }
@@ -95,14 +145,23 @@ export default function PersonnelList() {
       setUnits([]); setSubUnits([]);
     } else if (field === 'districtId') {
       nextFilters.unitType = ''; nextFilters.unitId = ''; nextFilters.subUnitId = '';
-      if (value) loadUnits(value); else setUnits([]);
+      setUnits([]);
       setSubUnits([]);
     } else if (field === 'unitType') {
       nextFilters.unitId = ''; nextFilters.subUnitId = '';
+      if (nextFilters.districtId && value) {
+        loadUnits(nextFilters.districtId, value);
+      } else {
+        setUnits([]);
+      }
       setSubUnits([]);
     } else if (field === 'unitId') {
       nextFilters.subUnitId = '';
-      if (value) loadSubUnits(value); else setSubUnits([]);
+      if (value && nextFilters.districtId) {
+        loadSubUnits(value, nextFilters.districtId);
+      } else {
+        setSubUnits([]);
+      }
     }
     
     setHierFilters(nextFilters);
@@ -120,16 +179,17 @@ export default function PersonnelList() {
     setDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   }
 
-  async function loadUnits(districtId) {
-    const q = query(collection(db, 'units'), where('districtId', '==', districtId));
+  async function loadUnits(districtId, unitType) {
+    if (!districtId || !unitType) return;
+    const q = query(collection(db, 'units'), where('districtId', '==', districtId), where('unitType', '==', unitType));
     const snap = await getDocs(q);
     const loadedUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     setUnits(loadedUnits);
-    setUnitCategories(FIXED_CATEGORIES);
   }
 
-  async function loadSubUnits(unitId) {
-    const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId));
+  async function loadSubUnits(unitId, districtId) {
+    if (!unitId || !districtId) return;
+    const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId), where('districtId', '==', districtId));
     const snap = await getDocs(q);
     setSubUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   }
@@ -268,8 +328,8 @@ export default function PersonnelList() {
               onChange={(e) => setRankFilter(e.target.value)}
             >
               <option value="">All Ranks</option>
-              {getRanksForRole({ isSuperAdmin, isStateAdmin }).map(r => (
-                <option key={r} value={r}>{r}</option>
+              {masterRanks.map(r => (
+                <option key={r.id} value={r.value}>{r.value}</option>
               ))}
             </select>
             <select
@@ -286,9 +346,10 @@ export default function PersonnelList() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-            {/* State Selection - Hidden for State Admin and below */}
-            {/* State Selection - Hidden for State Admin and below */}
-            {isSuperAdmin && (
+            {/* State Selection */}
+            {!isSuperAdmin ? (
+              <input className="form-input form-input-sm" disabled value={user?.stateName || 'Haryana'} title="Auto-filled from your hierarchy" />
+            ) : (
               <select className="form-select form-select-sm" 
                 value={hierFilters.stateId} 
                 onChange={e => handleHierChange('stateId', e.target.value)}>
@@ -297,8 +358,10 @@ export default function PersonnelList() {
               </select>
             )}
 
-            {/* Range Selection - Hidden for Range Admin and below */}
-            {(isSuperAdmin || isStateAdmin) && (
+            {/* Range Selection */}
+            {!isSuperAdmin && !isStateAdmin ? (
+              <input className="form-input form-input-sm" disabled value={user?.rangeName || 'Locked Range'} title="Auto-filled from your hierarchy" />
+            ) : (
               <select className="form-select form-select-sm" 
                 value={hierFilters.rangeId} disabled={!hierFilters.stateId}
                 onChange={e => handleHierChange('rangeId', e.target.value)}>
@@ -307,8 +370,10 @@ export default function PersonnelList() {
               </select>
             )}
 
-            {/* District Selection - Hidden for District Admin and below */}
-            {(isSuperAdmin || isStateAdmin || isRangeAdmin) && (
+            {/* District Selection */}
+            {!isSuperAdmin && !isStateAdmin && !isRangeAdmin ? (
+              <input className="form-input form-input-sm" disabled value={user?.districtName || 'Locked District'} title="Auto-filled from your hierarchy" />
+            ) : (
               <select className="form-select form-select-sm" 
                 value={hierFilters.districtId} disabled={!hierFilters.rangeId}
                 onChange={e => handleHierChange('districtId', e.target.value)}>
@@ -317,8 +382,10 @@ export default function PersonnelList() {
               </select>
             )}
 
-            {/* Unit Category Selection - Visible for all */}
-            {(isSuperAdmin || isStateAdmin || isRangeAdmin || isDistrictAdmin) && (
+            {/* Unit Category Selection */}
+            {!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin ? (
+              <input className="form-input form-input-sm" disabled value="Fixed Category" title="Auto-filled from your hierarchy" />
+            ) : (
               <select className="form-select form-select-sm" 
                 value={hierFilters.unitType} disabled={!hierFilters.districtId}
                 onChange={e => handleHierChange('unitType', e.target.value)}>
@@ -327,14 +394,15 @@ export default function PersonnelList() {
               </select>
             )}
 
-            {/* Unit Selection - Hidden for Unit Admin and below. */}
-            {(isSuperAdmin || isStateAdmin || isRangeAdmin || isDistrictAdmin) && (
+            {/* Unit Selection */}
+            {!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin ? (
+              <input className="form-input form-input-sm" disabled value={user?.unitName || 'Locked Unit'} title="Auto-filled from your hierarchy" />
+            ) : (
               <select className="form-select form-select-sm" 
-                value={hierFilters.unitId} disabled={isDistrictAdmin ? !hierFilters.districtId : !hierFilters.unitType}
+                value={hierFilters.unitId} disabled={!hierFilters.districtId || !hierFilters.unitType}
                 onChange={e => handleHierChange('unitId', e.target.value)}>
-                <option value="">All Units</option>
-                {units.filter(u => u.unitType === hierFilters.unitType || !hierFilters.unitType)
-                  .map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
+                <option value="">{units.length === 0 && hierFilters.unitType ? 'No units available' : 'All Units'}</option>
+                {units.map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
               </select>
             )}
 

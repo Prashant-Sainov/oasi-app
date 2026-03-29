@@ -114,7 +114,7 @@ function autoMap(fileColumns) {
 
 export default function ExcelImport() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin } = useAuth();
   const toast = useToast();
   const fileInputRef = useRef(null);
 
@@ -280,11 +280,11 @@ export default function ExcelImport() {
             ...row,
             personnelId: docRef.id,
             serviceStatus: row.serviceStatus || 'Active',
-            stateId: row.stateId || user.stateId || '',
-            rangeId: row.rangeId || user.rangeId || '',
-            districtId: row.districtId || user.districtId || '',
+            stateId: !isSuperAdmin ? (user.stateId || '') : (row.stateId || ''),
+            rangeId: (!isSuperAdmin && !isStateAdmin) ? (user.rangeId || '') : (row.rangeId || ''),
+            districtId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) ? (user.districtId || '') : (row.districtId || ''),
             unitType: row.unitType || '',
-            currentUnitId: row.currentUnitId || user.unitId || '',
+            currentUnitId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) ? (user.unitId || '') : (row.currentUnitId || ''),
             currentSubUnitId: row.currentSubUnitId || user.subUnitId || '',
             createdAt: serverTimestamp(),
             createdByUserId: user.uid,

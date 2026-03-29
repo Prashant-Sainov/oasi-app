@@ -81,11 +81,17 @@ export default function ChitthaEditor() {
         // Unit admin can only see their own unit
         q = query(unitRef, where('__name__', '==', user.unitId));
       } else if (isDistrictAdmin && user?.districtId) {
-        q = query(unitRef, where('districtId', '==', user.districtId));
+        q = query(unitRef, 
+          where('districtId', '==', user.districtId),
+          where('assignedModule', '==', 'chittha')
+        );
       } else if (isStateAdmin && user?.stateId) {
-        q = query(unitRef, where('stateId', '==', user.stateId));
+        q = query(unitRef, 
+          where('stateId', '==', user.stateId),
+          where('assignedModule', '==', 'chittha')
+        );
       } else {
-        q = query(unitRef);
+        q = query(unitRef, where('assignedModule', '==', 'chittha'));
       }
       const snap = await getDocs(q);
       setUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));

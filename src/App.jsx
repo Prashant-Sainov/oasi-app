@@ -8,6 +8,7 @@ import PersonnelList from './pages/personnel/PersonnelList';
 import PersonnelForm from './pages/personnel/PersonnelForm';
 import ExcelImport from './pages/personnel/ExcelImport';
 import UnitSetup from './pages/admin/UnitSetup';
+import MasterData from './pages/admin/MasterData';
 import AttendanceRegister from './pages/attendance/AttendanceRegister';
 import ChitthaList from './pages/chittha/ChitthaList';
 import ChitthaEditor from './pages/chittha/ChitthaEditor';
@@ -73,6 +74,7 @@ export default function App() {
 
               {/* Unit Setup - Restricted to State Admin/Super Admin */}
               <Route path="/units" element={<StateAdminRoute><UnitSetup /></StateAdminRoute>} />
+              <Route path="/master-data" element={<StateAdminRoute><MasterData /></StateAdminRoute>} />
 
               {/* Phase 2: Attendance & Chittha */}
               <Route path="/attendance" element={<AttendanceRegister />} />
