@@ -28,12 +28,6 @@ CREATE TABLE personnel (
     village TEXT,
     police_station TEXT,
     home_district TEXT,
-    -- Education & Training
-    subject_graduation TEXT,
-    subject_post_graduation TEXT,
-    swat_awt_course TEXT,
-    special_course TEXT,
-    promotion_type TEXT,
     -- Service Details
     rank TEXT,
     cadre TEXT,
@@ -53,13 +47,8 @@ CREATE TABLE personnel (
     r_batch TEXT,
     t_duty_order TEXT,
     remarks TEXT,
-    -- Current Posting (denormalized for fast queries)
-    state_id UUID REFERENCES states(id),
-    range_id UUID REFERENCES ranges(id),
-    district_id UUID REFERENCES districts(id),
-    unit_type TEXT,
-    current_unit_id UUID REFERENCES units(id),
-    current_sub_unit_id UUID REFERENCES sub_units(id),
+    -- Current Posting (Linked to hierarchy node)
+    node_id UUID REFERENCES hierarchy_nodes(id) ON DELETE SET NULL,
     date_of_posting DATE,
     -- Metadata
     is_deleted BOOLEAN DEFAULT FALSE,
@@ -67,21 +56,14 @@ CREATE TABLE personnel (
     updated_by_user_id UUID,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    -- Dynamic/Extra fields stored as JSONB for extensibility
+    -- Dynamic/Extra fields
     extra_fields JSONB DEFAULT '{}'
 );
 
--- Performance Indexes
-CREATE INDEX idx_personnel_state ON personnel(state_id);
-CREATE INDEX idx_personnel_district ON personnel(district_id);
-CREATE INDEX idx_personnel_unit ON personnel(current_unit_id);
-CREATE INDEX idx_personnel_subunit ON personnel(current_sub_unit_id);
+CREATE INDEX idx_personnel_node ON personnel(node_id);
 CREATE INDEX idx_personnel_belt ON personnel(belt_number);
 CREATE INDEX idx_personnel_name ON personnel(full_name);
 CREATE INDEX idx_personnel_deleted ON personnel(is_deleted);
-CREATE INDEX idx_personnel_rank ON personnel(rank);
--- Composite index for common filtering patterns
-CREATE INDEX idx_personnel_district_unit ON personnel(district_id, current_unit_id);
 
 -- =====================
 -- 3B. PERSONNEL POSTING HISTORY (Transfer Tracking)
@@ -89,85 +71,46 @@ CREATE INDEX idx_personnel_district_unit ON personnel(district_id, current_unit_
 CREATE TABLE personnel_posting (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     personnel_id UUID NOT NULL REFERENCES personnel(id) ON DELETE CASCADE,
-    -- Source (From)
-    from_unit_id UUID REFERENCES units(id),
-    from_sub_unit_id UUID REFERENCES sub_units(id),
-    from_unit_name TEXT,          -- denormalized for history readability
-    -- Destination (To)
-    to_unit_id UUID REFERENCES units(id),
-    to_sub_unit_id UUID REFERENCES sub_units(id),
-    to_unit_name TEXT,            -- denormalized for history readability
+    -- Source & Destination
+    from_node_id UUID REFERENCES hierarchy_nodes(id) ON DELETE SET NULL,
+    to_node_id UUID REFERENCES hierarchy_nodes(id) ON DELETE SET NULL,
     -- Posting Details
     posting_date DATE,
     relieved_date DATE,
-    posting_type TEXT DEFAULT 'Active',  -- Active, History, Pending
+    posting_type TEXT DEFAULT 'Active',
     is_active BOOLEAN DEFAULT TRUE,
-    -- Transfer Order
+    -- Order Details
     order_number TEXT,
     order_date DATE,
-    document_url TEXT,
     remarks TEXT,
-    -- Approval Workflow
-    status TEXT DEFAULT 'Active',        -- Active, Pending, Approved, Rejected, Transferred
-    approved_by_user_id UUID,
-    approved_at TIMESTAMP WITH TIME ZONE,
-    -- Metadata
-    created_by_user_id UUID,
+    -- Workflow
+    status TEXT DEFAULT 'Active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_posting_personnel ON personnel_posting(personnel_id);
-CREATE INDEX idx_posting_to_unit ON personnel_posting(to_unit_id);
-CREATE INDEX idx_posting_from_unit ON personnel_posting(from_unit_id);
-CREATE INDEX idx_posting_active ON personnel_posting(is_active);
-CREATE INDEX idx_posting_status ON personnel_posting(status);
+CREATE INDEX idx_posting_to_node ON personnel_posting(to_node_id);
+CREATE INDEX idx_posting_from_node ON personnel_posting(from_node_id);
 
 -- =====================
--- 3C. TRANSFER REGISTER (Standalone Transfer Workflow)
+-- 3C. TRANSFER REGISTER (Workflow)
 -- =====================
 CREATE TABLE transfer_register (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     personnel_id UUID NOT NULL REFERENCES personnel(id) ON DELETE CASCADE,
-    -- Denormalized Personnel Info (for fast display)
-    personnel_name TEXT,
-    belt_number TEXT,
-    rank TEXT,
-    -- Location Context
-    state_id UUID REFERENCES states(id),
-    range_id UUID REFERENCES ranges(id),
-    district_id UUID REFERENCES districts(id),
-    -- Transfer Details
-    from_unit_id UUID REFERENCES units(id),
-    from_sub_unit_id UUID REFERENCES sub_units(id),
-    from_unit_name TEXT,
-    to_unit_id UUID REFERENCES units(id),
-    to_sub_unit_id UUID REFERENCES sub_units(id),
-    to_unit_name TEXT,
-    -- Order Details
+    from_node_id UUID REFERENCES hierarchy_nodes(id),
+    to_node_id UUID REFERENCES hierarchy_nodes(id),
     order_number TEXT,
     transfer_date DATE,
-    document_url TEXT,
     reason TEXT,
-    remarks TEXT,
-    -- Workflow
-    status TEXT DEFAULT 'Pending',  -- Pending, Approved, Rejected, Transferred
-    approved_by_user_id UUID,
-    approved_at TIMESTAMP WITH TIME ZONE,
-    -- Metadata
-    created_by_user_id UUID,
+    status TEXT DEFAULT 'Pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_transfer_personnel ON transfer_register(personnel_id);
-CREATE INDEX idx_transfer_status ON transfer_register(status);
-CREATE INDEX idx_transfer_district ON transfer_register(district_id);
-CREATE INDEX idx_transfer_from_unit ON transfer_register(from_unit_id);
-CREATE INDEX idx_transfer_to_unit ON transfer_register(to_unit_id);
-
 -- =====================
--- 3D. RLS POLICIES FOR PHASE 3 TABLES
+-- 3D. RLS POLICIES
 -- =====================
 ALTER TABLE personnel ENABLE ROW LEVEL SECURITY;
 ALTER TABLE personnel_posting ENABLE ROW LEVEL SECURITY;
@@ -181,10 +124,8 @@ CREATE POLICY "read_all" ON transfer_register FOR SELECT USING (true);
 CREATE POLICY "manage_all" ON transfer_register FOR ALL USING (true) WITH CHECK (true);
 
 -- =====================
--- 3E. ADD PERSONNEL FK TO APP_USERS
+-- 3E. LINK PERSONNEL TO APP_USERS
 -- =====================
--- Now that the personnel table exists, we can add the FK
--- (This is safe even if the column already has data — we just add the constraint)
 DO $$
 BEGIN
     IF NOT EXISTS (

@@ -1,61 +1,50 @@
--- PHASE 1: HIERARCHY & FOUNDATION
+-- ============================================================
+-- FOUNDATION: RECURSIVE HIERARCHY
+-- ============================================================
+
 -- Enables UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 1. States
-CREATE TABLE states (
+-- HIERARCHY NODES TABLE
+-- This recursive table replaces the old states, ranges, districts, and units.
+CREATE TABLE IF NOT EXISTS hierarchy_nodes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    node_code TEXT NOT NULL UNIQUE,      -- e.g., "1", "2.1", "2.1.1.3"
+    name TEXT NOT NULL,
+    level INTEGER NOT NULL,              -- 1 (PHQ), 2 (Range), 3 (District), etc.
+    parent_id UUID REFERENCES hierarchy_nodes(id) ON DELETE CASCADE,
+    is_fixed BOOLEAN DEFAULT FALSE,     -- Level 1 nodes are fixed
+    assigned_module TEXT DEFAULT 'attendance', -- 'attendance', 'chittha'
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for faster hierarchy traversal
+CREATE INDEX IF NOT EXISTS idx_hierarchy_parent ON hierarchy_nodes(parent_id);
+CREATE INDEX IF NOT EXISTS idx_hierarchy_code ON hierarchy_nodes(node_code);
+CREATE INDEX IF NOT EXISTS idx_hierarchy_level ON hierarchy_nodes(level);
+
+-- TRIGGER to auto-update updated_at field
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_hierarchy_nodes_modtime
+    BEFORE UPDATE ON hierarchy_nodes
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- UNIT CATEGORIES (Helpful for grouping nodes like 'Police Station', 'CIA', etc.)
+CREATE TABLE IF NOT EXISTS unit_categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL UNIQUE,
-    code TEXT UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Ranges
-CREATE TABLE ranges (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    state_id UUID NOT NULL REFERENCES states(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(state_id, name)
-);
-
--- 3. Districts
-CREATE TABLE districts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    range_id UUID NOT NULL REFERENCES ranges(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(range_id, name)
-);
-
--- 4. Unit Categories
-CREATE TABLE unit_categories (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 5. Units
-CREATE TABLE units (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    district_id UUID NOT NULL REFERENCES districts(id) ON DELETE RESTRICT,
-    category_id UUID REFERENCES unit_categories(id) ON DELETE SET NULL,
-    name TEXT NOT NULL,
-    sanctioned_strength INTEGER DEFAULT 0,
-    assigned_module TEXT DEFAULT 'attendance', -- e.g., 'attendance', 'chittha'
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(district_id, name)
-);
-
--- 6. Sub-Units
-CREATE TABLE sub_units (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    unit_id UUID NOT NULL REFERENCES units(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    assigned_module TEXT DEFAULT 'attendance',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(unit_id, name)
-);
-
--- SEED DATA: Haryana State
-INSERT INTO states (name, code) VALUES ('Haryana', 'HR') ON CONFLICT DO NOTHING;
+-- Link hierarchy nodes to categories (Optional)
+ALTER TABLE hierarchy_nodes ADD COLUMN IF NOT EXISTS category_id UUID REFERENCES unit_categories(id) ON DELETE SET NULL;

@@ -1,11 +1,11 @@
+-- ============================================================
+-- PHASE 4: REPORTS, GRIEVANCES, LEAVES & REMAINING TABLES
+-- ============================================================
+
 -- FIR Reports Table
 CREATE TABLE IF NOT EXISTS fir_reports (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    state_id TEXT,
-    range_id TEXT,
-    district_id TEXT,
-    unit_id TEXT,
-    sub_unit_id TEXT,
+    node_id UUID REFERENCES hierarchy_nodes(id) ON DELETE SET NULL,
     year TEXT NOT NULL,
     quarter TEXT NOT NULL,
     police_station TEXT NOT NULL,
@@ -15,30 +15,26 @@ CREATE TABLE IF NOT EXISTS fir_reports (
     pending INTEGER DEFAULT 0,
     cognizable INTEGER DEFAULT 0,
     non_cognizable INTEGER DEFAULT 0,
-    created_by_user_id TEXT,
+    created_by_user_id UUID REFERENCES app_users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index for FIR Reports
+CREATE INDEX IF NOT EXISTS idx_fir_reports_node ON fir_reports (node_id);
 CREATE INDEX IF NOT EXISTS idx_fir_reports_period ON fir_reports (year, quarter);
 
 -- Grievances Table
 CREATE TABLE IF NOT EXISTS grievances (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    state_id TEXT,
-    range_id TEXT,
-    district_id TEXT,
-    unit_id TEXT,
-    sub_unit_id TEXT,
+    node_id UUID REFERENCES hierarchy_nodes(id) ON DELETE SET NULL,
     applicant_name TEXT NOT NULL,
     applicant_mobile TEXT,
     grievance_type TEXT,
     description TEXT,
     status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'In Progress', 'Resolved', 'Closed')),
-    assigned_to_user_id TEXT,
+    assigned_to_user_id UUID REFERENCES app_users(id),
     resolution_text TEXT,
-    created_by_user_id TEXT,
+    created_by_user_id UUID REFERENCES app_users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -46,53 +42,49 @@ CREATE TABLE IF NOT EXISTS grievances (
 -- Leaves Table
 CREATE TABLE IF NOT EXISTS leaves (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    personnel_id UUID REFERENCES personnel(id),
-    state_id TEXT,
-    range_id TEXT,
-    district_id TEXT,
-    unit_id TEXT,
-    sub_unit_id TEXT,
-    leave_type TEXT NOT NULL, -- e.g., Casual, Medical, Earned
+    personnel_id UUID REFERENCES personnel(id) ON DELETE CASCADE,
+    node_id UUID REFERENCES hierarchy_nodes(id) ON DELETE SET NULL,
+    leave_type TEXT NOT NULL, 
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     total_days INTEGER,
     reason TEXT,
     status TEXT DEFAULT 'Applied' CHECK (status IN ('Applied', 'Approved', 'Rejected', 'Cancelled')),
-    approved_by_user_id TEXT,
+    approved_by_user_id UUID REFERENCES app_users(id),
     approval_date TIMESTAMP WITH TIME ZONE,
     remarks TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Transfers Table
+-- Transfers Table (Alternative format for quick tracking)
 CREATE TABLE IF NOT EXISTS transfers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    personnel_id UUID REFERENCES personnel(id),
-    state_id TEXT,
-    range_id TEXT,
-    district_id TEXT,
-    from_unit_id UUID REFERENCES units(id),
-    to_unit_id UUID REFERENCES units(id),
+    personnel_id UUID REFERENCES personnel(id) ON DELETE CASCADE,
+    from_node_id UUID REFERENCES hierarchy_nodes(id),
+    to_node_id UUID REFERENCES hierarchy_nodes(id),
     order_number TEXT,
     order_date DATE,
     relieving_date DATE,
     joining_date DATE,
     status TEXT DEFAULT 'Ordered' CHECK (status IN ('Ordered', 'Relieved', 'Joined', 'Cancelled')),
     remarks TEXT,
-    created_by_user_id TEXT,
+    created_by_user_id UUID REFERENCES app_users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Add RLS Policies for new tables
+-- RLS Policies
 ALTER TABLE fir_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE grievances ENABLE ROW LEVEL SECURITY;
 ALTER TABLE leaves ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transfers ENABLE ROW LEVEL SECURITY;
 
--- Permissive policies for migration
-CREATE POLICY "Allow all for authenticated users on fir_reports" ON fir_reports FOR ALL TO anon USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for authenticated users on grievances" ON grievances FOR ALL TO anon USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for authenticated users on leaves" ON leaves FOR ALL TO anon USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for authenticated users on transfers" ON transfers FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "read_all" ON fir_reports FOR SELECT USING (true);
+CREATE POLICY "manage_all" ON fir_reports FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "read_all" ON grievances FOR SELECT USING (true);
+CREATE POLICY "manage_all" ON grievances FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "read_all" ON leaves FOR SELECT USING (true);
+CREATE POLICY "manage_all" ON leaves FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "read_all" ON transfers FOR SELECT USING (true);
+CREATE POLICY "manage_all" ON transfers FOR ALL USING (true) WITH CHECK (true);
