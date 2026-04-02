@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase';
-import { collection, query, where, getDocs, getCountFromServer, onSnapshot } from 'firebase/firestore';
+import { supabase } from '../supabase';
 import { Users, UserCheck, UserX, Building2, ClipboardList, AlertTriangle, TrendingUp, FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
@@ -40,98 +39,130 @@ export default function Dashboard() {
 
     loadDashboardData();
 
-    // Real-time hierarchy stats
-    const q = query(collection(db, 'ranges'), where('stateId', '==', user.stateId || 'haryana'));
-    const unsubscribe = onSnapshot(q, (snap) => {
-      const counts = { ranges: 0, commissionerates: 0, others: 0 };
-      snap.docs.forEach(doc => {
-        const name = doc.data().rangeName || '';
-        if (name.toLowerCase().includes('commissionerate')) counts.commissionerates++;
-        else if (name.toLowerCase().includes('range')) counts.ranges++;
-        else counts.others++;
-      });
-      setHierarchyStats(counts);
-    }, (err) => { if (import.meta.env.DEV) console.error('Real-time hierarchy error:', err); });
+    // Real-time hierarchy stats (Ranges)
+    const fetchHierarchy = async () => {
+      const { data, error } = await supabase
+        .from('ranges')
+        .select('name')
+        .eq('state_id', user.stateId || 'haryana');
+      
+      if (data) {
+        const counts = { ranges: 0, commissionerates: 0, others: 0 };
+        data.forEach(row => {
+          const name = row.name || '';
+          if (name.toLowerCase().includes('commissionerate')) counts.commissionerates++;
+          else if (name.toLowerCase().includes('range')) counts.ranges++;
+          else counts.others++;
+        });
+        setHierarchyStats(counts);
+      }
+    };
+
+    fetchHierarchy();
+
+    // Real-time subscription for ranges
+    const rangeSub = supabase
+      .channel('public:ranges')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ranges' }, fetchHierarchy)
+      .subscribe();
 
     // Real-time district listener for Super Admin
+    let distSub;
     if (user.role === 'super_admin') {
-      const distUnsub = onSnapshot(collection(db, 'districts'), (snap) => {
-        setAllDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      });
-      return () => { unsubscribe(); distUnsub(); };
+      const fetchDistricts = async () => {
+        const { data } = await supabase.from('districts').select('*').order('name');
+        if (data) setAllDistricts(data.map(d => ({ id: d.id, districtName: d.name, ...d })));
+      };
+      
+      fetchDistricts();
+      
+      distSub = supabase
+        .channel('public:districts')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'districts' }, fetchDistricts)
+        .subscribe();
     }
 
-    return () => unsubscribe();
+    return () => {
+      supabase.removeChannel(rangeSub);
+      if (distSub) supabase.removeChannel(distSub);
+    };
   }, [user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin]);
 
   async function loadDashboardData() {
     try {
       setLoading(true);
 
-      // Build query based on role
-      let personnelQuery;
-      const personnelRef = collection(db, 'personnel');
+      // 1. Total Personnel Stats
+      let pQuery = supabase.from('personnel').select('*', { count: 'exact', head: false }).eq('service_status', 'Active').eq('is_deleted', false);
 
       if (isUnitAdmin && user.unitId) {
-        personnelQuery = query(personnelRef, where('currentUnitId', '==', user.unitId), where('serviceStatus', '==', 'Active'));
+        pQuery = pQuery.eq('current_unit_id', user.unitId);
       } else if (isDistrictAdmin && user.districtId) {
-        personnelQuery = query(personnelRef, where('districtId', '==', user.districtId), where('serviceStatus', '==', 'Active'));
+        pQuery = pQuery.eq('district_id', user.districtId);
       } else if (isRangeAdmin && user.rangeId) {
-        personnelQuery = query(personnelRef, where('rangeId', '==', user.rangeId), where('serviceStatus', '==', 'Active'));
-      } else {
-        personnelQuery = query(personnelRef, where('serviceStatus', '==', 'Active'));
+        pQuery = pQuery.eq('range_id', user.rangeId);
       }
 
-      const personnelSnap = await getDocs(personnelQuery);
-      const totalPersonnel = personnelSnap.size;
+      const { count: totalPersonnel, data: personnelData, error: pError } = await pQuery.order('created_at', { ascending: false }).limit(10);
+      if (pError) throw pError;
 
-      // Get recent personnel (last 10 added)
-      const recent = personnelSnap.docs
-        .sort((a, b) => (b.data().createdAt?.seconds || 0) - (a.data().createdAt?.seconds || 0))
-        .slice(0, 10)
-        .map(doc => ({ id: doc.id, ...doc.data() }));
-      setRecentPersonnel(recent);
+      setRecentPersonnel((personnelData || []).map(p => ({
+        id: p.id,
+        fullName: p.full_name,
+        beltNumber: p.belt_number,
+        rank: p.rank,
+        mobileNumber: p.mobile_number,
+        serviceStatus: p.service_status
+      })));
 
-      // (Hierarchy stats are now handled by real-time onSnapshot above)
-
-      // Get today's attendance
+      // 2. Today's Attendance
       const today = new Date().toISOString().split('T')[0];
-      const attendanceRef = collection(db, 'attendanceRegister');
-      let attendQuery;
+      let aQuery = supabase.from('attendance_register').select('*', { count: 'exact', head: false }).eq('date', today);
+      
       if (isUnitAdmin && user.unitId) {
-        attendQuery = query(attendanceRef, where('date', '==', today), where('unitId', '==', user.unitId));
+        aQuery = aQuery.eq('unit_id', user.unitId);
       } else if (isDistrictAdmin && user.districtId) {
-        attendQuery = query(attendanceRef, where('date', '==', today), where('districtId', '==', user.districtId));
+        aQuery = aQuery.eq('district_id', user.districtId);
       } else if (isRangeAdmin && user.rangeId) {
-        attendQuery = query(attendanceRef, where('date', '==', today), where('rangeId', '==', user.rangeId));
-      } else {
-        attendQuery = query(attendanceRef, where('date', '==', today));
+        aQuery = aQuery.eq('range_id', user.rangeId);
       }
 
-      const attendSnap = await getDocs(attendQuery);
-      const presentToday = attendSnap.docs.filter(d =>
-        d.data().attendanceType === 'Present' || d.data().attendanceType === 'Duty Outside'
-      ).length;
+      // Filter for Present types
+      const { data: attData, error: aError } = await aQuery.in('attendance_type', ['Present', 'Duty Outside']);
+      if (aError) throw aError;
+      
+      const presentToday = attData.length;
 
       setStats({
-        totalPersonnel,
+        totalPersonnel: totalPersonnel || 0,
         presentToday,
-        absentToday: totalPersonnel - presentToday,
+        absentToday: (totalPersonnel || 0) - presentToday,
         activeChitthas: 0,
         pendingAlerts: 0,
       });
 
-      // Super Admin specific data points
+      // 3. Super Admin specific data points
       if (isSuperAdmin) {
         // Load States
-        const stSnap = await getDocs(collection(db, 'states'));
-        const stList = stSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setStatesList(stList.sort((a, b) => (a.stateName || '').localeCompare(b.stateName || '')));
+        const { data: states, error: sError } = await supabase.from('states').select('*').order('name');
+        if (sError) throw sError;
+        setStatesList(states.map(s => ({ id: s.id, stateName: s.name })));
 
         // Load State Admins
-        const saSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'state_admin'), where('isActive', '==', true)));
-        const saList = saSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setStateAdmins(saList);
+        const { data: admins, error: uError } = await supabase
+          .from('app_users') // Assuming app_users table
+          .select('*')
+          .eq('role', 'state_admin')
+          .eq('is_active', true);
+        
+        if (!uError) {
+          setStateAdmins(admins.map(a => ({
+            id: a.id,
+            beltNumber: a.belt_number,
+            name: a.full_name,
+            stateId: a.state_id
+          })));
+        }
       }
       
     } catch (err) {

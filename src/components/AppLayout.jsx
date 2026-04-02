@@ -18,28 +18,28 @@ const NAV_ITEMS = [
   {
     section: 'Management',
     items: [
-      { to: '/units', label: 'Unit Setup', icon: Building2, roles: ['state_admin'] },
-      { to: '/master-data', label: 'Dropdown Master', icon: Database, roles: ['state_admin'] },
-      { to: '/personnel', label: 'Personnel', icon: Users, roles: ['state_admin', 'district_admin', 'unit_admin'] },
-      { to: '/personnel/import', label: 'Import Data', icon: Upload, roles: ['state_admin', 'district_admin', 'unit_admin'] },
+      { to: '/units', label: 'Unit Setup', icon: Building2, roles: ['state_admin', 'super_admin'] },
+      { to: '/dropdown-master', label: 'Dropdown Master', icon: Database, roles: ['state_admin', 'super_admin'] },
+      { to: '/personnel', label: 'Personnel', icon: Users, roles: ['state_admin', 'district_admin', 'unit_admin', 'super_admin'] },
+      { to: '/personnel/import', label: 'Import Data', icon: Upload, roles: ['state_admin', 'district_admin', 'unit_admin', 'super_admin'] },
     ],
   },
   {
     section: 'Registers',
     items: [
-      { to: '/attendance', label: 'Attendance', icon: CalendarCheck, roles: ['state_admin', 'district_admin', 'unit_admin'] },
-      { to: '/chitthas', label: 'Naukari Chittha', icon: ClipboardList, roles: ['state_admin', 'district_admin', 'unit_admin'] },
-      { to: '/leave', label: 'Leave Register', icon: Clock, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin'] },
-      { to: '/transfer', label: 'Transfers', icon: ArrowRightLeft, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin'] },
-      { to: '/reports/fir', label: 'FIR & Reports', icon: FileText, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin'] },
+      { to: '/attendance', label: 'Attendance', icon: CalendarCheck, roles: ['state_admin', 'district_admin', 'unit_admin', 'super_admin'] },
+      { to: '/chitthas', label: 'Naukari Chittha', icon: ClipboardList, roles: ['state_admin', 'district_admin', 'unit_admin', 'super_admin'] },
+      { to: '/leave', label: 'Leave Register', icon: Clock, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin', 'super_admin'] },
+      { to: '/transfer', label: 'Transfers', icon: ArrowRightLeft, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin', 'super_admin'] },
+      { to: '/reports/fir', label: 'FIR & Reports', icon: FileText, roles: ['state_admin', 'range_admin', 'district_admin', 'unit_admin', 'super_admin'] },
     ],
   },
   {
     section: 'Admin',
     items: [
-      { to: '/grievances', label: 'Grievances', icon: MessageSquare, roles: ['state_admin', 'district_admin', 'unit_admin', 'staff'] },
-      { to: '/admin/roles', label: 'Role Management', icon: Shield, roles: ['state_admin'] },
-      { to: '/admin/settings', label: 'Settings', icon: Settings, roles: ['state_admin'] },
+      { to: '/grievances', label: 'Grievances', icon: MessageSquare, roles: ['state_admin', 'district_admin', 'unit_admin', 'staff', 'super_admin'] },
+      { to: '/admin/roles', label: 'Role Management', icon: Shield, roles: ['state_admin', 'super_admin'] },
+      { to: '/admin/settings', label: 'Settings', icon: Settings, roles: ['state_admin', 'super_admin'] },
     ],
   },
 ];

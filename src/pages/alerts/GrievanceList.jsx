@@ -1,16 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import {
-  collection, query, where, getDocs, doc, updateDoc,
-  serverTimestamp, orderBy
-} from 'firebase/firestore';
-import {
-  MessageSquare, Plus, Search, CheckCircle,
-  Clock, XCircle, ArrowRight
-} from 'lucide-react';
+import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
+import { 
+  MessageSquare, Search, Plus, CheckCircle, 
+  Clock, XCircle, AlertCircle, ChevronRight,
+  MoreVertical, Send, User, Calendar
+} from 'lucide-react';
 
 const GRIEVANCE_STATUSES = [
   { value: 'Open', label: 'Open', color: 'badge-danger' },
@@ -20,7 +17,7 @@ const GRIEVANCE_STATUSES = [
 ];
 
 export default function GrievanceList() {
-  const { user, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
+  const { user, isRangeAdmin, isDistrictAdmin, isUnitAdmin, isStateAdmin, isSuperAdmin } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -30,32 +27,45 @@ export default function GrievanceList() {
   const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
-    loadGrievances();
+    fetchGrievances();
   }, [user]);
 
-  async function loadGrievances() {
+  async function fetchGrievances() {
     try {
       setLoading(true);
-      const ref = collection(db, 'grievances');
-      let q = query(ref, orderBy('createdAt', 'desc'));
+      
+      let queryBuilder = supabase
+        .from('grievances')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      // Regular staff only see their own grievances.
-      // Admins see grievances assigned to them or their unit.
-      if (user.role === 'staff') {
-        q = query(ref, where('createdByUserId', '==', user.uid || user.userId));
-      } else if (isUnitAdmin && user.unitId) {
-        q = query(ref, where('unitId', '==', user.unitId));
+      // Role-based filtering
+      if (isUnitAdmin && user.unitId) {
+        queryBuilder = queryBuilder.eq('unit_id', user.unitId);
       } else if (isDistrictAdmin && user.districtId) {
-        q = query(ref, where('districtId', '==', user.districtId));
+        queryBuilder = queryBuilder.eq('district_id', user.districtId);
       } else if (isRangeAdmin && user.rangeId) {
-        q = query(ref, where('rangeId', '==', user.rangeId));
+        queryBuilder = queryBuilder.eq('range_id', user.rangeId);
+      } else if (!isStateAdmin && !isSuperAdmin) {
+        // Staff/Basic user only sees their own submissions
+        queryBuilder = queryBuilder.eq('created_by_user_id', user.id);
       }
 
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setGrievances(data);
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+
+      setGrievances(data.map(g => ({
+        id: g.id,
+        personnelName: g.applicant_name,
+        subject: g.grievance_type,
+        description: g.description,
+        status: g.status,
+        beltNumber: g.belt_number,
+        createdAt: g.created_at,
+        ...g
+      })));
     } catch (err) {
-      console.error('Load grievances error:', err);
+      console.error('Fetch grievances error:', err);
       toast.error('Failed to load grievances.');
     } finally {
       setLoading(false);

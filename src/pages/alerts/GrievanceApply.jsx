@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, doc, setDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
 import { Send, ArrowLeft, MessageSquare } from 'lucide-react';
 
@@ -30,12 +29,27 @@ export default function GrievanceApply() {
   async function loadPersonnelInfo() {
     try {
       setLoading(true);
-      const q = query(collection(db, 'personnel'), where('beltNumber', '==', user.beltNumber));
-      const snap = await getDocs(q);
+      const { data, error } = await supabase
+        .from('personnel')
+        .select('*')
+        .eq('belt_number', user.beltNumber)
+        .eq('is_deleted', false)
+        .single();
       
-      if (!snap.empty) {
-        const data = snap.docs[0].data();
-        setPersonnelInfo({ id: snap.docs[0].id, ...data });
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is no rows found
+      
+      if (data) {
+        setPersonnelInfo({
+          id: data.id,
+          fullName: data.full_name,
+          rank: data.rank,
+          beltNumber: data.belt_number,
+          stateId: data.state_id,
+          rangeId: data.range_id,
+          districtId: data.district_id,
+          currentUnitId: data.current_unit_id,
+          currentSubUnitId: data.current_sub_unit_id
+        });
       } else {
          toast.warning('No personnel record found linked to your Belt Number.');
       }
@@ -67,28 +81,26 @@ export default function GrievanceApply() {
 
     setSubmitting(true);
     try {
-      const gRef = doc(collection(db, 'grievances'));
-      await setDoc(gRef, {
-        grievanceId: gRef.id,
-        personnelId: personnelInfo.id,
-        personnelName: personnelInfo.fullName || '',
-        beltNumber: personnelInfo.beltNumber || '',
-        rank: personnelInfo.rank || '',
-        
-        stateId: personnelInfo.stateId || '',
-        rangeId: personnelInfo.rangeId || '',
-        districtId: personnelInfo.districtId || '',
-        unitId: personnelInfo.currentUnitId || '',
-        subUnitId: personnelInfo.currentSubUnitId || '',
-        
-        subject: formData.subject,
+      const payload = {
+        applicant_name: personnelInfo.fullName || '',
+        applicant_mobile: personnelInfo.mobileNumber || '', // Add mobile if available
+        grievance_type: formData.subject,
         description: formData.description,
-        status: 'Open',
+        status: 'Pending',
         
-        createdByUserId: user.uid || user.userId,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+        state_id: personnelInfo.stateId || '',
+        range_id: personnelInfo.rangeId || '',
+        district_id: personnelInfo.districtId || '',
+        unit_id: personnelInfo.currentUnitId || '',
+        sub_unit_id: personnelInfo.currentSubUnitId || '',
+        
+        created_by_user_id: user.id || null, // Assuming user.id from AuthContext
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('grievances').insert([payload]);
+      if (error) throw error;
 
       toast.success('Grievance submitted successfully.');
       navigate('/grievances');

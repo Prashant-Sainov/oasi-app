@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db, storage } from '../../firebase';
-import { collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Save, ArrowLeft, Camera, X } from 'lucide-react';
+import { supabase } from '../../supabase';
+import { Save, ArrowLeft, Camera, X, Edit } from 'lucide-react';
 import { validateMobile, validateAadhar, validatePAN, validateDateOfBirth, validateDateOrder, maskAadhar, maskPAN } from '../../utils/validators';
 import { useLocation } from 'react-router-dom';
 
@@ -16,14 +14,42 @@ const EMPTY_FORM = {
   dateOfLastPromotion: '', retirementDate: '', village: '', policeStation: '',
   homeDistrict: '', bloodGroup: '', mobileNumber: '', alternateContact: '',
   aadharNumber: '', pan: '', serviceStatus: 'Active',
-  role1: '', role2: '', ioStatus: '', ioCategory: '',
+  psDutyType: '', ioStatus: '', ioCategory: '',
   paradeGroup: '', spoTrade: '', promotionType: '', specialCourse: '',
   company: '', remarks: '',
+  subjectGraduation: '', subjectPostGraduation: '', swatAwtCourse: '', rBatch: '', tDutyOrder: '', dateOfPosting: '',
   stateId: '', rangeId: '', districtId: '', unitType: '', currentUnitId: '', currentSubUnitId: '',
 };
 
+const DEFAULT_LAYOUT = [
+  {
+    id: 'personal',
+    title: '1. Personal Details',
+    fields: [ 'photo_and_name_block', 'dateOfBirth', 'gender', 'bloodGroup', 'mobileNumber', 'alternateContact', 'payCode', 'religion', 'caste', 'category', 'aadharNumber', 'pan', 'village', 'policeStation', 'homeDistrict' ]
+  },
+  {
+    id: 'education',
+    title: '2. Education & Training',
+    fields: [ 'subjectGraduation', 'subjectPostGraduation', 'swatAwtCourse', 'specialCourse', 'promotionType' ]
+  },
+  {
+    id: 'service',
+    title: '3. Service Details',
+    fields: [ 'rank', 'beltNumber', 'cadre', 'serviceType', 'serviceStatus', 'serviceBookNumber', 'dateOfEnlistment', 'dateOfLastPromotion', 'retirementDate' ]
+  },
+  {
+    id: 'posting',
+    title: '4. Posting & Location (STRICT)',
+    fields: [ 'stateId', 'rangeId', 'districtId', 'unitType', 'currentUnitId', 'currentSubUnitId' ]
+  },
+  {
+    id: 'duty',
+    title: '5. Duty & Role',
+    fields: [ 'psDutyType', 'ioStatus', 'ioCategory', 'paradeGroup', 'spoTrade', 'company', 'dateOfPosting', 'rBatch', 'tDutyOrder', 'remarks' ]
+  }
+];
+
 export default function PersonnelForm() {
-  const [showPosting, setShowPosting] = useState(false);
   const { id } = useParams();
   const location = useLocation();
   const isEdit = !!id && id !== 'add' && location.pathname.endsWith('/edit');
@@ -33,9 +59,44 @@ export default function PersonnelForm() {
   const { user, isSuperAdmin, isStateAdmin, isRangeAdmin, isDistrictAdmin, isUnitAdmin } = useAuth();
   const toast = useToast();
 
+  const [rawLayout, setRawLayout] = useState(DEFAULT_LAYOUT);
+  const [masterFields, setMasterFields] = useState([]);
+  const [allMasterData, setAllMasterData] = useState([]);
+
+  // Memoized Layout Merging: Automatically adds unplaced master fields to a virtual section
+  const layout = useMemo(() => {
+    const sections = JSON.parse(JSON.stringify(rawLayout));
+    const placedFields = new Set(sections.flatMap(s => s.fields));
+    
+    // Ensure core text fields are present even if removed from DB layout previously
+    const dutySection = sections.find(s => s.id === 'duty');
+    if (dutySection) {
+      if (!placedFields.has('psDutyType')) {
+        dutySection.fields.push('psDutyType');
+        placedFields.add('psDutyType');
+      }
+    }
+
+    // Identify fields defined in Dropdown Master that are NOT in the layout and NOT hardcoded system fields
+    const unplacedMasterFields = masterFields.filter(f => {
+      const fid = f.personnelFieldName || f.fieldName;
+      return !placedFields.has(fid) && !['rank', 'gender', 'serviceType', 'serviceStatus', 'cadre', 'religion', 'caste', 'category'].includes(fid);
+    });
+
+    if (unplacedMasterFields.length > 0) {
+      sections.push({
+        id: 'additional_auto',
+        title: '6. Additional Information (Auto-Sync)',
+        fields: unplacedMasterFields.map(f => f.personnelFieldName || f.fieldName)
+      });
+    }
+    return sections;
+  }, [rawLayout, masterFields]);
+
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showPosting, setShowPosting] = useState(false);
   
   const [states, setStates] = useState([]);
   const [ranges, setRanges] = useState([]);
@@ -47,20 +108,9 @@ export default function PersonnelForm() {
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
 
-  // Dynamic Dropdown Master
-  const [masterRanks, setMasterRanks] = useState([]);
-  const [masterCategories, setMasterCategories] = useState([]);
-  const [masterGenders, setMasterGenders] = useState([]);
-  const [masterReligions, setMasterReligions] = useState([]);
-  const [masterCastes, setMasterCastes] = useState([]);
-  const [masterCadres, setMasterCadres] = useState([]);
-  const [masterServiceTypes, setMasterServiceTypes] = useState([]);
-  const [masterServiceStatuses, setMasterServiceStatuses] = useState([]);
-
   useEffect(() => {
     loadStates();
     loadCategories();
-    loadMasterData();
     if (isEdit || isView) {
       loadPersonnel();
       setShowPosting(true);
@@ -81,67 +131,119 @@ export default function PersonnelForm() {
 
   async function loadStates() {
     if (!isSuperAdmin) return;
-    const snap = await getDocs(collection(db, 'states'));
-    setStates(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const { data, error } = await supabase.from('states').select('*').order('name');
+    if (!error) {
+      setStates(data.map(d => ({ id: d.id, stateName: d.name, ...d })));
+    }
   }
 
   async function loadCategories() {
     try {
-      const q = query(collection(db, 'unitCategories'));
-      const snap = await getDocs(q);
-      setUnitCategories(snap.docs.map(d => d.data().name));
+      const { data, error } = await supabase.from('unit_categories').select('name').order('name');
+      if (error) throw error;
+      setUnitCategories(data.map(d => d.name));
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to load categories:', err);
     }
   }
 
-  async function loadMasterData() {
+  // Added Real-time Master Data Listeners
+  useEffect(() => {
     if (!user?.stateId) return;
-    try {
-      const q = query(
-        collection(db, 'masterData'),
-        where('stateId', '==', user.stateId),
-        where('isActive', '==', true)
-      );
-      const snap = await getDocs(q);
-      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // Access Level Checker
-      const hasAccess = (record) => {
-        const level = record.accessLevel || 'all';
-        if (level === 'all') return true;
+    async function loadMasterConfig() {
+      try {
+        // 1. Fetch Field Definitions
+        const { data: fields, error: fError } = await supabase
+          .from('master_field_types')
+          .select('*')
+          .eq('state_id', user.stateId)
+          .eq('is_active', true);
 
-        // "Only" - Exact Match
-        if (level === 'super_admin_only') return isSuperAdmin;
-        if (level === 'state_admin_only') return isStateAdmin;
-        if (level === 'range_admin_only') return isRangeAdmin;
-        if (level === 'district_admin_only') return isDistrictAdmin;
-        if (level === 'unit_admin_only') return isUnitAdmin;
+        if (fError) throw fError;
 
-        // "Plus" - Hierarchical
-        if (level === 'state_admin_plus') return isStateAdmin || isSuperAdmin;
-        if (level === 'range_admin_plus') return isRangeAdmin || isStateAdmin || isSuperAdmin;
-        if (level === 'district_admin_plus') return isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
-        if (level === 'unit_admin_plus') return isUnitAdmin || isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+        const mappedFields = fields.map(f => ({
+          id: f.id,
+          fieldName: f.field_name,
+          displayName: f.display_name,
+          personnelFieldName: f.personnel_field_name,
+          isActive: f.is_active
+        }));
+        setMasterFields(mappedFields);
 
-        return true;
-      };
+        // 2. Fetch Dropdown Values
+        const { data: values, error: vError } = await supabase
+          .from('master_dropdown_values')
+          .select('*')
+          .eq('state_id', user.stateId)
+          .eq('is_active', true);
+        
+        if (vError) throw vError;
 
-      const sortFn = (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0);
-      const getValues = (type) => all.filter(r => r.fieldType === type && hasAccess(r)).sort(sortFn);
+        const mappedValues = values.map(v => {
+          // Find the fieldName for this value from the fields list we just fetched
+          const field = fields.find(f => f.id === v.field_type_id);
+          return {
+            id: v.id,
+            value: v.value,
+            fieldType: field ? field.field_name : 'unknown',
+            displayOrder: v.display_order,
+            accessLevel: v.access_level
+          };
+        });
+        setAllMasterData(mappedValues);
 
-      setMasterRanks(getValues('rank'));
-      setMasterCategories(getValues('category'));
-      setMasterGenders(getValues('gender'));
-      setMasterReligions(getValues('religion'));
-      setMasterCastes(getValues('caste'));
-      setMasterCadres(getValues('cadre'));
-      setMasterServiceTypes(getValues('serviceType'));
-      setMasterServiceStatuses(getValues('serviceStatus'));
-    } catch (err) {
-      if (import.meta.env.DEV) console.error('Failed to load dropdown master data:', err);
+      } catch (err) {
+        if (import.meta.env.DEV) console.error('Master config load error:', err);
+      }
     }
-  }
+
+    loadMasterConfig();
+  }, [user]);
+
+  // Load override layout if exists (M11)
+  useEffect(() => {
+    if (!user?.stateId) return;
+    async function loadLayout() {
+      const { data, error } = await supabase
+        .from('personnel_layouts')
+        .select('sections')
+        .eq('state_id', user.stateId)
+        .maybeSingle();
+
+      if (data && !error) {
+        setRawLayout(data.sections || DEFAULT_LAYOUT);
+      }
+    }
+    loadLayout();
+  }, [user]);
+
+  // Access Level Checker
+  const hasAccess = (record) => {
+    const level = record.accessLevel || 'all';
+    if (level === 'all') return true;
+
+    // "Only" - Exact Match
+    if (level === 'super_admin_only') return isSuperAdmin;
+    if (level === 'state_admin_only') return isStateAdmin;
+    if (level === 'range_admin_only') return isRangeAdmin;
+    if (level === 'district_admin_only') return isDistrictAdmin;
+    if (level === 'unit_admin_only') return isUnitAdmin;
+
+    // "Plus" - Hierarchical
+    if (level === 'state_admin_plus') return isStateAdmin || isSuperAdmin;
+    if (level === 'range_admin_plus') return isRangeAdmin || isStateAdmin || isSuperAdmin;
+    if (level === 'district_admin_plus') return isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+    if (level === 'unit_admin_plus') return isUnitAdmin || isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+
+    return true;
+  };
+
+  const getDropdownValues = (fieldType) => {
+    return allMasterData
+      .filter(r => r.fieldType === fieldType && hasAccess(r))
+      .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+  };
 
   useEffect(() => {
     if (form.stateId) {
@@ -154,9 +256,15 @@ export default function PersonnelForm() {
 
   async function loadRanges(stateId) {
     if (!isSuperAdmin && !isStateAdmin) return;
-    const q = query(collection(db, 'ranges'), where('stateId', '==', stateId));
-    const snap = await getDocs(q);
-    setRanges(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const { data, error } = await supabase
+      .from('ranges')
+      .select('*')
+      .eq('state_id', stateId)
+      .order('name');
+    
+    if (!error) {
+      setRanges(data.map(d => ({ id: d.id, rangeName: d.name, ...d })));
+    }
   }
 
   useEffect(() => {
@@ -170,9 +278,15 @@ export default function PersonnelForm() {
 
   async function loadDistricts(rangeId) {
     if (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) return;
-    const q = query(collection(db, 'districts'), where('rangeId', '==', rangeId));
-    const snap = await getDocs(q);
-    setDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const { data, error } = await supabase
+      .from('districts')
+      .select('*')
+      .eq('range_id', rangeId)
+      .order('name');
+    
+    if (!error) {
+      setDistricts(data.map(d => ({ id: d.id, districtName: d.name, ...d })));
+    }
   }
 
   useEffect(() => {
@@ -191,10 +305,15 @@ export default function PersonnelForm() {
     if (!districtId || !unitType) return;
     if (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) return;
     try {
-      const q = query(collection(db, 'units'), where('districtId', '==', districtId), where('unitType', '==', unitType));
-      const snap = await getDocs(q);
-      const loadedUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setUnits(loadedUnits);
+      const { data, error } = await supabase
+        .from('units')
+        .select('*')
+        .eq('district_id', districtId)
+        .eq('unit_type', unitType)
+        .order('name');
+      
+      if (error) throw error;
+      setUnits(data.map(d => ({ id: d.id, unitName: d.name, ...d })));
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to load units:', err);
     }
@@ -212,9 +331,15 @@ export default function PersonnelForm() {
   async function loadSubUnits(unitId, districtId) {
     if (!unitId || !districtId) return;
     try {
-      const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId), where('districtId', '==', districtId));
-      const snap = await getDocs(q);
-      setSubUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const { data, error } = await supabase
+        .from('sub_units')
+        .select('*')
+        .eq('unit_id', unitId)
+        .eq('district_id', districtId)
+        .order('name');
+      
+      if (error) throw error;
+      setSubUnits(data.map(d => ({ id: d.id, subUnitName: d.name, ...d })));
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to load sub-units:', err);
     }
@@ -223,10 +348,66 @@ export default function PersonnelForm() {
   async function loadPersonnel() {
     try {
       setLoading(true);
-      const docRef = doc(db, 'personnel', id);
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        setForm({ ...EMPTY_FORM, ...snap.data() });
+      const { data, error } = await supabase
+        .from('personnel')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+
+      if (data) {
+        // Map snake_case from DB to camelCase for form state
+        const mappedData = {
+          beltNumber: data.belt_number,
+          payCode: data.pay_code,
+          rank: data.rank,
+          fullName: data.full_name,
+          fatherName: data.father_name,
+          gender: data.gender,
+          dateOfBirth: data.date_of_birth,
+          religion: data.religion,
+          caste: data.caste,
+          category: data.category,
+          cadre: data.cadre,
+          serviceType: data.service_type,
+          serviceBookNumber: data.service_book_number,
+          dateOfEnlistment: data.date_of_enlistment,
+          dateOfLastPromotion: data.date_of_last_promotion,
+          retirementDate: data.retirement_date,
+          village: data.village,
+          policeStation: data.police_station,
+          homeDistrict: data.home_district,
+          bloodGroup: data.blood_group,
+          mobileNumber: data.mobile_number,
+          alternateContact: data.alternate_contact,
+          aadharNumber: data.aadhar_number,
+          pan: data.pan,
+          serviceStatus: data.service_status,
+          psDutyType: data.ps_duty_type,
+          ioStatus: data.io_status,
+          ioCategory: data.io_category,
+          paradeGroup: data.parade_group,
+          spoTrade: data.spo_trade,
+          promotionType: data.promotion_type,
+          specialCourse: data.special_course,
+          company: data.company,
+          remarks: data.remarks,
+          subjectGraduation: data.subject_graduation,
+          subjectPostGraduation: data.subject_post_graduation,
+          swatAwtCourse: data.swat_awt_course,
+          rBatch: data.r_batch,
+          tDutyOrder: data.t_duty_order,
+          dateOfPosting: data.date_of_posting,
+          stateId: data.state_id,
+          rangeId: data.range_id,
+          districtId: data.district_id,
+          unitType: data.unit_type,
+          currentUnitId: data.current_unit_id,
+          currentSubUnitId: data.current_sub_unit_id,
+          photoURL: data.photo_url
+        };
+        setForm(mappedData);
       } else {
         toast.error('Personnel record not found.');
         navigate('/personnel');
@@ -307,7 +488,18 @@ export default function PersonnelForm() {
     // Required fields
     if (!form.fullName.trim()) { toast.warning('Full Name is required.'); return; }
     if (!form.mobileNumber.trim()) { toast.warning('Mobile Number is required.'); return; }
-    if (!form.rank) { toast.warning('Rank is required.'); return; }
+    
+    // Rank validation (Dynamic)
+    const rankMeta = masterFields.find(f => f.fieldName === 'rank' || f.personnelFieldName === 'rank');
+    if (rankMeta) {
+      if (!form.rank) { toast.warning('Rank is required.'); return; }
+      const allowedRanks = getDropdownValues(rankMeta.fieldName);
+      const isRankAllowed = allowedRanks.some(r => r.value === form.rank);
+      if (!isRankAllowed) {
+        toast.error('This rank is not permitted for your role.');
+        return;
+      }
+    }
 
     // Mobile validation
     const mobileCheck = validateMobile(form.mobileNumber.trim());
@@ -341,54 +533,98 @@ export default function PersonnelForm() {
       if (!order.valid) { toast.error(order.message); return; }
     }
 
-    // Rank restriction enforcement (dynamic)
-    const isRankAllowed = masterRanks.some(r => r.value === form.rank);
-    if (!isRankAllowed && form.rank) {
-      toast.error('This rank is not permitted for your role.');
-      return;
-    }
-
-    // Auto-fill payCode if empty
     const payCode = form.payCode.trim() || form.mobileNumber.trim();
 
     setSaving(true);
     try {
       let photoURL = form.photoURL || '';
 
-      // Upload photo if a new one is selected
       if (photoFile) {
         const fileExt = photoFile.name.split('.').pop();
         const fileName = `${payCode}_${Date.now()}.${fileExt}`;
-        const storageRef = ref(storage, `personnel_photos/${fileName}`);
-        const snapshot = await uploadBytes(storageRef, photoFile);
-        photoURL = await getDownloadURL(snapshot.ref);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('personnel_photos')
+          .upload(fileName, photoFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from('personnel_photos')
+          .getPublicUrl(fileName);
+        
+        photoURL = publicUrlData.publicUrl;
       }
 
-      const data = {
-        ...form,
-        payCode,
-        photoURL,
-        fullName: form.fullName.trim(),
-        mobileNumber: form.mobileNumber.trim(),
-        // Backend enforcement: ensure user cannot bypass UI restrictions
-        stateId: !isSuperAdmin ? user.stateId : form.stateId,
-        rangeId: (!isSuperAdmin && !isStateAdmin) ? user.rangeId : form.rangeId,
-        districtId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) ? user.districtId : form.districtId,
-        currentUnitId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) ? user.unitId : form.currentUnitId,
-        updatedAt: serverTimestamp(),
-        updatedByUserId: user.uid,
+      const payload = {
+        belt_number: form.beltNumber,
+        pay_code: payCode,
+        rank: form.rank,
+        full_name: form.fullName.trim(),
+        father_name: form.fatherName,
+        gender: form.gender,
+        date_of_birth: form.dateOfBirth || null,
+        religion: form.religion,
+        caste: form.caste,
+        category: form.category,
+        cadre: form.cadre,
+        service_type: form.serviceType,
+        service_book_number: form.serviceBookNumber,
+        date_of_enlistment: form.dateOfEnlistment || null,
+        date_of_last_promotion: form.dateOfLastPromotion || null,
+        retirement_date: form.retirementDate || null,
+        village: form.village,
+        police_station: form.police_station,
+        home_district: form.homeDistrict,
+        blood_group: form.bloodGroup,
+        mobile_number: form.mobileNumber.trim(),
+        alternate_contact: form.alternateContact,
+        aadhar_number: form.aadharNumber,
+        pan: form.pan,
+        service_status: form.serviceStatus,
+        ps_duty_type: form.psDutyType,
+        io_status: form.ioStatus,
+        io_category: form.ioCategory,
+        parade_group: form.paradeGroup,
+        spo_trade: form.spoTrade,
+        promotion_type: form.promotionType,
+        special_course: form.specialCourse,
+        company: form.company,
+        remarks: form.remarks,
+        subject_graduation: form.subjectGraduation,
+        subject_post_graduation: form.subjectPostGraduation,
+        swat_awt_course: form.swatAwtCourse,
+        r_batch: form.rBatch,
+        t_duty_order: form.tDutyOrder,
+        date_of_posting: form.dateOfPosting || null,
+        state_id: !isSuperAdmin ? user.stateId : form.stateId,
+        range_id: (!isSuperAdmin && !isStateAdmin) ? user.rangeId : form.rangeId,
+        district_id: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) ? user.districtId : form.districtId,
+        unit_type: form.unitType,
+        current_unit_id: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) ? (user.unitId || null) : (form.currentUnitId || null),
+        current_sub_unit_id: form.currentSubUnitId || null,
+        photo_url: photoURL,
+        updated_at: new Date().toISOString(),
+        updated_by_user_id: user.id,
       };
 
       if (isEdit) {
-        await updateDoc(doc(db, 'personnel', id), data);
+        const { error } = await supabase
+          .from('personnel')
+          .update(payload)
+          .eq('id', id);
+        
+        if (error) throw error;
         toast.success('Personnel record updated successfully.');
-        navigate(`/personnel/${id}`); // Go back to view
       } else {
-        const newDocRef = doc(collection(db, 'personnel'));
-        data.personnelId = newDocRef.id;
-        data.createdAt = serverTimestamp();
-        data.createdByUserId = user.uid;
-        await setDoc(newDocRef, data);
+        payload.is_deleted = false;
+        payload.created_at = new Date().toISOString();
+        payload.created_by_user_id = user.id;
+
+        const { error } = await supabase
+          .from('personnel')
+          .insert([payload]);
+
+        if (error) throw error;
         toast.success('Personnel record created successfully.');
       }
       navigate('/personnel');
@@ -399,6 +635,195 @@ export default function PersonnelForm() {
       setSaving(false);
     }
   }
+
+  // Dynamic Component Helper
+  const DynamicDropdown = ({ fieldName, label, required = false, className = "form-group" }) => {
+    const fieldMeta = masterFields.find(f => f.personnelFieldName === fieldName || f.fieldName === fieldName);
+    if (!fieldMeta) return null;
+
+    const values = getDropdownValues(fieldMeta.fieldName);
+
+    return (
+      <div className={className}>
+        <label className="form-label">{label || fieldMeta.displayName} {required && <span className="required">*</span>}</label>
+        <select 
+          className="form-select" 
+          name={fieldMeta.personnelFieldName || fieldMeta.fieldName} 
+          value={form[fieldMeta.personnelFieldName || fieldMeta.fieldName] || ''} 
+          onChange={handleChange}
+          required={required}
+        >
+          <option value="">Select</option>
+          {values.map(v => (
+            <option key={v.id} value={v.value}>{v.value}</option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
+  // Identify fields that are already rendered in specific sections
+  const standardFields = [
+    'rank', 'gender', 'serviceType', 'serviceStatus', 'cadre', 'religion', 'caste', 'category'
+  ];
+  
+  const customMasterFields = masterFields.filter(f => 
+    !standardFields.includes(f.fieldName) && !standardFields.includes(f.personnelFieldName)
+  );
+
+  // Field Renderer Logic
+  const renderField = (fieldId) => {
+    // Special Photo + Name Block
+    if (fieldId === 'photo_and_name_block') {
+      return (
+        <div key="photo_block" style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+          <div style={{ flexShrink: 0 }}>
+            <label className="form-label" style={{ textAlign: 'center', display: 'block' }}>Personnel Photo</label>
+            <div className="photo-upload-container">
+              {photoPreview || form.photoURL ? (
+                <div style={{ position: 'relative' }}>
+                  <img src={photoPreview || form.photoURL} alt="Preview" className="photo-preview-large" />
+                  {!isView && <button type="button" className="photo-remove-btn" onClick={removePhoto}><X size={14} /></button>}
+                </div>
+              ) : (
+                <label className={`photo-placeholder-large ${isView ? '' : 'cursor-pointer'}`}>
+                  {!isView && <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />}
+                  <Camera size={32} />
+                  <span>{isView ? 'No Photo' : 'Upload Photo'}</span>
+                </label>
+              )}
+            </div>
+          </div>
+          <div style={{ flexGrow: 1 }}>
+            <div className="form-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <div className="form-group">
+                <label className="form-label">Full Name <span className="required">*</span></label>
+                <input className="form-input" name="fullName" value={form.fullName} onChange={handleChange} placeholder="Enter full name" readOnly={isView} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Father's Name</label>
+                <input className="form-input" name="fatherName" value={form.fatherName} onChange={handleChange} placeholder="Enter father's name" readOnly={isView} />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Standard Fields
+    switch (fieldId) {
+      case 'dateOfBirth': return <div key={fieldId} className="form-group"><label className="form-label">Date of Birth</label><input className="form-input" type="date" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'gender': return <DynamicDropdown key={fieldId} fieldName="gender" label="Gender" />;
+      case 'bloodGroup': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">Blood Group</label>
+          <select className="form-select" name={fieldId} value={form[fieldId]} onChange={handleChange} disabled={isView}>
+            <option value="">Select</option>
+            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+          </select>
+        </div>
+      );
+      case 'mobileNumber': return <div key={fieldId} className="form-group"><label className="form-label">Mobile Number <span className="required">*</span></label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="10-digit mobile" type="tel" readOnly={isView} /></div>;
+      case 'alternateContact': return <div key={fieldId} className="form-group"><label className="form-label">Alternate Contact</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} type="tel" readOnly={isView} /></div>;
+      case 'payCode': return <div key={fieldId} className="form-group"><label className="form-label">Pay Code <span className="form-hint">(Auto-fills from Mobile)</span></label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="Pay Code" readOnly={isView} /></div>;
+      case 'religion': return <DynamicDropdown key={fieldId} fieldName="religion" label="Religion" />;
+      case 'caste': return <DynamicDropdown key={fieldId} fieldName="caste" label="Caste" />;
+      case 'category': return <DynamicDropdown key={fieldId} fieldName="category" label="Category" />;
+      case 'aadharNumber': return <div key={fieldId} className="form-group"><label className="form-label">Aadhar Number</label><input className="form-input" name={fieldId} value={isView ? maskAadhar(form[fieldId]) : form[fieldId]} onChange={handleChange} placeholder="XXXX-XXXX-XXXX" disabled={isView} /></div>;
+      case 'pan': return <div key={fieldId} className="form-group"><label className="form-label">PAN</label><input className="form-input" name={fieldId} value={isView ? maskPAN(form[fieldId]) : form[fieldId]} onChange={handleChange} disabled={isView} /></div>;
+      case 'village': return <div key={fieldId} className="form-group"><label className="form-label">Village / Town</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="e.g. Village Name" readOnly={isView} /></div>;
+      case 'policeStation': return <div key={fieldId} className="form-group"><label className="form-label">Police Station</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="e.g. PS City" readOnly={isView} /></div>;
+      case 'homeDistrict': return <div key={fieldId} className="form-group"><label className="form-label">Home District (Origin)</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="e.g. Hisar" readOnly={isView} /></div>;
+      
+      case 'subjectGraduation': return <div key={fieldId} className="form-group"><label className="form-label">Subject (Graduation)</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="e.g. Physics" readOnly={isView} /><small style={{ color: 'var(--gray-500)', fontSize: '0.75rem' }}>Comma separated</small></div>;
+      case 'subjectPostGraduation': return <div key={fieldId} className="form-group"><label className="form-label">Subject (Post Graduation)</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="e.g. IT" readOnly={isView} /><small style={{ color: 'var(--gray-500)', fontSize: '0.75rem' }}>Comma separated</small></div>;
+      case 'swatAwtCourse': return <div key={fieldId} className="form-group"><label className="form-label">SWAT/AWT Course</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'specialCourse': return <div key={fieldId} className="form-group"><label className="form-label">Special Course</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'promotionType': return <div key={fieldId} className="form-group"><label className="form-label">Promotion Type</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+
+      case 'rank': return <DynamicDropdown key={fieldId} fieldName="rank" label="Rank" required />;
+      case 'beltNumber': return <div key={fieldId} className="form-group"><label className="form-label">Belt Number</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} placeholder="e.g. 1234" readOnly={isView} /></div>;
+      case 'cadre': return <DynamicDropdown key={fieldId} fieldName="cadre" label="Cadre" />;
+      case 'serviceType': return <DynamicDropdown key={fieldId} fieldName="serviceType" label="Service Type" />;
+      case 'serviceStatus': return <DynamicDropdown key={fieldId} fieldName="serviceStatus" label="Service Status" />;
+      case 'serviceBookNumber': return <div key={fieldId} className="form-group"><label className="form-label">Service Book Number</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'dateOfEnlistment': return <div key={fieldId} className="form-group"><label className="form-label">Date of Enlistment</label><input className="form-input" type="date" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'dateOfLastPromotion': return <div key={fieldId} className="form-group"><label className="form-label">Date of Last Promotion</label><input className="form-input" type="date" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'retirementDate': return <div key={fieldId} className="form-group"><label className="form-label">Retirement Date</label><input className="form-input" type="date" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+
+      case 'stateId': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">State</label>
+          <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange} disabled={!isSuperAdmin || isView}>
+            <option value="">Select State</option>
+            {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
+          </select>
+        </div>
+      );
+      case 'rangeId': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">Range</label>
+          <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin) || isView}>
+            <option value="">Select Range</option>
+            {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
+          </select>
+        </div>
+      );
+      case 'districtId': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">District</label>
+          <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isRangeAdmin) || isView}>
+            <option value="">Select District</option>
+            {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
+          </select>
+        </div>
+      );
+      case 'unitType': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">Unit Category</label>
+          <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={isView}>
+            <option value="">Select Category</option>
+            {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+      );
+      case 'currentUnitId': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">Unit</label>
+          <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) || isView}>
+            <option value="">{units.length === 0 ? 'No units found' : 'Select Unit'}</option>
+            {units.map(u => <option key={u.id} value={u.id}>{u.unitName}</option>)}
+          </select>
+        </div>
+      );
+      case 'currentSubUnitId': return (
+        <div key={fieldId} className="form-group">
+          <label className="form-label">Sub-Unit</label>
+          <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={isView}>
+            <option value="">{subUnits.length === 0 ? 'No sub-units found' : 'Select Sub-Unit'}</option>
+            {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
+          </select>
+        </div>
+      );
+
+      case 'psDutyType': return <div key={fieldId} className="form-group"><label className="form-label">PS Duty Type (Role 2)</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'ioStatus': return <DynamicDropdown key={fieldId} fieldName="ioStatus" label="IO Status" />;
+      case 'ioCategory': return <DynamicDropdown key={fieldId} fieldName="ioCategory" label="IO Category" />;
+      case 'paradeGroup': return <DynamicDropdown key={fieldId} fieldName="paradeGroup" label="Parade Group" />;
+      case 'spoTrade': return <DynamicDropdown key={fieldId} fieldName="spoTrade" label="SPO Trade" />;
+      case 'company': return <div key={fieldId} className="form-group"><label className="form-label">Company</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'dateOfPosting': return <div key={fieldId} className="form-group"><label className="form-label">Date of Posting</label><input className="form-input" type="date" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'rBatch': return <div key={fieldId} className="form-group"><label className="form-label">R/BATCH</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'tDutyOrder': return <div key={fieldId} className="form-group"><label className="form-label">T/DUTY ORDER</label><input className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} /></div>;
+      case 'remarks': return <div key={fieldId} className="form-group"><label className="form-label">Remarks</label><textarea className="form-input" name={fieldId} value={form[fieldId]} onChange={handleChange} readOnly={isView} style={{ minHeight: '80px' }} /></div>;
+
+      default:
+        // Try looking up in customMasterFields
+        const customField = customMasterFields.find(f => f.personnelFieldName === fieldId || f.fieldName === fieldId);
+        if (customField) return <DynamicDropdown key={fieldId} fieldName={customField.fieldName} />;
+        return null;
+    }
+  };
 
   if (loading) {
     return (
@@ -426,322 +851,27 @@ export default function PersonnelForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* Basic Information */}
-        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
-          <div className="panel-header"><h3>Basic Information</h3></div>
-          <div className="panel-body">
-            <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', alignItems: 'flex-start' }}>
-              <div style={{ flexShrink: 0 }}>
-                <label className="form-label" style={{ textAlign: 'center', display: 'block' }}>Personnel Photo</label>
-                <div className="photo-upload-container">
-                  {photoPreview || form.photoURL ? (
-                    <div style={{ position: 'relative' }}>
-                      <img src={photoPreview || form.photoURL} alt="Preview" className="photo-preview-large" />
-                      <button type="button" className="photo-remove-btn" onClick={removePhoto}><X size={14} /></button>
-                    </div>
-                  ) : (
-                    <label className="photo-placeholder-large cursor-pointer">
-                      <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
-                      <Camera size={32} />
-                      <span>Upload Photo</span>
-                    </label>
-                  )}
-                </div>
-              </div>
-              <div style={{ flexGrow: 1 }}>
-                <div className="form-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                  <div className="form-group">
-                    <label className="form-label">Full Name <span className="required">*</span></label>
-                    <input className="form-input" name="fullName" value={form.fullName} onChange={handleChange} placeholder="Enter full name" />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Father's Name</label>
-                    <input className="form-input" name="fatherName" value={form.fatherName} onChange={handleChange} placeholder="Enter father's name" />
-                  </div>
-                </div>
-                <div className="form-row" style={{ gridTemplateColumns: '1fr 1fr', marginTop: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Belt Number</label>
-                    <input className="form-input" name="beltNumber" value={form.beltNumber} onChange={handleChange} placeholder="e.g. 1234" />
-                  </div>
-                  <div className="form-group">
-                <label className="form-label">Rank <span className="required">*</span></label>
-                  <select className="form-select" name="rank" value={form.rank} onChange={handleChange} required>
-                  <option value="">Select</option>
-                  {masterRanks.map(r => (
-                    <option key={r.id} value={r.value}>{r.value}</option>
-                  ))}
-                </select>
-              </div>
-                </div>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Mobile Number <span className="required">*</span></label>
-                <input className="form-input" name="mobileNumber" value={form.mobileNumber} onChange={handleChange} placeholder="10-digit mobile" type="tel" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Pay Code <span className="form-hint">(Auto-filled from Mobile)</span></label>
-                <input className="form-input" name="payCode" value={form.payCode} onChange={handleChange} placeholder="Pay Code or Mobile No." />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Gender</label>
-                <select className="form-select" name="gender" value={form.gender} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {masterGenders.map(g => <option key={g.id} value={g.value}>{g.value}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Date of Birth</label>
-                <input className="form-input" type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Blood Group</label>
-                <select className="form-select" name="bloodGroup" value={form.bloodGroup} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Service Information */}
-        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
-          <div className="panel-header"><h3>Service Details</h3></div>
-          <div className="panel-body">
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Service Type</label>
-                <select className="form-select" name="serviceType" value={form.serviceType} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {masterServiceTypes.map(st => <option key={st.id} value={st.value}>{st.value}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Service Status</label>
-                <select className="form-select" name="serviceStatus" value={form.serviceStatus} onChange={handleChange}>
-                  {masterServiceStatuses.map(s => <option key={s.id} value={s.value}>{s.value}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Cadre</label>
-                <select className="form-select" name="cadre" value={form.cadre} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {masterCadres.map(c => <option key={c.id} value={c.value}>{c.value}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Date of Enlistment</label>
-                <input className="form-input" type="date" name="dateOfEnlistment" value={form.dateOfEnlistment} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Date of Last Promotion</label>
-                <input className="form-input" type="date" name="dateOfLastPromotion" value={form.dateOfLastPromotion} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Retirement Date</label>
-                <input className="form-input" type="date" name="retirementDate" value={form.retirementDate} onChange={handleChange} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Service Book Number</label>
-                <input className="form-input" name="serviceBookNumber" value={form.serviceBookNumber} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Promotion Type</label>
-                <input className="form-input" name="promotionType" value={form.promotionType} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Special Course</label>
-                <input className="form-input" name="specialCourse" value={form.specialCourse} onChange={handleChange} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Category & Identity */}
-        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
-          <div className="panel-header"><h3>Category & Identity</h3></div>
-          <div className="panel-body">
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Religion</label>
-                <select className="form-select" name="religion" value={form.religion} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {masterReligions.map(r => <option key={r.id} value={r.value}>{r.value}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Caste</label>
-                <select className="form-select" name="caste" value={form.caste} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {masterCastes.map(c => <option key={c.id} value={c.value}>{c.value}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Category</label>
-                <select className="form-select" name="category" value={form.category} onChange={handleChange}>
-                  <option value="">Select</option>
-                  {masterCategories.map(c => <option key={c.id} value={c.value}>{c.value}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Aadhar Number</label>
-                <input className="form-input" name="aadharNumber" 
-                  value={isView ? maskAadhar(form.aadharNumber) : form.aadharNumber} 
-                  onChange={handleChange} placeholder="XXXX-XXXX-XXXX" disabled={isView} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">PAN</label>
-                <input className="form-input" name="pan" 
-                  value={isView ? maskPAN(form.pan) : form.pan} 
-                  onChange={handleChange} disabled={isView} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Alternate Contact</label>
-                <input className="form-input" name="alternateContact" value={form.alternateContact} onChange={handleChange} type="tel" disabled={isView} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Posting Details Restricted per Role - Removed for all admins per request */}
-        {/* Current Posting Section - Restored for all admins with role-based locking */}
-        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
-            <div className="panel-header">
-              <h3>Current Posting</h3>
-            </div>
+        {layout.map((section) => (
+          <div key={section.id} className="panel" style={{ marginBottom: 'var(--space-5)' }}>
+            <div className="panel-header"><h3>{section.title}</h3></div>
             <div className="panel-body">
-              <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '1rem' }}>
-                <div className="form-group">
-                  <label className="form-label">State</label>
-                  {!isSuperAdmin ? (
-                    <input className="form-input" disabled value={user?.stateName || 'Haryana'} title="Auto-filled & Locked" />
-                  ) : (
-                    <select className="form-select" name="stateId" value={form.stateId} onChange={handleChange}>
-                      <option value="">Select State</option>
-                      {states.map(s => <option key={s.id} value={s.id}>{s.stateName}</option>)}
-                    </select>
-                  )}
+              {/* Special Handling for Sections that don't use standard grid */}
+              {section.id === 'personal' ? (
+                <>
+                  {renderField('photo_and_name_block')}
+                  <div className="form-row">
+                    {section.fields.filter(fid => fid !== 'photo_and_name_block').map(fid => renderField(fid))}
+                  </div>
+                </>
+              ) : (
+                <div className="form-row">
+                  {section.fields.map(fid => renderField(fid))}
                 </div>
-
-                <div className="form-group">
-                  <label className="form-label">Range</label>
-                  {!isSuperAdmin && !isStateAdmin ? (
-                    <input className="form-input" disabled value={user?.rangeName || 'Locked Range'} title="Auto-filled & Locked" />
-                  ) : (
-                    <select className="form-select" name="rangeId" value={form.rangeId} onChange={handleChange} disabled={!form.stateId}>
-                      <option value="">{ranges.length === 0 && form.stateId ? 'No Ranges Found' : 'Select Range'}</option>
-                      {ranges.map(r => <option key={r.id} value={r.id}>{r.rangeName}</option>)}
-                    </select>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">District</label>
-                  {!isSuperAdmin && !isStateAdmin && !isRangeAdmin ? (
-                    <input className="form-input" disabled value={user?.districtName || 'Locked District'} title="Auto-filled & Locked" />
-                  ) : (
-                    <select className="form-select" name="districtId" value={form.districtId} onChange={handleChange} disabled={!form.rangeId}>
-                      <option value="">{districts.length === 0 && form.rangeId ? 'No Districts Found' : 'Select District'}</option>
-                      {districts.map(d => <option key={d.id} value={d.id}>{d.districtName}</option>)}
-                    </select>
-                  )}
-                </div>
-              </div>
-              
-              <div className="form-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                <div className="form-group">
-                  <label className="form-label">Unit Category</label>
-                  {!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin ? (
-                    <input className="form-input" disabled value="Auto-determined" title="Auto-filled & Locked" />
-                  ) : (
-                    <select className="form-select" name="unitType" value={form.unitType} onChange={handleChange} disabled={!form.districtId}>
-                      <option value="">Select Category</option>
-                      {unitCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Unit</label>
-                  {!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin ? (
-                    <input className="form-input" disabled value={user?.unitName || 'Locked Unit'} title="Auto-filled & Locked" />
-                  ) : (
-                    <select className="form-select" name="currentUnitId" value={form.currentUnitId} onChange={handleChange} disabled={!form.unitType || !form.districtId}>
-                      <option value="">{units.length === 0 && form.unitType ? 'No units available for selected category in this district' : 'Select Unit'}</option>
-                      {units.map(u => (
-                        <option key={u.id} value={u.id}>{u.unitName}</option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Sub-Unit</label>
-                  <select className="form-select" name="currentSubUnitId" value={form.currentSubUnitId} onChange={handleChange} disabled={(!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin && !isUnitAdmin) || !form.currentUnitId}>
-                    <option value="">{subUnits.length === 0 && form.currentUnitId ? 'No sub-units available' : 'Select Sub-Unit'}</option>
-                    {subUnits.map(su => <option key={su.id} value={su.id}>{su.subUnitName}</option>)}
-                  </select>
-                </div>
-              </div>
+              )}
             </div>
           </div>
+        ))}
 
-
-        {/* Duty/Role Information */}
-        <div className="panel" style={{ marginBottom: 'var(--space-5)' }}>
-          <div className="panel-header"><h3>Duty & Role</h3></div>
-          <div className="panel-body">
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Role 1</label>
-                <input className="form-input" name="role1" value={form.role1} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Role 2</label>
-                <input className="form-input" name="role2" value={form.role2} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">IO Status</label>
-                <input className="form-input" name="ioStatus" value={form.ioStatus} onChange={handleChange} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">IO Category</label>
-                <input className="form-input" name="ioCategory" value={form.ioCategory} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Parade Group</label>
-                <input className="form-input" name="paradeGroup" value={form.paradeGroup} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">SPO Trade</label>
-                <input className="form-input" name="spoTrade" value={form.spoTrade} onChange={handleChange} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Company</label>
-                <input className="form-input" name="company" value={form.company} onChange={handleChange} />
-              </div>
-              <div className="form-group" style={{ gridColumn: '2 / -1' }}>
-                <label className="form-label">Remarks</label>
-                <textarea className="form-textarea" name="remarks" value={form.remarks} onChange={handleChange} rows={2} />
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Submit */}
         <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginBottom: 40 }}>

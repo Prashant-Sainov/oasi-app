@@ -3,8 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft, Plus, Trash2, X, ClipboardList, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 
 const DEFAULT_HEADS = [
   { id: 'head_police', headName: 'Police Official', total: 0, absent: 0, leave: 0, present: 0 },
@@ -75,26 +74,24 @@ export default function ChitthaEditor() {
 
   async function fetchUnits() {
     try {
-      const unitRef = collection(db, 'units');
-      let q;
+      let queryBuilder = supabase.from('units').select('*').eq('assigned_module', 'chittha');
+
       if (isUnitAdmin && user?.unitId) {
-        // Unit admin can only see their own unit
-        q = query(unitRef, where('__name__', '==', user.unitId));
+        queryBuilder = queryBuilder.eq('id', user.unitId);
       } else if (isDistrictAdmin && user?.districtId) {
-        q = query(unitRef, 
-          where('districtId', '==', user.districtId),
-          where('assignedModule', '==', 'chittha')
-        );
+        queryBuilder = queryBuilder.eq('district_id', user.districtId);
       } else if (isStateAdmin && user?.stateId) {
-        q = query(unitRef, 
-          where('stateId', '==', user.stateId),
-          where('assignedModule', '==', 'chittha')
-        );
-      } else {
-        q = query(unitRef, where('assignedModule', '==', 'chittha'));
+        queryBuilder = queryBuilder.eq('state_id', user.stateId);
       }
-      const snap = await getDocs(q);
-      setUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+      
+      setUnits(data.map(u => ({
+        id: u.id,
+        unitName: u.name,
+        ...u
+      })));
     } catch (err) {
       console.error(err);
     }
@@ -102,12 +99,27 @@ export default function ChitthaEditor() {
 
   async function fetchUnitPersonnel(unitId) {
     try {
-      const q = query(collection(db, 'personnel'), where('currentUnitId', '==', unitId), where('serviceStatus', '==', 'Active'));
-      const snap = await getDocs(q);
-      const personnel = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setAllUnitPersonnel(personnel);
+      const { data: personnel, error } = await supabase
+        .from('personnel')
+        .select('*')
+        .eq('current_unit_id', unitId)
+        .eq('service_status', 'Active')
+        .eq('is_deleted', false);
+      
+      if (error) throw error;
+
+      const mappedPersonnel = personnel.map(p => ({
+        id: p.id,
+        fullName: p.full_name,
+        rank: p.rank,
+        beltNumber: p.belt_number,
+        mobileNumber: p.mobile_number,
+        ...p
+      }));
+
+      setAllUnitPersonnel(mappedPersonnel);
       // Auto-populate section 11 (Unallocated)
-      const officerObjs = personnel.map(p => toOfficerObj(p));
+      const officerObjs = mappedPersonnel.map(p => toOfficerObj(p));
       setSections(prev => prev.map(s =>
         s.id === 'sec_unallocated' ? { ...s, officers: officerObjs } : { ...s, officers: [] }
       ));
@@ -118,30 +130,55 @@ export default function ChitthaEditor() {
 
   async function fetchChittha() {
     try {
-      const docRef = doc(db, 'naukriChittha', id);
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const data = snap.data();
-        setFormData({
-          unitId: data.unitId,
-          unitName: data.unitName,
-          chitthaDate: data.chitthaDate,
-          dateLabel: data.dateLabel || '',
-          status: data.status,
-        });
-        if (data.headSummary) setHeadSummary(data.headSummary);
-        const assignRef = collection(db, 'chitthaAssignments');
-        const aSnap = await getDocs(query(assignRef, where('chitthaId', '==', id)));
-        const allAssignments = aSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        if (data.sectionConfigs) {
-          const reconstructed = data.sectionConfigs.map(s => ({
-            ...s,
-            officers: allAssignments.filter(a => a.sectionId === s.id),
-          }));
-          setSections(reconstructed);
-        }
+      const { data: chitthaData, error: cError } = await supabase
+        .from('chitthas')
+        .select(`
+          *,
+          units:unit_id (name)
+        `)
+        .eq('id', id)
+        .single();
+      
+      if (cError) throw cError;
+
+      setFormData({
+        unitId: chitthaData.unit_id,
+        unitName: chitthaData.units?.name || '',
+        chitthaDate: chitthaData.chittha_date,
+        dateLabel: chitthaData.date_label || '',
+        status: chitthaData.status,
+      });
+
+      if (chitthaData.head_summary) setHeadSummary(chitthaData.head_summary);
+
+      // Load assignments
+      const { data: assignments, error: aError } = await supabase
+        .from('chittha_assignments')
+        .select('*')
+        .eq('chittha_id', id);
+      
+      if (aError) throw aError;
+
+      // Map back to sections format
+      if (chitthaData.section_configs) {
+        const reconstructed = chitthaData.section_configs.map(s => ({
+          ...s,
+          officers: assignments
+            .filter(a => a.section_name === s.id) // UI uses id as sectionName in NaukariChittha, but here it might be different. Let's check sections.
+            .map(a => ({
+              personnelId: a.personnel_id,
+              personnelName: a.personnel_name_at_time, // Or fetch from personnel
+              personnelRank: a.personnel_rank_at_time,
+              personnelBelt: a.personnel_belt_at_time,
+              dutyPoint: a.duty_point,
+              remarks: a.remarks,
+              sectionId: a.section_name
+            }))
+        }));
+        setSections(reconstructed);
       }
     } catch (err) {
+      console.error(err);
       toast.error('Failed to load roster');
     } finally {
       setLoading(false);
@@ -287,33 +324,74 @@ export default function ChitthaEditor() {
 
     try {
       setSaving(true);
-      const chitthaId = id || doc(collection(db, 'naukriChittha')).id;
+      
       const payload = {
-        id: chitthaId,
-        ...formData,
-        districtId: user?.districtId || '',
-        districtName: user?.districtName || '',
-        headSummary,
-        sectionConfigs: sections.map(s => ({ id: s.id, title: s.title })),
-        sectionCount: sections.length,
-        updatedAt: serverTimestamp(),
+        unit_id: formData.unitId,
+        district_id: user?.districtId || null,
+        chittha_date: formData.chitthaDate,
+        date_label: formData.dateLabel || '',
+        status: formData.status,
+        head_summary: headSummary,
+        section_configs: sections.map(s => ({ id: s.id, title: s.title })),
+        updated_at: new Date().toISOString(),
       };
-      if (!id) payload.createdAt = serverTimestamp();
-      await setDoc(doc(db, 'naukriChittha', chitthaId), payload, { merge: true });
 
+      let chitthaId = id;
+
+      if (!id) {
+        payload.created_at = new Date().toISOString();
+        payload.state_id = user?.stateId || null;
+        payload.range_id = user?.rangeId || null;
+        payload.created_by_user_id = user?.id || null;
+        
+        const { data: newChittha, error: cError } = await supabase
+          .from('chitthas')
+          .insert([payload])
+          .select()
+          .single();
+        
+        if (cError) throw cError;
+        chitthaId = newChittha.id;
+      } else {
+        const { error: cError } = await supabase
+          .from('chitthas')
+          .update(payload)
+          .eq('id', id);
+        
+        if (cError) throw cError;
+      }
+
+      // Handle assignments (Delete existing and re-insert for simplicity in editor)
+      if (id) {
+        await supabase.from('chittha_assignments').delete().eq('chittha_id', chitthaId);
+      }
+
+      const assignmentPayload = [];
       for (const section of sections) {
         for (const off of section.officers) {
-          const assignId = `${chitthaId}_${section.id}_${off.personnelId}`;
-          await setDoc(doc(db, 'chitthaAssignments', assignId), {
-            ...off,
-            chitthaId,
-            sectionId: section.id,
-            sectionTitle: section.title,
-            chitthaDate: formData.chitthaDate,
-            unitId: formData.unitId,
+          const person = allUnitPersonnel.find(p => p.id === off.personnelId);
+          assignmentPayload.push({
+            chittha_id: chitthaId,
+            personnel_id: off.personnelId,
+            section_name: section.id,
+            duty_type: 'General', // Default
+            duty_location: off.dutyPoint || '',
+            remark_text: off.remarks || '',
+            state_id: person?.state_id || user?.stateId || null,
+            unit_id: formData.unitId,
+            created_at: new Date().toISOString()
           });
         }
       }
+
+      if (assignmentPayload.length > 0) {
+        const { error: aError } = await supabase
+          .from('chittha_assignments')
+          .insert(assignmentPayload);
+        
+        if (aError) throw aError;
+      }
+
       toast.success('Roster saved successfully!');
       navigate('/chitthas');
     } catch (err) {

@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { db } from '../firebase';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '../supabase';
 
 const AuthContext = createContext(null);
 
@@ -23,7 +22,7 @@ export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore session from localStorage and sync with Firestore
+  // Restore session from localStorage and sync with Supabase
   useEffect(() => {
     async function syncSession() {
       const stored = localStorage.getItem('oasi_user');
@@ -32,32 +31,44 @@ export default function AuthProvider({ children }) {
           const parsed = JSON.parse(stored);
           setUser(parsed); // Set initial state from storage for speed
 
-          // Re-fetch from Firestore to ensure data (like stateId) is fresh
-          const userDoc = await getDoc(doc(db, 'users', parsed.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            
-            // Fetch hierarchy names
-            const names = await fetchHierarchyNames(userData);
+          // Re-fetch from Supabase to ensure data is fresh
+          const { data: userData, error } = await supabase
+            .from('app_users')
+            .select(`
+              *,
+              roles (name),
+              states (name),
+              ranges (name),
+              districts (name),
+              units (name),
+              sub_units (name)
+            `)
+            .eq('id', parsed.uid)
+            .single();
 
+          if (userData && !error) {
             const updatedUser = {
               ...parsed,
               name: userData.name,
-              beltNumber: userData.beltNumber,
-              role: userData.role,
-              roleLabel: ROLE_LABELS[userData.role] || userData.role,
-              stateId: userData.stateId || null,
-              rangeId: userData.rangeId || null,
-              districtId: userData.districtId || null,
-              unitId: userData.unitId || null,
-              subUnitId: userData.subUnitId || null,
-              personnelId: userData.personnelId || null,
-              ...names,
+              beltNumber: userData.belt_number,
+              role: userData.roles?.name || 'staff',
+              roleLabel: ROLE_LABELS[userData.roles?.name] || userData.roles?.name || 'Normal Staff',
+              stateId: userData.state_id,
+              rangeId: userData.range_id,
+              districtId: userData.district_id,
+              unitId: userData.unit_id,
+              subUnitId: userData.sub_unit_id,
+              personnelId: userData.personnel_id,
+              stateName: userData.states?.name || '',
+              rangeName: userData.ranges?.name || '',
+              districtName: userData.districts?.name || '',
+              unitName: userData.units?.name || '',
+              subUnitName: userData.sub_units?.name || '',
             };
             localStorage.setItem('oasi_user', JSON.stringify(updatedUser));
             setUser(updatedUser);
           } else {
-            // User deleted or disabled
+            // User not found or error
             logoutRef.current();
           }
         } catch (err) {
@@ -71,100 +82,62 @@ export default function AuthProvider({ children }) {
     syncSession();
   }, []);
 
-  async function fetchHierarchyNames(userData) {
-    const names = {
-      stateName: '',
-      rangeName: '',
-      districtName: '',
-      unitName: '',
-      subUnitName: ''
-    };
-
-    try {
-      if (userData.stateId) {
-        const s = await getDoc(doc(db, 'states', userData.stateId));
-        if (s.exists()) names.stateName = s.data().stateName;
-      }
-      if (userData.rangeId) {
-        const r = await getDoc(doc(db, 'ranges', userData.rangeId));
-        if (r.exists()) names.rangeName = r.data().rangeName;
-      }
-      if (userData.districtId) {
-        const d = await getDoc(doc(db, 'districts', userData.districtId));
-        if (d.exists()) names.districtName = d.data().districtName;
-      }
-      if (userData.unitId) {
-        const u = await getDoc(doc(db, 'units', userData.unitId));
-        if (u.exists()) names.unitName = u.data().unitName;
-      }
-      if (userData.subUnitId) {
-        const su = await getDoc(doc(db, 'subUnits', userData.subUnitId));
-        if (su.exists()) names.subUnitName = su.data().subUnitName;
-      }
-    } catch (e) {
-      console.error('Error fetching hierarchy names:', e);
-    }
-    return names;
-  }
-
   const login = useCallback(async (beltNumber, password) => {
-    // Query users collection by beltNumber
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('beltNumber', '==', beltNumber.trim()), where('isActive', '==', true));
-    const snap = await getDocs(q);
+    // Query app_users table by belt_number
+    const { data: userData, error } = await supabase
+      .from('app_users')
+      .select(`
+        *,
+        roles (name),
+        states (name),
+        ranges (name),
+        districts (name),
+        units (name),
+        sub_units (name)
+      `)
+      .eq('belt_number', beltNumber.trim())
+      .eq('is_active', true)
+      .single();
 
-    if (snap.empty) {
+    if (error || !userData) {
       throw new Error('Invalid credentials. No active user found with this Belt Number.');
     }
-
-    // Guard against multiple users with same belt number
-    if (snap.docs.length > 1) {
-      console.warn('Multiple active users found with belt number:', beltNumber);
-    }
-
-    const userDoc = snap.docs[0];
-    const userData = userDoc.data();
 
     /**
      * ⚠️  SECURITY WARNING — PLAINTEXT PASSWORD COMPARISON
      * 
-     * This is NOT safe for production. Passwords are stored in plaintext in Firestore.
-     * 
-     * MIGRATION PLAN:
-     * 1. Create a Firebase Cloud Function that accepts (beltNumber, password)
-     * 2. Use bcrypt.compare() in the Cloud Function to validate
-     * 3. Return a Firebase Custom Token on success
-     * 4. Use signInWithCustomToken() on the client
-     * 5. Delete all plaintext passwords from Firestore
-     * 
-     * Alternatively, migrate to Firebase Auth (email/password) by generating
-     * email addresses like beltNumber@oasi-portal.internal
+     * MIGRATION NOTE: The current schema uses 'password_hash'. 
+     * For now we are doing a direct comparison to maintain parity with legacy logic,
+     * but you should switch to Supabase Auth or bcrypt hashing ASAP.
      */
-    if (userData.password !== password) {
+    if (userData.password_hash !== password) {
       throw new Error('Invalid credentials. Password does not match.');
     }
 
     const sessionUser = {
-      uid: userDoc.id,
-      userId: userData.userId,
+      uid: userData.id,
       name: userData.name,
-      beltNumber: userData.beltNumber,
-      role: userData.role,
-      roleLabel: ROLE_LABELS[userData.role] || userData.role,
-      stateId: userData.stateId || null,
-      rangeId: userData.rangeId || null,
-      districtId: userData.districtId || null,
-      unitId: userData.unitId || null,
-      subUnitId: userData.subUnitId || null,
-      personnelId: userData.personnelId || null,
+      beltNumber: userData.belt_number,
+      role: userData.roles?.name || 'staff',
+      roleLabel: ROLE_LABELS[userData.roles?.name] || userData.roles?.name || 'Normal Staff',
+      stateId: userData.state_id,
+      rangeId: userData.range_id,
+      districtId: userData.district_id,
+      unitId: userData.unit_id,
+      subUnitId: userData.sub_unit_id,
+      personnelId: userData.personnel_id,
+      stateName: userData.states?.name || '',
+      rangeName: userData.ranges?.name || '',
+      districtName: userData.districts?.name || '',
+      unitName: userData.units?.name || '',
+      subUnitName: userData.sub_units?.name || '',
     };
 
-    // Fetch hierarchy names for login
-    const names = await fetchHierarchyNames(userData);
-    Object.assign(sessionUser, names);
-
     // Update last login
-    await updateDoc(doc(db, 'users', userDoc.id), { lastLogin: serverTimestamp() });
+    await supabase
+      .from('app_users')
+      .update({ last_login: new Date().toISOString() })
+      .eq('id', userData.id);
 
     localStorage.setItem('oasi_user', JSON.stringify(sessionUser));
     setUser(sessionUser);
@@ -176,7 +149,7 @@ export default function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  // Stable ref for use in effects without dependency issues
+  // Stable ref for use in effects
   const logoutRef = useRef(logout);
   logoutRef.current = logout;
 

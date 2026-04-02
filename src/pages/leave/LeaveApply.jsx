@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db, storage } from '../../firebase';
-import {
-  collection, doc, setDoc, query, where, getDocs, serverTimestamp
-} from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
 import { Send, UploadCloud, ArrowLeft, Calendar } from 'lucide-react';
 
@@ -43,14 +39,26 @@ export default function LeaveApply() {
 
   async function loadPersonnel() {
     try {
-      const q = query(
-        collection(db, 'personnel'),
-        where('currentUnitId', '==', user.unitId || ''),
-        where('serviceStatus', '==', 'Active')
-      );
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setPersonnel(data);
+      const { data, error } = await supabase
+        .from('personnel')
+        .select('*')
+        .eq('current_unit_id', user.unitId || '')
+        .eq('service_status', 'Active')
+        .eq('is_deleted', false);
+      
+      if (error) throw error;
+
+      setPersonnel(data.map(p => ({
+        id: p.id,
+        fullName: p.full_name,
+        rank: p.rank,
+        beltNumber: p.belt_number,
+        stateId: p.state_id,
+        rangeId: p.range_id,
+        districtId: p.district_id,
+        currentUnitId: p.current_unit_id,
+        currentSubUnitId: p.current_sub_unit_id
+      })));
     } catch (err) {
       console.error('Load personnel error:', err);
       toast.error('Failed to load personnel list.');
@@ -92,34 +100,44 @@ export default function LeaveApply() {
       
       let documentUrl = '';
       if (documentFile) {
-        const fileRef = ref(storage, `leave_documents/${Date.now()}_${documentFile.name}`);
-        const uploadResult = await uploadBytes(fileRef, documentFile);
-        documentUrl = await getDownloadURL(uploadResult.ref);
+        const fileExt = documentFile.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `leave_docs/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('personnel-docs')
+          .upload(filePath, documentFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from('personnel-docs')
+          .getPublicUrl(filePath);
+        
+        documentUrl = publicUrlData.publicUrl;
       }
 
-      const leaveRef = doc(collection(db, 'leaveRegister'));
-      await setDoc(leaveRef, {
-        leaveId: leaveRef.id,
-        personnelId: selectedPerson.id,
-        personnelName: selectedPerson.fullName || '',
-        beltNumber: selectedPerson.beltNumber || '',
-        rank: selectedPerson.rank || '',
-        stateId: selectedPerson.stateId || '',
-        rangeId: selectedPerson.rangeId || '',
-        districtId: selectedPerson.districtId || '',
-        unitId: selectedPerson.currentUnitId || '',
-        subUnitId: selectedPerson.currentSubUnitId || '',
-        leaveType: formData.leaveType,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        totalDays,
+      const payload = {
+        personnel_id: selectedPerson.id,
+        state_id: selectedPerson.stateId || '',
+        range_id: selectedPerson.rangeId || '',
+        district_id: selectedPerson.districtId || '',
+        unit_id: selectedPerson.currentUnitId || '',
+        sub_unit_id: selectedPerson.currentSubUnitId || '',
+        
+        leave_type: formData.leaveType,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        total_days: totalDays,
         reason: formData.reason,
-        status: 'Pending',
-        documentUrl,
-        createdByUserId: user.uid || user.userId,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+        status: 'Applied',
+        remarks: documentUrl ? `Supporting doc: ${documentUrl}` : '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('leaves').insert([payload]);
+      if (error) throw error;
 
       toast.success('Leave application submitted successfully.');
       navigate('/leave');

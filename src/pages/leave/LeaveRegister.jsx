@@ -1,11 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import {
-  collection, query, where, getDocs, doc, updateDoc,
-  serverTimestamp, orderBy, limit
-} from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import {
   FileText, Plus, Search, Filter, CheckCircle, XCircle,
   Clock, Calendar, User, ArrowRight
@@ -36,20 +32,47 @@ export default function LeaveRegister() {
   async function loadLeaves() {
     try {
       setLoading(true);
-      const leaveRef = collection(db, 'leaveRegister');
-      let q = query(leaveRef, orderBy('createdAt', 'desc'), limit(100));
+      
+      let queryBuilder = supabase
+        .from('leaves')
+        .select(`
+          *,
+          personnel:personnel_id (
+            full_name,
+            rank,
+            belt_number
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100);
 
       // Role-based filtering
       if (isUnitAdmin && user.unitId) {
-        q = query(leaveRef, where('unitId', '==', user.unitId), orderBy('createdAt', 'desc'), limit(100));
+        queryBuilder = queryBuilder.eq('unit_id', user.unitId);
       } else if (isDistrictAdmin && user.districtId) {
-        q = query(leaveRef, where('districtId', '==', user.districtId), orderBy('createdAt', 'desc'), limit(100));
+        queryBuilder = queryBuilder.eq('district_id', user.districtId);
       } else if (isRangeAdmin && user.rangeId) {
-        q = query(leaveRef, where('rangeId', '==', user.rangeId), orderBy('createdAt', 'desc'), limit(100));
+        queryBuilder = queryBuilder.eq('range_id', user.rangeId);
       }
 
-      const snap = await getDocs(q);
-      setLeaves(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+
+      setLeaves(data.map(l => ({
+        id: l.id,
+        personnelName: l.personnel?.full_name || 'Unknown',
+        beltNumber: l.personnel?.belt_number || '—',
+        rank: l.personnel?.rank || '—',
+        leaveType: l.leave_type,
+        startDate: l.start_date,
+        endDate: l.end_date,
+        totalDays: l.total_days,
+        status: l.status,
+        unitId: l.unit_id,
+        districtId: l.district_id,
+        rangeId: l.range_id,
+        ...l
+      })));
     } catch (err) {
       if (import.meta.env.DEV) console.error('Load leaves error:', err);
       toast.error('Failed to load leave records.');
@@ -87,13 +110,18 @@ export default function LeaveRegister() {
     }
 
     try {
-      const leaveDoc = doc(db, 'leaveRegister', leave.id);
-      await updateDoc(leaveDoc, {
-        status: newStatus,
-        updatedAt: serverTimestamp(),
-        approvedBy: user.uid || user.userId,
-        approvedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('leaves')
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString(),
+          approved_by_user_id: user.id || null,
+          approval_date: new Date().toISOString(),
+        })
+        .eq('id', leave.id);
+      
+      if (error) throw error;
+
       setLeaves(prev => prev.map(l => l.id === leave.id ? { ...l, status: newStatus } : l));
       toast.success(`Leave ${newStatus.toLowerCase()} successfully.`);
     } catch (err) {

@@ -1,11 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import {
-  collection, query, where, getDocs, doc, setDoc, updateDoc,
-  deleteDoc, serverTimestamp, getDoc
-} from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import {
   ClipboardList, Plus, Trash2, Search, Save, Lock,
   ChevronDown, ChevronRight, AlertTriangle, Check, X,
@@ -101,31 +97,63 @@ export default function NaukariChittha() {
       setLoading(true);
 
       // Load personnel
-      const personnelRef = collection(db, 'personnel');
-      let pConstraints = [where('serviceStatus', '==', 'Active')];
-      if (user.unitId) pConstraints.push(where('currentUnitId', '==', user.unitId));
-      else if (isDistrictAdmin && user.districtId) pConstraints.push(where('districtId', '==', user.districtId));
-      else if (isRangeAdmin && user.rangeId) pConstraints.push(where('rangeId', '==', user.rangeId));
-      const pSnap = await getDocs(query(personnelRef, ...pConstraints));
-      const pData = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setPersonnel(pData);
+      let pQuery = supabase.from('personnel').select('*').eq('service_status', 'Active').eq('is_deleted', false);
+      
+      if (user.unitId) pQuery = pQuery.eq('current_unit_id', user.unitId);
+      else if (isDistrictAdmin && user.districtId) pQuery = pQuery.eq('district_id', user.districtId);
+      else if (isRangeAdmin && user.rangeId) pQuery = pQuery.eq('range_id', user.rangeId);
+      
+      const { data: pData, error: pError } = await pQuery;
+      if (pError) throw pError;
+      
+      const mappedPersonnel = pData.map(p => ({
+        id: p.id,
+        fullName: p.full_name,
+        beltNumber: p.belt_number,
+        rank: p.rank,
+        currentUnitId: p.current_unit_id,
+        currentSubUnitId: p.current_sub_unit_id,
+        stateId: p.state_id,
+        rangeId: p.range_id,
+        districtId: p.district_id
+      }));
+      setPersonnel(mappedPersonnel);
 
       // Load existing chittha for this date
-      const chitthaRef = collection(db, 'naukriChittha');
-      let cConstraints = [where('chitthaDate', '==', selectedDate)];
-      if (user.unitId) cConstraints.push(where('unitId', '==', user.unitId));
-      else if (isDistrictAdmin && user.districtId) cConstraints.push(where('districtId', '==', user.districtId));
-      else if (isRangeAdmin && user.rangeId) cConstraints.push(where('rangeId', '==', user.rangeId));
-      const cSnap = await getDocs(query(chitthaRef, ...cConstraints));
+      let cQuery = supabase.from('chitthas').select('*').eq('chittha_date', selectedDate);
+      if (user.unitId) cQuery = cQuery.eq('unit_id', user.unitId);
+      else if (isDistrictAdmin && user.districtId) cQuery = cQuery.eq('district_id', user.districtId);
+      else if (isRangeAdmin && user.rangeId) cQuery = cQuery.eq('range_id', user.rangeId);
+      
+      const { data: cData, error: cError } = await cQuery;
+      if (cError) throw cError;
 
-      if (cSnap.docs.length > 0) {
-        const chitthaDoc = cSnap.docs[0];
-        setChittha({ id: chitthaDoc.id, ...chitthaDoc.data() });
+      if (cData.length > 0) {
+        const chitthaDoc = cData[0];
+        setChittha(chitthaDoc);
 
         // Load assignments for this chittha
-        const assignRef = collection(db, 'chitthaAssignments');
-        const aSnap = await getDocs(query(assignRef, where('chitthaId', '==', chitthaDoc.id)));
-        setAssignments(aSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        const { data: aData, error: aError } = await supabase
+          .from('chittha_assignments')
+          .select('*')
+          .eq('chittha_id', chitthaDoc.id);
+        
+        if (aError) throw aError;
+        
+        setAssignments(aData.map(a => ({
+          id: a.id,
+          chitthaId: a.chittha_id,
+          personnelId: a.personnel_id,
+          sectionName: a.section_name,
+          dutyType: a.duty_type,
+          dutyLocation: a.duty_location,
+          remarkText: a.remark_text,
+          isLockedByOSI: a.is_locked_by_osi,
+          // Re-mapping for table display
+          personnelName: mappedPersonnel.find(p => p.id === a.personnel_id)?.fullName || 'Unknown',
+          personnelBelt: mappedPersonnel.find(p => p.id === a.personnel_id)?.beltNumber || '—',
+          personnelRank: mappedPersonnel.find(p => p.id === a.personnel_id)?.rank || '—'
+        })));
       } else {
         setChittha(null);
         setAssignments([]);
@@ -148,24 +176,30 @@ export default function NaukariChittha() {
 
     try {
       setSaving(true);
-      const newRef = doc(collection(db, 'naukriChittha'));
       const data = {
-        chitthaId: newRef.id,
-        stateId: user.stateId || '',
-        rangeId: user.rangeId || '',
-        districtId: user.districtId || '',
-        unitId: user.unitId || '',
-        subUnitId: user.subUnitId || '',
-        chitthaDate: selectedDate,
+        state_id: user.stateId || null,
+        range_id: user.rangeId || null,
+        district_id: user.districtId || null,
+        unit_id: user.unitId || null,
+        sub_unit_id: user.subUnitId || null,
+        chittha_date: selectedDate,
         status: 'Draft',
-        createdByUserId: user.uid || user.userId,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        created_by_user_id: user.id || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
-      await setDoc(newRef, data);
-      setChittha({ id: newRef.id, ...data });
+      
+      const { data: result, error } = await supabase
+        .from('chitthas')
+        .insert([data])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setChittha(result);
       toast.success('Chittha created for today.');
     } catch (err) {
+      console.error('Create error:', err);
       toast.error('Failed to create chittha.');
     } finally {
       setSaving(false);
@@ -229,35 +263,34 @@ export default function NaukariChittha() {
     }
     setSaving(true);
     try {
-      for (const personId of selectedPersonnel) {
+      const payload = selectedPersonnel.map(personId => {
         const person = personnel.find(p => p.id === personId);
-        const newRef = doc(collection(db, 'chitthaAssignments'));
-        await setDoc(newRef, {
-          assignmentId: newRef.id,
-          chitthaId: chittha.id,
-          personnelId: personId,
-          personnelName: person?.fullName || '',
-          personnelBelt: person?.beltNumber || '',
-          personnelRank: person?.rank || '',
-          sectionName: assignSection,
-          dutyType: assignDutyType,
-          dutyLocation: assignLocation,
-          remarkText: assignRemark,
-          stateId: person?.stateId || user.stateId || '',
-          rangeId: person?.rangeId || user.rangeId || '',
-          districtId: person?.districtId || user.districtId || '',
-          unitId: person?.currentUnitId || user.unitId || '',
-          subUnitId: person?.currentSubUnitId || user.subUnitId || '',
-          isLockedByOSI: false,
-          isVIPDuty: false,
-          createdAt: serverTimestamp(),
-        });
-      }
+        return {
+          chittha_id: chittha.id,
+          personnel_id: personId,
+          section_name: assignSection,
+          duty_type: assignDutyType,
+          duty_location: assignLocation,
+          remark_text: assignRemark,
+          state_id: person?.stateId || user.stateId || null,
+          range_id: person?.rangeId || user.rangeId || null,
+          district_id: person?.districtId || user.districtId || null,
+          unit_id: person?.currentUnitId || user.unitId || null,
+          sub_unit_id: person?.currentSubUnitId || user.subUnitId || null,
+          is_locked_by_osi: false,
+          is_vip_duty: false,
+          created_at: new Date().toISOString()
+        };
+      });
+
+      const { error } = await supabase.from('chittha_assignments').insert(payload);
+      if (error) throw error;
 
       toast.success(`${selectedPersonnel.length} personnel assigned to ${CHITTHA_SECTIONS.find(s => s.key === assignSection)?.label}`);
       setShowAssignModal(false);
       loadData(); // Refresh
     } catch (err) {
+      console.error('Save error:', err);
       toast.error('Failed to save assignments.');
     } finally {
       setSaving(false);
@@ -272,7 +305,8 @@ export default function NaukariChittha() {
       return;
     }
     try {
-      await deleteDoc(doc(db, 'chitthaAssignments', assignmentId));
+      const { error } = await supabase.from('chittha_assignments').delete().eq('id', assignmentId);
+      if (error) throw error;
       setAssignments(prev => prev.filter(a => a.id !== assignmentId));
       toast.success('Assignment removed.');
     } catch (err) {
@@ -288,11 +322,16 @@ export default function NaukariChittha() {
     }
     try {
       setSaving(true);
-      await updateDoc(doc(db, 'naukriChittha', chittha.id), {
-        status: 'Submitted',
-        submittedAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('chitthas')
+        .update({
+          status: 'Submitted',
+          submitted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', chittha.id);
+      
+      if (error) throw error;
       setChittha(prev => ({ ...prev, status: 'Submitted' }));
       toast.success('Chittha submitted successfully!');
     } catch (err) {
@@ -380,7 +419,7 @@ export default function NaukariChittha() {
         </div>
       ) : !chittha ? (
         <div className="panel">
-          <div className="empty-state" style={{ paddin: 40 }}>
+          <div className="empty-state" style={{ padding: 40 }}>
             <ClipboardList className="icon" />
             <h4>No chittha for {selectedDate}</h4>
             <p>{timeStatus.allowed

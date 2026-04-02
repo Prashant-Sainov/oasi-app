@@ -2,8 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, query, where, getDocs, getDoc, doc, updateDoc, serverTimestamp, orderBy, limit, startAfter } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import { Search, Plus, Eye, Edit, Trash2, Copy, Download,
   Filter, ChevronLeft, ChevronRight, Users
 } from 'lucide-react';
@@ -18,8 +17,10 @@ export default function PersonnelList() {
   const [personnel, setPersonnel] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [rankFilter, setRankFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('Active');
+  const [dynamicFilters, setDynamicFilters] = useState({});
+  // statusFilter is special as it's a core field but usually mapped to a master field too.
+  // We'll keep it as is if it matches a hardcoded status, but eventually it should be dynamic too.
+  const [statusFilter, setStatusFilter] = useState('');
   
   // Hierarchy Filters
   const [hierFilters, setHierFilters] = useState({
@@ -34,59 +35,109 @@ export default function PersonnelList() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteModal, setDeleteModal] = useState(null);
-  const [masterRanks, setMasterRanks] = useState([]);
+  const [masterFields, setMasterFields] = useState([]);
+  const [allMasterData, setAllMasterData] = useState([]);
 
   useEffect(() => {
     loadCategories();
-    loadMasterRanks();
     loadHierarchyCounts();
     loadPersonnel();
   }, [user]);
 
-  async function loadMasterRanks() {
+  // Load Master Data for Filters
+  useEffect(() => {
     if (!user?.stateId) return;
+
+    async function loadMasterConfig() {
+      try {
+        const { data: fields, error: fError } = await supabase
+          .from('master_field_types')
+          .select('*')
+          .eq('state_id', user.stateId)
+          .eq('is_active', true);
+
+        if (fError) throw fError;
+        setMasterFields(fields.map(f => ({
+          id: f.id,
+          fieldName: f.field_name,
+          displayName: f.display_name,
+          personnelFieldName: f.personnel_field_name,
+        })));
+
+        const { data: values, error: vError } = await supabase
+          .from('master_dropdown_values')
+          .select('*')
+          .eq('state_id', user.stateId)
+          .eq('is_active', true);
+        
+        if (vError) throw vError;
+        setAllMasterData(values.map(v => {
+          const field = fields.find(f => f.id === v.field_type_id);
+          return {
+            id: v.id,
+            value: v.value,
+            fieldType: field ? field.field_name : 'unknown',
+            displayOrder: v.display_order,
+            accessLevel: v.access_level
+          };
+        }));
+      } catch (err) {
+        if (import.meta.env.DEV) console.error('Filter master config error:', err);
+      }
+    }
+
+    loadMasterConfig();
+  }, [user]);
+
+  const hasAccess = (record) => {
+    const level = record.accessLevel || 'all';
+    if (level === 'all') return true;
+    if (level === 'super_admin_only') return isSuperAdmin;
+    if (level === 'state_admin_only') return isStateAdmin;
+    if (level === 'range_admin_only') return isRangeAdmin;
+    if (level === 'district_admin_only') return isDistrictAdmin;
+    if (level === 'unit_admin_only') return isUnitAdmin;
+    if (level === 'state_admin_plus') return isStateAdmin || isSuperAdmin;
+    if (level === 'range_admin_plus') return isRangeAdmin || isStateAdmin || isSuperAdmin;
+    if (level === 'district_admin_plus') return isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+    if (level === 'unit_admin_plus') return isUnitAdmin || isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
+    return true;
+  };
+
+  const getDropdownValues = (fieldType) => {
+    return allMasterData
+      .filter(r => r.fieldType === fieldType && hasAccess(r))
+      .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+  };
+
+  async function handleResetPersonnel() {
+    if (!isSuperAdmin) return;
+    const confirm = window.confirm('DANGER: This will delete ALL personnel records from the database. This action cannot be undone. Proceed?');
+    if (!confirm) return;
+
     try {
-      const q = query(
-        collection(db, 'masterData'),
-        where('fieldType', '==', 'rank'),
-        where('stateId', '==', user.stateId),
-        where('isActive', '==', true)
-      );
-      const snap = await getDocs(q);
-      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setLoading(true);
+      const { error } = await supabase
+        .from('personnel')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete everything
+      
+      if (error) throw error;
 
-      // Access Level Checker
-      const hasAccess = (record) => {
-        const level = record.accessLevel || 'all';
-        if (level === 'all') return true;
-
-        if (level === 'super_admin_only') return isSuperAdmin;
-        if (level === 'state_admin_only') return isStateAdmin;
-        if (level === 'range_admin_only') return isRangeAdmin;
-        if (level === 'district_admin_only') return isDistrictAdmin;
-        if (level === 'unit_admin_only') return isUnitAdmin;
-
-        if (level === 'state_admin_plus') return isStateAdmin || isSuperAdmin;
-        if (level === 'range_admin_plus') return isRangeAdmin || isStateAdmin || isSuperAdmin;
-        if (level === 'district_admin_plus') return isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
-        if (level === 'unit_admin_plus') return isUnitAdmin || isDistrictAdmin || isRangeAdmin || isStateAdmin || isSuperAdmin;
-
-        return true;
-      };
-
-      const data = all.filter(hasAccess);
-      data.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-      setMasterRanks(data);
+      toast.success(`Records reset initiated.`);
+      loadPersonnel();
     } catch (err) {
-      if (import.meta.env.DEV) console.error('Failed to load ranks:', err);
+      if (import.meta.env.DEV) console.error('Reset error:', err);
+      toast.error('Failed to reset personnel data.');
+    } finally {
+      setLoading(false);
     }
   }
 
   async function loadCategories() {
     try {
-      const q = query(collection(db, 'unitCategories'));
-      const snap = await getDocs(q);
-      setUnitCategories(snap.docs.map(d => d.data().name));
+      const { data, error } = await supabase.from('unit_categories').select('name').order('name');
+      if (!error) setUnitCategories(data.map(d => d.name));
     } catch (err) {
       if (import.meta.env.DEV) console.error('Failed to load categories:', err);
     }
@@ -95,33 +146,22 @@ export default function PersonnelList() {
   async function loadHierarchyCounts() {
     // Initial load restricted by role
     if (isSuperAdmin) {
-      const sSnap = await getDocs(collection(db, 'states'));
-      setStates(sSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const { data, error } = await supabase.from('states').select('*').order('name');
+      if (!error) setStates(data.map(d => ({ id: d.id, stateName: d.name })));
     } else {
-      // For other admins, State is fixed
       if (user?.stateId) {
         setHierFilters(p => ({ ...p, stateId: user.stateId }));
-        // We don't need to load all states, just the one assigned
-        // But we might want the name for the label if we show it (though we'll hide it)
-        const sDoc = await getDoc(doc(db, 'states', user.stateId));
-        if (sDoc.exists()) setStates([{ id: sDoc.id, ...sDoc.data() }]);
+        const { data: sData } = await supabase.from('states').select('name').eq('id', user.stateId).single();
+        if (sData) setStates([{ id: user.stateId, stateName: sData.name }]);
         
-        // Auto-load ranges for State Admin
         if (isStateAdmin) loadRanges(user.stateId);
-        
-        // For Range Admin+, even Range is fixed
         if (user?.rangeId) {
           setHierFilters(p => ({ ...p, rangeId: user.rangeId }));
           if (isRangeAdmin) loadDistricts(user.rangeId);
         }
-
-        // For District Admin+, even District is fixed
         if (user?.districtId) {
           setHierFilters(p => ({ ...p, districtId: user.districtId }));
-          // Do not load units here because unitType is not selected yet
         }
-
-        // For Unit Admin, everything is fixed except Sub-Unit
         if (user?.unitId) {
           setHierFilters(p => ({ ...p, unitId: user.unitId }));
           if (isUnitAdmin) loadSubUnits(user.unitId, user.districtId);
@@ -168,57 +208,80 @@ export default function PersonnelList() {
   }
 
   async function loadRanges(stateId) {
-    const q = query(collection(db, 'ranges'), where('stateId', '==', stateId));
-    const snap = await getDocs(q);
-    setRanges(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const { data, error } = await supabase.from('ranges').select('*').eq('state_id', stateId).order('name');
+    if (!error) setRanges(data.map(d => ({ id: d.id, rangeName: d.name })));
   }
 
   async function loadDistricts(rangeId) {
-    const q = query(collection(db, 'districts'), where('rangeId', '==', rangeId));
-    const snap = await getDocs(q);
-    setDistricts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const { data, error } = await supabase.from('districts').select('*').eq('range_id', rangeId).order('name');
+    if (!error) setDistricts(data.map(d => ({ id: d.id, districtName: d.name })));
   }
 
   async function loadUnits(districtId, unitType) {
     if (!districtId || !unitType) return;
-    const q = query(collection(db, 'units'), where('districtId', '==', districtId), where('unitType', '==', unitType));
-    const snap = await getDocs(q);
-    const loadedUnits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    setUnits(loadedUnits);
+    const { data, error } = await supabase
+      .from('units')
+      .select('*')
+      .eq('district_id', districtId)
+      .eq('unit_type', unitType)
+      .order('name');
+    if (!error) setUnits(data.map(d => ({ id: d.id, unitName: d.name })));
   }
 
   async function loadSubUnits(unitId, districtId) {
     if (!unitId || !districtId) return;
-    const q = query(collection(db, 'subUnits'), where('unitId', '==', unitId), where('districtId', '==', districtId));
-    const snap = await getDocs(q);
-    setSubUnits(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const { data, error } = await supabase
+      .from('sub_units')
+      .select('*')
+      .eq('unit_id', unitId)
+      .eq('district_id', districtId)
+      .order('name');
+    if (!error) setSubUnits(data.map(d => ({ id: d.id, subUnitName: d.name })));
   }
 
   async function loadPersonnel() {
     try {
       setLoading(true);
-      const personnelRef = collection(db, 'personnel');
-      let constraints = [where('isDeleted', '==', false)];
+      let queryBuilder = supabase.from('personnel').select('*');
 
-      // Role-based filtering (Strict enforcement from AuthContext)
+      // Role-based filtering
       if (isUnitAdmin && user?.unitId) {
-        constraints.push(where('currentUnitId', '==', user.unitId));
+        queryBuilder = queryBuilder.eq('current_unit_id', user.unitId);
       } else if (isDistrictAdmin && user?.districtId) {
-        constraints.push(where('districtId', '==', user.districtId));
+        queryBuilder = queryBuilder.eq('district_id', user.districtId);
       } else if (isRangeAdmin && user?.rangeId) {
-        constraints.push(where('rangeId', '==', user.rangeId));
+        queryBuilder = queryBuilder.eq('range_id', user.rangeId);
       } else if (isStateAdmin && user?.stateId) {
-        constraints.push(where('stateId', '==', user.stateId));
+        queryBuilder = queryBuilder.eq('state_id', user.stateId);
+      } else if (!isSuperAdmin && user?.stateId) {
+        queryBuilder = queryBuilder.eq('state_id', user.stateId);
       }
 
-      // Note: Ideally we would do more server-side filtering and pagination here
-      // But adding multiple where clauses Requires manual Index creation in Firebase.
-      // For this phase, we fetch the scoped set and filter/paginate in memory to ensure
-      // the app remains functional without immediate Index management.
-      const q = query(personnelRef, ...constraints);
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setPersonnel(data);
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+
+      // Map snake_case from DB to camelCase for UI compatibility if needed
+      const mappedData = data.map(d => ({
+        id: d.id,
+        beltNumber: d.belt_number,
+        payCode: d.pay_code,
+        fullName: d.full_name,
+        fatherName: d.father_name,
+        rank: d.rank,
+        mobileNumber: d.mobile_number,
+        psDutyType: d.ps_duty_type,
+        homeDistrictPS: d.home_district_ps,
+        serviceStatus: d.service_status,
+        stateId: d.state_id,
+        rangeId: d.range_id,
+        districtId: d.district_id,
+        unitType: d.unit_type,
+        currentUnitId: d.current_unit_id,
+        currentSubUnitId: d.current_sub_unit_id,
+        isDeleted: d.is_deleted
+      }));
+
+      setPersonnel(mappedData);
     } catch (e) {
       if (import.meta.env.DEV) console.error('Personnel load error:', e);
       toast.error('Failed to load personnel records.');
@@ -233,8 +296,12 @@ export default function PersonnelList() {
       // Status filter
       if (statusFilter && p.serviceStatus !== statusFilter) return false;
 
-      // Rank filter
-      if (rankFilter && p.rank !== rankFilter) return false;
+      // Dynamic Master Filters
+      for (const field of masterFields) {
+        const key = field.personnelFieldName || field.fieldName;
+        const filterVal = dynamicFilters[key];
+        if (filterVal && p[key] !== filterVal) return false;
+      }
 
       // Hierarchy Filters
       if (hierFilters.stateId && p.stateId !== hierFilters.stateId) return false;
@@ -243,6 +310,9 @@ export default function PersonnelList() {
       if (hierFilters.unitType && p.unitType !== hierFilters.unitType) return false;
       if (hierFilters.unitId && (p.currentUnitId !== hierFilters.unitId)) return false;
       if (hierFilters.subUnitId && p.currentSubUnitId !== hierFilters.subUnitId) return false;
+
+      // Soft-Delete Filter (Client-side secondary safety)
+      if (p.isDeleted === true) return false;
 
       // Search
       if (searchTerm) {
@@ -258,7 +328,7 @@ export default function PersonnelList() {
 
       return true;
     });
-  }, [personnel, searchTerm, rankFilter, statusFilter, hierFilters]);
+  }, [personnel, searchTerm, dynamicFilters, statusFilter, hierFilters, masterFields]);
 
   // Pagination
   const totalPages = Math.ceil(filteredPersonnel.length / PAGE_SIZE);
@@ -267,7 +337,7 @@ export default function PersonnelList() {
     currentPage * PAGE_SIZE
   );
 
-  useEffect(() => { setCurrentPage(1); }, [searchTerm, rankFilter, statusFilter]);
+  useEffect(() => { setCurrentPage(1); }, [searchTerm, dynamicFilters, statusFilter]);
 
   // Soft-delete: mark record as deleted instead of removing
   const canDelete = isSuperAdmin || isStateAdmin || isDistrictAdmin;
@@ -278,11 +348,17 @@ export default function PersonnelList() {
       return;
     }
     try {
-      await updateDoc(doc(db, 'personnel', person.id), {
-        isDeleted: true,
-        deletedAt: serverTimestamp(),
-        deletedBy: user.uid,
-      });
+      const { error } = await supabase
+        .from('personnel')
+        .update({
+          is_deleted: true,
+          updated_at: new Date().toISOString(),
+          updated_by_user_id: user.id, // AuthContext maps user.uid to user.id or uid
+        })
+        .eq('id', person.id);
+
+      if (error) throw error;
+
       toast.success(`${person.fullName} has been removed.`);
       setPersonnel(prev => prev.filter(p => p.id !== person.id));
       setDeleteModal(null);
@@ -324,25 +400,37 @@ export default function PersonnelList() {
             </div>
             <select
               className="filter-select"
-              value={rankFilter}
-              onChange={(e) => setRankFilter(e.target.value)}
-            >
-              <option value="">All Ranks</option>
-              {masterRanks.map(r => (
-                <option key={r.id} value={r.value}>{r.value}</option>
-              ))}
-            </select>
-            <select
-              className="filter-select"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Retired">Retired</option>
-              <option value="Suspended">Suspended</option>
-              <option value="Deceased">Deceased</option>
+              {getDropdownValues('serviceStatus').length > 0
+                ? getDropdownValues('serviceStatus').map(v => (
+                    <option key={v.id} value={v.value}>{v.value}</option>
+                  ))
+                : ['Active', 'Retired', 'Suspended', 'Deceased'].map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))
+              }
             </select>
+
+            {/* Dynamic Dropdown Filters */}
+            {masterFields.filter(f => f.fieldName !== 'serviceStatus').map(field => (
+              <select
+                key={field.id}
+                className="filter-select"
+                value={dynamicFilters[field.personnelFieldName || field.fieldName] || ''}
+                onChange={(e) => setDynamicFilters(prev => ({
+                  ...prev,
+                  [field.personnelFieldName || field.fieldName]: e.target.value
+                }))}
+              >
+                <option value="">All {field.displayName}</option>
+                {getDropdownValues(field.fieldName).map(v => (
+                  <option key={v.id} value={v.value}>{v.value}</option>
+                ))}
+              </select>
+            ))}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
@@ -442,6 +530,8 @@ export default function PersonnelList() {
                   <th>Father's Name</th>
                   <th>Rank</th>
                   <th>Mobile</th>
+                  <th>PS Duty Type (Role 2)</th>
+                  <th>Home Dist. PS</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
@@ -456,6 +546,8 @@ export default function PersonnelList() {
                     <td>{p.fatherName || '—'}</td>
                     <td><span className="badge badge-primary">{p.rank || '—'}</span></td>
                     <td>{p.mobileNumber || '—'}</td>
+                    <td>{p.psDutyType || '—'}</td>
+                    <td>{p.homeDistrictPS || '—'}</td>
                     <td>
                       <span className={`badge ${
                         p.serviceStatus === 'Active' ? 'badge-success' :

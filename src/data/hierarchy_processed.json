@@ -1,0 +1,9977 @@
+[
+  {
+    "node_code": "1",
+    "name": "PHQ",
+    "level": 1,
+    "parent_code": null,
+    "is_fixed": true
+  },
+  {
+    "node_code": "2",
+    "name": "Ranges, Commissionerate and Districts",
+    "level": 1,
+    "parent_code": null,
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1",
+    "name": "Commissionerate",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.1",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.1.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.2",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.1.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3",
+    "name": "Zones",
+    "level": 1,
+    "parent_code": "2.1.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.1",
+    "name": "DLF-II",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.2",
+    "name": "DLF",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.3",
+    "name": "PHASE-1",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.4",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.5",
+    "name": "SECTOR-40",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.6",
+    "name": "SECTOR-56",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.7",
+    "name": "LOK",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.8",
+    "name": "METRO",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.9",
+    "name": "50",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.10",
+    "name": "53",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.11",
+    "name": "Cyber Crime Police Station, Gurugram",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.12",
+    "name": "PH-3rd",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.13",
+    "name": "Manesar",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.14",
+    "name": "West",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.15",
+    "name": "South",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.16",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.17",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.18",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.19",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.20",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.21",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.22",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.23",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.24",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.25",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.26",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.27",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.28",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.29",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.31",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.32",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.33",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.34",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.35",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.36",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.37",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.38",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.39",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.40",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.41",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.42",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.1.43",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.1.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.1",
+    "name": "GURGAON",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.2",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.3",
+    "name": "PARK",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.4",
+    "name": "VIHAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.5",
+    "name": "SECTOR-10",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.6",
+    "name": "SECTOR-5, GURGAON",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.7",
+    "name": "18",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.8",
+    "name": "SECTOR-14, Gurugram",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.9",
+    "name": "VIHAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.10",
+    "name": "COLONY",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.11",
+    "name": "NAGAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.12",
+    "name": "9A",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.13",
+    "name": "BAJGHERA",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.14",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.15",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.16",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.17",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.18",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.19",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.20",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.21",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.22",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.23",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.24",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.25",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.26",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.27",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.28",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.29",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.30",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.32",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.33",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.34",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.35",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.36",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.37",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.39",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.40",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.2.41",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.1.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.1",
+    "name": "BADSHAHPUR",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.2",
+    "name": "BHONDSI",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.3",
+    "name": "SOHNA",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.4",
+    "name": "SOHANA",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.5",
+    "name": "SECTOR-65",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.6",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.7",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.8",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.9",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.10",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.11",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.12",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.13",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.14",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.15",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.16",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.17",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.18",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.19",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.20",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.21",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.22",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.23",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.24",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.25",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.26",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.27",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.29",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.30",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.31",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.32",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.3.33",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.1.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.1",
+    "name": "GURUGRAM",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.2",
+    "name": "NAGAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.3",
+    "name": "DAULA",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.4",
+    "name": "MANESAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.5",
+    "name": "PATAUDI",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.6",
+    "name": "37",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.7",
+    "name": "INDUSTRIAL SECTOR - 7, MANESAR",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.8",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.9",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.10",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.11",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.12",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.13",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.14",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.15",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.16",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.17",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.18",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.19",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.20",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.21",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.23",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.24",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.25",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.26",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.27",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.29",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.30",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.31",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.33",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.4.35",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.1.1.3.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.5",
+    "name": "HQ",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.6",
+    "name": "Crime",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.1.1.3.7",
+    "name": "Traffic",
+    "level": 1,
+    "parent_code": "2.1.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2",
+    "name": "Commissionerate",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.1",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.2",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3",
+    "name": "Zones",
+    "level": 1,
+    "parent_code": "2.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.2.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.1",
+    "name": "KOTWALI",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.2",
+    "name": "N.I.T.",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.3",
+    "name": "MUJESAR",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.4",
+    "name": "NAGAR)",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.5",
+    "name": "SECTOR-58",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.6",
+    "name": "SARAN",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.7",
+    "name": "KUND",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.8",
+    "name": "Women Police Station NIT,Faridabad",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.9",
+    "name": "DABUA",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.10",
+    "name": "DHAUJ",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.11",
+    "name": "NIT",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.12",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.13",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.14",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.15",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.16",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.17",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.18",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.19",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.20",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.21",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.22",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.23",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.24",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.25",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.26",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.27",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.28",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.29",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.30",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.31",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.32",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.33",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.34",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.35",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.36",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.38",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.1.39",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.2.1.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.2.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.1",
+    "name": "WOMEN POLICE STATION, FARIDABAD",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.2",
+    "name": "BHUPANI",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.3",
+    "name": "CENTRAL",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.4",
+    "name": "OLD",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.5",
+    "name": "FARIDABAD",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.6",
+    "name": "KHAWAJA",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.7",
+    "name": "KHERIPUL",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.8",
+    "name": "SECTOR-17",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.9",
+    "name": "PALLA",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.10",
+    "name": "B.P.T.P.",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.11",
+    "name": "Faridabad",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.12",
+    "name": "Central",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.13",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.14",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.15",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.16",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.17",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.18",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.19",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.20",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.21",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.22",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.23",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.24",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.25",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.26",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.28",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.29",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.31",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.32",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.33",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.36",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.2.40",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.2.1.3.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.2.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.1",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.2",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.3",
+    "name": "CHHANSA",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.4",
+    "name": "TIGAON",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.5",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.6",
+    "name": "8",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.7",
+    "name": "Ballabgarh",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.8",
+    "name": "NAGAR",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.9",
+    "name": "Ballabgarh",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.10",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.11",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.12",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.13",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.14",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.15",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.16",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.17",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.18",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.19",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.20",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.21",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.22",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.23",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.24",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.25",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.26",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.28",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.29",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.30",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.31",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.32",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.33",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.34",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.35",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.36",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.3.37",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.2.1.3.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.4",
+    "name": "HQ",
+    "level": 1,
+    "parent_code": "2.2.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.5",
+    "name": "Crime",
+    "level": 1,
+    "parent_code": "2.2.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.2.1.3.6",
+    "name": "Traffic",
+    "level": 1,
+    "parent_code": "2.2.1.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3",
+    "name": "Commissionerate",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.1",
+    "name": "CHANDIMANDIR",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.2",
+    "name": "CRIME",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.3",
+    "name": "KALKA",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.4",
+    "name": "COMPLEX",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.5",
+    "name": "Nodal Cyber Crime Police Station, Haryana",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.6",
+    "name": "SECTOR-5",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.7",
+    "name": "PINJORE",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.8",
+    "name": "RANI",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.9",
+    "name": "SECTOR-14, PANCHKULA",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.10",
+    "name": "SECTOR-20",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.11",
+    "name": "SECTOR-7, PANCHKULA",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.12",
+    "name": "WOMEN POLICE STATION, PANCHKULA",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.13",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.14",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.15",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.16",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.17",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.18",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.19",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.20",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.21",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.22",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.23",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.24",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.25",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.26",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.28",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.29",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.31",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.32",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.33",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.36",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.40",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.1",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.2",
+    "name": "Zones",
+    "level": 1,
+    "parent_code": "2.3.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.2.1",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.3.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.3.1.2.2",
+    "name": "Crime",
+    "level": 1,
+    "parent_code": "2.3.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4",
+    "name": "Commissionerate",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.1",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2",
+    "name": "Zones",
+    "level": 1,
+    "parent_code": "2.4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.4.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.1",
+    "name": "GANNAUR",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.2",
+    "name": "KUNDLI",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.3",
+    "name": "MURTHAL",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.4",
+    "name": "RAI",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.5",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.6",
+    "name": "BARHI",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.7",
+    "name": "BAHALGARH",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.8",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.9",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.10",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.11",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.12",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.13",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.14",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.15",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.16",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.17",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.18",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.19",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.20",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.21",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.23",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.24",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.25",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.26",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.27",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.29",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.30",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.31",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.33",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.1.35",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.4.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.4.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.1",
+    "name": "SECTOR-27, SONIPAT",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.2",
+    "name": "SONIPAT",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.3",
+    "name": "KHARKHODA",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.4",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.5",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.6",
+    "name": "STATION",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.7",
+    "name": "Sonipat",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.8",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.9",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.10",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.11",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.12",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.13",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.14",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.15",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.16",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.17",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.18",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.19",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.20",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.21",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.23",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.24",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.25",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.26",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.27",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.29",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.30",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.31",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.33",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.2.35",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.4.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.4.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.1",
+    "name": "BARAUDA",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.2",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.3",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.4",
+    "name": "MOOHANA",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.5",
+    "name": "KALAN",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.6",
+    "name": "GOHANA",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.7",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.8",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.9",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.10",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.11",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.12",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.13",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.14",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.15",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.16",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.17",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.18",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.19",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.20",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.21",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.22",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.23",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.24",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.25",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.26",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.27",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.28",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.29",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.30",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.31",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.33",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.3.34",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.4.1.2.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.4",
+    "name": "HQ",
+    "level": 1,
+    "parent_code": "2.4.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.4.1.2.5",
+    "name": "Crime",
+    "level": 1,
+    "parent_code": "2.4.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5",
+    "name": "Commissionerate",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.1",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.5.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2",
+    "name": "Zones",
+    "level": 1,
+    "parent_code": "2.5.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.5.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.1",
+    "name": "WOMEN POLICE STATION, JHAJJAR",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.2",
+    "name": "BERI",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.3",
+    "name": "JHAJJAR",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.4",
+    "name": "SAHLAWAS",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.5",
+    "name": "DUJANA",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.6",
+    "name": "MACHHROLI",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.7",
+    "name": "JHAJJAR",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.8",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.9",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.10",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.11",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.12",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.13",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.14",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.15",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.16",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.17",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.18",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.19",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.20",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.21",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.23",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.24",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.25",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.26",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.27",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.29",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.30",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.31",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.33",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.1.35",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.5.1.2.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2",
+    "name": "Zone",
+    "level": 1,
+    "parent_code": "2.5.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.1",
+    "name": "BAHADURGARH",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.2",
+    "name": "BAHADURGARH",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.3",
+    "name": "BAHADURGARH",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.4",
+    "name": "BAHADURGARH",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.5",
+    "name": "BAHADURGRH",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.6",
+    "name": "ASAUDA",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.7",
+    "name": "BADLI",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.8",
+    "name": "WOMEN PS BAHADURGARH,JHAJJAR",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.9",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.10",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.11",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.12",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.13",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.14",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.15",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.16",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.17",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.18",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.19",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.20",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.21",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.22",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.23",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.24",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.25",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.26",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.27",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.28",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.29",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.30",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.31",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.32",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.33",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.34",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.35",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.2.36",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.5.1.2.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.3",
+    "name": "HQ",
+    "level": 1,
+    "parent_code": "2.5.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.5.1.2.4",
+    "name": "Crime",
+    "level": 1,
+    "parent_code": "2.5.1.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6",
+    "name": "Range",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.1",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.1",
+    "name": "CANTT",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.2",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.3",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.4",
+    "name": "NAGAR",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.5",
+    "name": "BARARA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.6",
+    "name": "NAGAR",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.7",
+    "name": "MULLANA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.8",
+    "name": "NAGGAL",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.9",
+    "name": "NARAINGARH",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.10",
+    "name": "PANJOKHRA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.11",
+    "name": "CANTT",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.12",
+    "name": "AMBALA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.13",
+    "name": "SAHA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.14",
+    "name": "SECTOR-9, AMBALA CITY",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.15",
+    "name": "SHAHZADPUR",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.16",
+    "name": "WOMEN POLICE STATION NARAINGARH, AMBALA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.17",
+    "name": "WOMEN POLICE STATION, AMBALA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.18",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.19",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.20",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.21",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.22",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.23",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.24",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.25",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.26",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.27",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.28",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.29",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.30",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.31",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.32",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.33",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.34",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.35",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.36",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.37",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.38",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.40",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.41",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.42",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.43",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.44",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.2.45",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.6.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.1",
+    "name": "BABAIN",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.2",
+    "name": "CITY PEHOWA, KURUKSHETRA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.3",
+    "name": "CYBER CRIME POLICE STATION, KURUKSHETRA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.4",
+    "name": "ISMAILABAD",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.5",
+    "name": "JHANSA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.6",
+    "name": "KRISHANA GATE, THANASAR KURUKSHETRA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.7",
+    "name": "UNIVERSITY",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.8",
+    "name": "LADWA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.9",
+    "name": "PEHOWA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.10",
+    "name": "SHAHABAD",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.11",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.12",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.13",
+    "name": "WOMEN POLICE STATION, KURUKSHETRA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.14",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.15",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.16",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.17",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.18",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.19",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.20",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.21",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.22",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.23",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.24",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.25",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.26",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.27",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.28",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.29",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.30",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.32",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.33",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.34",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.35",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.36",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.37",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.39",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.40",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.3.41",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.6.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.1",
+    "name": "BILASPUR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.2",
+    "name": "BURIA",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.3",
+    "name": "CHHACHHRAULI",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.4",
+    "name": "CHHAPAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.5",
+    "name": "Cyber Crime Police Station, Yamunanagar",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.6",
+    "name": "FARAKPUR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.7",
+    "name": "GANDHI NAGAR, YAMUNANAGAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.8",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.9",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.10",
+    "name": "JATHLANA",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.11",
+    "name": "NAGAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.12",
+    "name": "RADAUR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.13",
+    "name": "SADHAURA",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.14",
+    "name": "SEC.17 HUDA, JAGADHRI YAMUNANAGAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.15",
+    "name": "WOMEN POLICE STATION, YAMUNA NAGAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.16",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.17",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.18",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.19",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.20",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.21",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.22",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.23",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.24",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.25",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.26",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.27",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.28",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.29",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.30",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.31",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.32",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.33",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.34",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.35",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.36",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.37",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.38",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.40",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.41",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.42",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.43",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.44",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.6.4.45",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.6.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.7",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.1",
+    "name": "ASSANDH",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.2",
+    "name": "BUTANA",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.3",
+    "name": "karnal",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.4",
+    "name": "GHARAUNDA",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.5",
+    "name": "INDRI",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.6",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.7",
+    "name": "LINES",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.8",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.9",
+    "name": "KUNJPURA",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.10",
+    "name": "MADHUBAN",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.11",
+    "name": "MUNAK, KARNAL",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.12",
+    "name": "KARNAL",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.13",
+    "name": "NISSING",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.14",
+    "name": "KARNAL",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.15",
+    "name": "KARNAL",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.16",
+    "name": "TARAORI",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.17",
+    "name": "Women Police Station Assand,Karnal",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.18",
+    "name": "WOMEN POLICE STATION, KARNAL",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.19",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.20",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.21",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.22",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.23",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.24",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.25",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.26",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.27",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.28",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.29",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.30",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.31",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.32",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.33",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.34",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.35",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.36",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.37",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.38",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.39",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.40",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.41",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.42",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.43",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.44",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.45",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.1.46",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.7.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.7",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.1",
+    "name": "Kaithal",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.2",
+    "name": "CHEEKA",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.3",
+    "name": "KAITHAL",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.4",
+    "name": "Dhand",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.5",
+    "name": "GUHLA",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.6",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.7",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.8",
+    "name": "KALAYAT",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.9",
+    "name": "PUNDRI",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.10",
+    "name": "RAJAUND",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.11",
+    "name": "SIWAN",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.12",
+    "name": "TITRAM",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.13",
+    "name": "WOMEN POLICE STATION, KAITHAL",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.14",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.15",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.16",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.17",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.18",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.19",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.20",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.21",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.22",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.23",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.24",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.25",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.26",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.27",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.28",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.29",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.30",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.32",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.33",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.34",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.35",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.36",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.37",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.39",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.40",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.2.41",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.7.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.7",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.1",
+    "name": "BAPOLI",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.2",
+    "name": "CHANDNIBAGH",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.3",
+    "name": "Panipat",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.4",
+    "name": "Panipat",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.5",
+    "name": "ISRANA",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.6",
+    "name": "MATLAUDA",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.7",
+    "name": "Panipat",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.8",
+    "name": "Panipat",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.9",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.10",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.11",
+    "name": "Panipat",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.12",
+    "name": "SAMALKHA",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.13",
+    "name": "SANOLI",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.14",
+    "name": "PANIPAT",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.15",
+    "name": "Panipat",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.16",
+    "name": "WOMEN POLICE STATION, PANIPAT",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.17",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.18",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.19",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.20",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.21",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.23",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.24",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.25",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.26",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.27",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.28",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.29",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.30",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.32",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.33",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.34",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.35",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.36",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.37",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.38",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.39",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.40",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.41",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.42",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.43",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.7.3.44",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.7.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.8",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.1",
+    "name": "ADAMPUR",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.2",
+    "name": "AGROHA",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.3",
+    "name": "HISAR",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.4",
+    "name": "BARWALA",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.5",
+    "name": "Cyber Crime, Police Station Hisar",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.6",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.7",
+    "name": "LINES",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.8",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.9",
+    "name": "HISAR",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.10",
+    "name": "UKLANA",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.11",
+    "name": "HISAR",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.12",
+    "name": "WOMEN POLICE STATION, HISSAR",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.13",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.14",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.15",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.16",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.17",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.18",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.19",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.20",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.21",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.22",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.23",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.24",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.25",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.26",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.28",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.29",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.31",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.32",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.33",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.36",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.1.40",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.8.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.8",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.1",
+    "name": "BASS",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.2",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.3",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.4",
+    "name": "NARNAUND",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.5",
+    "name": "PS CYBER CRIME, HANSI",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.6",
+    "name": "Women Police Station, HANSI",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.7",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.8",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.9",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.10",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.11",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.12",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.13",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.14",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.15",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.16",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.17",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.18",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.19",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.20",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.21",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.22",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.23",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.24",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.25",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.26",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.27",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.28",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.29",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.30",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.31",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.33",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.2.34",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.8.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.8",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.1",
+    "name": "ALEWA",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.2",
+    "name": "SAFIDON",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.3",
+    "name": "Jind",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.4",
+    "name": "GARHI",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.5",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.6",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.7",
+    "name": "JULANA",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.8",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.9",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.10",
+    "name": "KHERA",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.11",
+    "name": "PS Cyber, District Jind",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.12",
+    "name": "SAFIDON",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.13",
+    "name": "UCHANA",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.14",
+    "name": "WOMEN POLICE STATION, JIND",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.15",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.16",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.17",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.18",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.19",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.20",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.21",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.22",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.23",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.24",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.25",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.26",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.27",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.28",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.29",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.30",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.31",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.32",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.33",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.34",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.36",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.37",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.38",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.39",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.40",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.41",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.3.42",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.8.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.8",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.1",
+    "name": "BARAGUDHA(Sirsa)",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.2",
+    "name": "DABWALI(Sirsa)",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.3",
+    "name": "Sirsa",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.4",
+    "name": "DING",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.5",
+    "name": "ELLENABAD",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.6",
+    "name": "CHOPTA",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.7",
+    "name": "Police Station,Civil Line Sirsa",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.8",
+    "name": "RANIA",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.9",
+    "name": "RORI(Sirsa)",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.10",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.11",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.12",
+    "name": "WOMEN POLICE STATION, SIRSA",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.13",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.14",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.15",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.16",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.17",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.18",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.19",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.20",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.21",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.22",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.23",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.24",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.25",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.26",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.28",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.29",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.31",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.32",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.33",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.36",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.4.40",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.8.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.8",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.1",
+    "name": "DABWALI",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.2",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.3",
+    "name": "WALI",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.4",
+    "name": "ODHAN",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.5",
+    "name": "Women Police Station Dabwali,Sirsa",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.6",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.7",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.8",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.9",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.10",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.11",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.12",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.13",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.14",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.15",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.16",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.17",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.18",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.19",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.20",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.21",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.22",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.23",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.24",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.25",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.26",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.27",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.29",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.30",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.31",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.32",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.5.33",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.8.5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.8",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.1",
+    "name": "KALAN",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.2",
+    "name": "BHUNA",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.3",
+    "name": "FATEHABAD",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.4",
+    "name": "RATIA",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.5",
+    "name": "TOHANA",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.6",
+    "name": "Fatehabad",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.7",
+    "name": "JAKHAL",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.8",
+    "name": "FATEHABAD",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.9",
+    "name": "RATTIA",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.10",
+    "name": "TOHANA",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.11",
+    "name": "WOMEN POLICE STATION, FATEHABAD",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.12",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.13",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.14",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.15",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.16",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.17",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.18",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.19",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.20",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.21",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.22",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.23",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.24",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.25",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.26",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.27",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.28",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.29",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.30",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.31",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.32",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.33",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.34",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.35",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.36",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.38",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.8.6.39",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.8.6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9",
+    "name": "Office",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.9",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.1",
+    "name": "ROHTAK",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.2",
+    "name": "BAHUAKBARPUR",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.3",
+    "name": "Rohtak",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.4",
+    "name": "ROHTAK",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.5",
+    "name": "KALANAUR",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.6",
+    "name": "MAJRA",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.7",
+    "name": "MEHAM",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.8",
+    "name": "ROHTAK",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.9",
+    "name": "ROHTAK",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.10",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.11",
+    "name": "LINES",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.12",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.13",
+    "name": "SAMPLA",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.14",
+    "name": "COLONY",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.15",
+    "name": "ROHTAK",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.16",
+    "name": "WOMEN POLICE STATION, ROHTAK",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.17",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.18",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.19",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.20",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.21",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.23",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.24",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.25",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.26",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.27",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.28",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.29",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.30",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.32",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.33",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.34",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.35",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.36",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.37",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.38",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.39",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.40",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.41",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.42",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.43",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.1.44",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.9.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.9",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.1",
+    "name": "BADHRA",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.2",
+    "name": "KALAN",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.3",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.4",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.5",
+    "name": "KALAN",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.6",
+    "name": "PS Cyber Crime, Charkhi Dadri",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.7",
+    "name": "Women Police Station, Charkhi Dadri",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.8",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.9",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.10",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.11",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.12",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.13",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.14",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.15",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.16",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.17",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.18",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.19",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.20",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.21",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.23",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.24",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.25",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.26",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.27",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.28",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.29",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.30",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.31",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.32",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.33",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.2.35",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.9.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.9",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.1",
+    "name": "KHERA",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.2",
+    "name": "BEHAL",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.3",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.4",
+    "name": "LINES",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.5",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.6",
+    "name": "Cyber Crime Police Station, Bhiwani",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.7",
+    "name": "BHIWANI",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.8",
+    "name": "LOHARU",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.9",
+    "name": "PS INDUSTRIAL AREA, BHIWANI",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.10",
+    "name": "SIWANI",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.11",
+    "name": "TOSHAM",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.12",
+    "name": "WOMEN POLICE STATION, BHIWANI",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.13",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.14",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.15",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.16",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.17",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.18",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.19",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.20",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.21",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.22",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.23",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.24",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.25",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.26",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.28",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.29",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.31",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.32",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.33",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.36",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.9.3.40",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.9.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10",
+    "name": "Range",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.10",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.1",
+    "name": "BAWAL",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.2",
+    "name": "DHARUHERA",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.3",
+    "name": "JATUSANA",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.4",
+    "name": "KASOLA",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.5",
+    "name": "KHOL",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.6",
+    "name": "KOSLI",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.7",
+    "name": "REWARI",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.8",
+    "name": "POLICE STATION CYBER CRIME, REWARI",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.9",
+    "name": "RAMPURA",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.10",
+    "name": "CITY",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.11",
+    "name": "SADAR",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.12",
+    "name": "ROHADAI",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.13",
+    "name": "SEC-6, DHARUHERA",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.14",
+    "name": "WOMEN POLICE STATION, REWARI",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.15",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.16",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.17",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.18",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.19",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.20",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.21",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.22",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.23",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.24",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.25",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.26",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.27",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.28",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.29",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.30",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.31",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.32",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.33",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.34",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.36",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.37",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.38",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.39",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.40",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.41",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.1.42",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.10.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.10",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.1",
+    "name": "BICCHOR",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.2",
+    "name": "NUH",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.3",
+    "name": "TAURU",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.4",
+    "name": "JHIRKA",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.5",
+    "name": "NAGINA",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.6",
+    "name": "PINANGWA",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.7",
+    "name": "Akera",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.8",
+    "name": "Jhirka",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.9",
+    "name": "Punhana",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.10",
+    "name": "Nuh(Mewat)",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.11",
+    "name": "Ahir",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.12",
+    "name": "PUNHANA",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.13",
+    "name": "MEO",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.14",
+    "name": "NUH",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.15",
+    "name": "TAURU",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.16",
+    "name": "WOMEN POLICE STATION, MEWAT",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.17",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.18",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.19",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.20",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.21",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.23",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.24",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.25",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.26",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.27",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.28",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.29",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.30",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.32",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.33",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.34",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.35",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.36",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.37",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.38",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.39",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.40",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.41",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.42",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.43",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.2.44",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.10.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.10",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.1",
+    "name": "BAHIN",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.2",
+    "name": "PALWAL",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.3",
+    "name": "HUT",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.4",
+    "name": "PALWAL",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.5",
+    "name": "GADPURI",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.6",
+    "name": "HASSANPUR",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.7",
+    "name": "HATHIN",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.8",
+    "name": "HODAL",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.9",
+    "name": "MUNDKATI",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.10",
+    "name": "PS Cyber Crime, District Palwal",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.11",
+    "name": "PALWAL",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.12",
+    "name": "UTAWAR",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.13",
+    "name": "WOMEN POLICE STATION, PALWAL",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.14",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.15",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.16",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.17",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.18",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.19",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.20",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.21",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.22",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.23",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.24",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.25",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.26",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.27",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.28",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.29",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.30",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.32",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.33",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.34",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.35",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.36",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.37",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.39",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.40",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.3.41",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.10.3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.10",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.1",
+    "name": "ATELI",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.2",
+    "name": "KANINA",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.3",
+    "name": "MAHENDERGARH",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.4",
+    "name": "NARNAUL",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.5",
+    "name": "CYBER POLICE STATION, MAHENDERGARH",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.6",
+    "name": "CHAUDHRI",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.7",
+    "name": "NIZAMPUR",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.8",
+    "name": "KANINA",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.9",
+    "name": "MAHENDERGARH",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.10",
+    "name": "NARNAUL",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.11",
+    "name": "SATNALI",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.12",
+    "name": "WOMEN POLICE STATION, NARNAUL",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.13",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.14",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.15",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.16",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.17",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.18",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.19",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.20",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.21",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.22",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.23",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.24",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.25",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.26",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.27",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.28",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.29",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.30",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.31",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.32",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.33",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.34",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.35",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.36",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.37",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.38",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.39",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.10.4.40",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.10.4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11",
+    "name": "Commando",
+    "level": 1,
+    "parent_code": "2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1",
+    "name": "District",
+    "level": 1,
+    "parent_code": "2.11",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.1",
+    "name": "Cantt",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.2",
+    "name": "BAHADURGARH",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.3",
+    "name": "CHANDIGARH",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.4",
+    "name": "FARIDABAD",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.5",
+    "name": "GURUGRAM",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.6",
+    "name": "HISAR",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.7",
+    "name": "JAGADHARI",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.8",
+    "name": "JIND",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.9",
+    "name": "KALKA",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.10",
+    "name": "KARNAL",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.11",
+    "name": "KURUKSHETRA",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.12",
+    "name": "PANIPAT",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.13",
+    "name": "REWARI",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.14",
+    "name": "ROHTAK",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.15",
+    "name": "SIRSA",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.16",
+    "name": "SONIPAT",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.17",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.18",
+    "name": "Centre",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.19",
+    "name": "ANC",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.20",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.21",
+    "name": "CIA",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.22",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.23",
+    "name": "Security",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.24",
+    "name": "Deputation",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.25",
+    "name": "DPO",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.26",
+    "name": "EOW",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.27",
+    "name": "Staffs",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.28",
+    "name": "Gunmen",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.29",
+    "name": "Proficient",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.30",
+    "name": "Lockup",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.31",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.32",
+    "name": "Court",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.33",
+    "name": "(Civil)",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.34",
+    "name": "Cell",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.35",
+    "name": "STAFF",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.36",
+    "name": "Lines",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.37",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.38",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.39",
+    "name": "Guard",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.40",
+    "name": "Staff",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.41",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.42",
+    "name": "order)",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.43",
+    "name": "TRAFFIC",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "2.11.1.44",
+    "name": "Courses",
+    "level": 1,
+    "parent_code": "2.11.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "3",
+    "name": "Centres",
+    "level": 1,
+    "parent_code": null,
+    "is_fixed": true
+  },
+  {
+    "node_code": "3.1",
+    "name": "Hisar",
+    "level": 1,
+    "parent_code": "3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "3.2",
+    "name": "HPA",
+    "level": 1,
+    "parent_code": "3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "3.3",
+    "name": "RTC, Bhondsi",
+    "level": 1,
+    "parent_code": "3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "3.4",
+    "name": "PTC, Sunaria",
+    "level": 1,
+    "parent_code": "3",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4",
+    "name": "Police",
+    "level": 1,
+    "parent_code": null,
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.1",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.2",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.3",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.4",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.5",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.6",
+    "name": "HAP",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.1.7",
+    "name": "DSRAF",
+    "level": 1,
+    "parent_code": "4.1",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.2",
+    "name": "IRB",
+    "level": 1,
+    "parent_code": "4",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.2.1",
+    "name": "IRB",
+    "level": 1,
+    "parent_code": "4.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.2.2",
+    "name": "IRB",
+    "level": 1,
+    "parent_code": "4.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.2.3",
+    "name": "IRB",
+    "level": 1,
+    "parent_code": "4.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.2.4",
+    "name": "IRB",
+    "level": 1,
+    "parent_code": "4.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "4.2.5",
+    "name": "IRB",
+    "level": 1,
+    "parent_code": "4.2",
+    "is_fixed": true
+  },
+  {
+    "node_code": "5",
+    "name": "Labs",
+    "level": 1,
+    "parent_code": null,
+    "is_fixed": true
+  },
+  {
+    "node_code": "5.1",
+    "name": "Madhuban",
+    "level": 1,
+    "parent_code": "5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "5.2",
+    "name": "Sunaria",
+    "level": 1,
+    "parent_code": "5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "5.3",
+    "name": "Hisar",
+    "level": 1,
+    "parent_code": "5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "5.4",
+    "name": "Bhondsi",
+    "level": 1,
+    "parent_code": "5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "5.5",
+    "name": "Panchkula",
+    "level": 1,
+    "parent_code": "5",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6",
+    "name": "Units",
+    "level": 1,
+    "parent_code": null,
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.1",
+    "name": "Commando",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.2",
+    "name": "Telecom",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.3",
+    "name": "CID",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.4",
+    "name": "HSDRF",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.5",
+    "name": "SCRB",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.6",
+    "name": "ACB",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.7",
+    "name": "HSEnB",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.8",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.9",
+    "name": "Branch",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.10",
+    "name": "HSNCB",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.11",
+    "name": "STF",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.12",
+    "name": "HIGHWAYS",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.13",
+    "name": "SPCA",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.14",
+    "name": "HHRC",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.15",
+    "name": "ATS",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.16",
+    "name": "GUARD",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.17",
+    "name": "CPT&R",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.18",
+    "name": "SECURITY",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.19",
+    "name": "ERSS",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  },
+  {
+    "node_code": "6.20",
+    "name": "CSO",
+    "level": 1,
+    "parent_code": "6",
+    "is_fixed": true
+  }
+]

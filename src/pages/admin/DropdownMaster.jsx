@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import {
-  collection, query, where, getDocs, doc, setDoc, updateDoc, deleteDoc,
-  serverTimestamp, orderBy, getCountFromServer, limit
-} from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import {
   Database, Plus, Edit, Trash2, Check, X, Search,
-  ChevronDown, Tag, ToggleLeft, ToggleRight, MoreVertical
+  ChevronDown, Tag, ToggleLeft, ToggleRight, MoreVertical,
+  Layout, ChevronUp
 } from 'lucide-react';
 
 const ACCESS_LEVEL_LABELS = {
@@ -24,8 +21,8 @@ const ACCESS_LEVEL_LABELS = {
   unit_admin_plus: 'Unit Admin & Above',
 };
 
-export default function MasterData() {
-  const { user, isSuperAdmin, isStateAdmin } = useAuth();
+export default function DropdownMaster() {
+  const { user, isStateAdmin, isSuperAdmin } = useAuth();
   const toast = useToast();
   const canEdit = isStateAdmin || isSuperAdmin;
 
@@ -59,6 +56,40 @@ export default function MasterData() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [editForm, setEditForm] = useState({ value: '', displayOrder: 0, accessLevel: 'all' });
 
+  // Personnel Layout State
+  const [personnelLayout, setPersonnelLayout] = useState([]);
+  const [layoutLoading, setLayoutLoading] = useState(false);
+  const [layoutSaving, setLayoutSaving] = useState(false);
+
+  // Default Layout Constant (Keep in sync with PersonnelForm)
+  const DEFAULT_LAYOUT_MAP = [
+    {
+      id: 'personal',
+      title: '1. Personal Details',
+      fields: [ 'photo_and_name_block', 'dateOfBirth', 'gender', 'bloodGroup', 'mobileNumber', 'alternateContact', 'payCode', 'religion', 'caste', 'category', 'aadharNumber', 'pan', 'homeDistrict' ]
+    },
+    {
+      id: 'education',
+      title: '2. Education & Training',
+      fields: [ 'subjectGraduation', 'subjectPostGraduation', 'swatAwtCourse', 'specialCourse', 'promotionType' ]
+    },
+    {
+      id: 'service',
+      title: '3. Service Details',
+      fields: [ 'rank', 'beltNumber', 'cadre', 'serviceType', 'serviceStatus', 'serviceBookNumber', 'dateOfEnlistment', 'dateOfLastPromotion', 'retirementDate' ]
+    },
+    {
+      id: 'posting',
+      title: '4. Posting & Location (STRICT)',
+      fields: [ 'stateId', 'rangeId', 'districtId', 'unitType', 'currentUnitId', 'currentSubUnitId' ]
+    },
+    {
+      id: 'duty',
+      title: '5. Duty & Role',
+      fields: [ 'psDutyType', 'ioStatus', 'ioCategory', 'paradeGroup', 'spoTrade', 'company', 'dateOfPosting', 'rBatch', 'tDutyOrder', 'remarks' ]
+    }
+  ];
+
   // Confirmation/Usage Modals
   const [confirmModal, setConfirmModal] = useState(null); // { title: '', message: '', onConfirm: fn, type: 'delete|save|deactivate' }
 
@@ -67,7 +98,9 @@ export default function MasterData() {
   }, [user]);
 
   useEffect(() => {
-    if (activeTab) {
+    if (activeTab === 'PERSONNEL_LAYOUT') {
+      loadPersonnelLayout();
+    } else if (activeTab) {
       loadRecords();
       setSearchTerm('');
       setBulkInput('');
@@ -76,23 +109,126 @@ export default function MasterData() {
     }
   }, [activeTab, user]);
 
+  async function loadPersonnelLayout() {
+    if (!user?.stateId) return;
+    try {
+      setLayoutLoading(true);
+      const { data, error } = await supabase
+        .from('personnel_layouts')
+        .select('*')
+        .eq('state_id', user.stateId)
+        .maybeSingle();
+
+      if (data && !error) {
+        const loadedSections = data.sections || DEFAULT_LAYOUT_MAP;
+        
+        // Ensure core fields are present in the layout manager
+        const placedFields = new Set(loadedSections.flatMap(s => s.fields));
+        const dutySection = loadedSections.find(s => s.id === 'duty');
+        if (dutySection) {
+          if (!placedFields.has('psDutyType')) dutySection.fields.push('psDutyType');
+        }
+        setPersonnelLayout(loadedSections);
+      } else {
+        setPersonnelLayout(DEFAULT_LAYOUT_MAP);
+      }
+    } catch (err) {
+      toast.error('Failed to load layout configuration.');
+    } finally {
+      setLayoutLoading(false);
+    }
+  }
+
+
+
+  async function savePersonnelLayout() {
+    if (!user?.stateId) return;
+    try {
+      setLayoutSaving(true);
+      const { error } = await supabase
+        .from('personnel_layouts')
+        .upsert({
+          state_id: user.stateId,
+          sections: personnelLayout,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+      toast.success('Personnel layout updated successfully.');
+    } catch (err) {
+      toast.error('Failed to save layout.');
+    } finally {
+      setLayoutSaving(false);
+    }
+  }
+
+  const moveSection = (index, direction) => {
+    const newLayout = [...personnelLayout];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newLayout.length) return;
+    [newLayout[index], newLayout[targetIndex]] = [newLayout[targetIndex], newLayout[index]];
+    setPersonnelLayout(newLayout);
+  };
+
+  const moveField = (sectionIndex, fieldIndex, direction) => {
+    const newLayout = [...personnelLayout];
+    const section = { ...newLayout[sectionIndex] };
+    const fields = [...section.fields];
+    const targetIndex = direction === 'up' ? fieldIndex - 1 : fieldIndex + 1;
+    if (targetIndex < 0 || targetIndex >= fields.length) return;
+    [fields[fieldIndex], fields[targetIndex]] = [fields[targetIndex], fields[fieldIndex]];
+    section.fields = fields;
+    newLayout[sectionIndex] = section;
+    setPersonnelLayout(newLayout);
+  };
+
+  const shiftFieldToSection = (fromSectionIndex, fieldIndex, toSectionId) => {
+    const newLayout = personnelLayout.map(s => ({ ...s, fields: [...s.fields] }));
+    const fieldId = newLayout[fromSectionIndex].fields[fieldIndex];
+    
+    // Remove from old
+    newLayout[fromSectionIndex].fields.splice(fieldIndex, 1);
+    
+    // Add to new
+    const toSection = newLayout.find(s => s.id === toSectionId);
+    if (toSection) toSection.fields.push(fieldId);
+    
+    setPersonnelLayout(newLayout);
+  };
+
   async function loadFields() {
     if (!user?.stateId) return;
     try {
       setLoading(true);
-      const q = query(
-        collection(db, 'masterDataFields'),
-        where('stateId', '==', user.stateId)
-      );
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setMasterFields(data);
-      if (data.length > 0) {
-        if (!activeTab) setActiveTab(data[0].fieldName);
+      const { data, error } = await supabase
+        .from('master_field_types')
+        .select('*')
+        .eq('state_id', user.stateId)
+        .order('display_name');
+
+      if (error) throw error;
+
+      // Map snake_case to camelCase for UI compatibility if needed, 
+      // or update UI to use snake_case. Let's update data to use camelCase internally.
+      const mapped = data.map(d => ({
+        id: d.id,
+        fieldName: d.field_name,
+        displayName: d.display_name,
+        personnelFieldName: d.personnel_field_name,
+        helperExample: d.helper_example,
+        description: d.description,
+        isActive: d.is_active,
+        stateId: d.state_id
+      }));
+
+      setMasterFields(mapped);
+      if (mapped.length > 0) {
+        if (!activeTab) setActiveTab(mapped[0].fieldName);
       } else {
-        setLoading(false); // No fields, so loading is "done"
+        setLoading(false); 
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       toast.error('Failed to load field types.');
       setLoading(false);
     }
@@ -103,22 +239,41 @@ export default function MasterData() {
       setRecordsLoading(false);
       return;
     }
+
+    const fieldConfig = masterFields.find(f => f.fieldName === activeTab);
+    if (!fieldConfig) {
+      setRecordsLoading(false);
+      return;
+    }
+
     try {
       setRecordsLoading(true);
-      const q = query(
-        collection(db, 'masterData'),
-        where('fieldType', '==', activeTab),
-        where('stateId', '==', user.stateId)
-      );
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      data.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-      setRecords(data);
-    } catch (err) {
+      const { data, error } = await supabase
+        .from('master_dropdown_values')
+        .select('*')
+        .eq('field_type_id', fieldConfig.id)
+        .eq('state_id', user.stateId)
+        .order('display_order');
+      
+      if (error) throw error;
+
+      const mapped = data.map(d => ({
+        id: d.id,
+        value: d.value,
+        displayOrder: d.display_order,
+        accessLevel: d.access_level,
+        isActive: d.is_active,
+        fieldTypeId: d.field_type_id,
+        fieldType: activeTab // Keep for UI logic
+      }));
+
+      setRecords(mapped);
+    } catch (error) {
+      console.error(error);
       toast.error('Failed to load dropdown data.');
     } finally {
       setRecordsLoading(false);
-      setLoading(false); // Initial load complete
+      setLoading(false); 
     }
   }
 
@@ -157,38 +312,32 @@ export default function MasterData() {
       return;
     }
 
+    const fieldConfig = masterFields.find(f => f.fieldName === activeTab);
+    if (!fieldConfig) return;
+
     setConfirmModal({
       title: 'Confirm Add Values',
-      message: `Are you sure you want to add ${validTags.length} new value(s) to "${masterFields.find(f => f.fieldName === activeTab)?.displayName}"?`,
+      message: `Are you sure you want to add ${validTags.length} new value(s) to "${fieldConfig.displayName}"?`,
       onConfirm: async () => {
         try {
           setSaving(true);
           const maxOrder = records.reduce((max, r) => Math.max(max, r.displayOrder || 0), 0);
 
-          for (let i = 0; i < validTags.length; i++) {
-            const tag = validTags[i];
-            const q = query(
-              collection(db, 'masterData'),
-              where('fieldType', '==', activeTab),
-              where('value', '==', tag.value),
-              where('stateId', '==', user.stateId)
-            );
-            const existing = await getDocs(q);
-            if (!existing.empty) continue;
+          const newEntries = validTags.map((tag, i) => ({
+            field_type_id: fieldConfig.id,
+            state_id: user.stateId,
+            value: tag.value,
+            display_order: maxOrder + i + 1,
+            access_level: 'all',
+            is_active: true,
+            updated_at: new Date().toISOString()
+          }));
 
-            const newRef = doc(collection(db, 'masterData'));
-            await setDoc(newRef, {
-              fieldType: activeTab,
-              value: tag.value,
-              stateId: user.stateId,
-              accessLevel: 'all',
-              parentValue: null,
-              isActive: true,
-              displayOrder: maxOrder + i + 1,
-              createdAt: serverTimestamp(),
-              updatedAt: serverTimestamp(),
-            });
-          }
+          const { error } = await supabase
+            .from('master_dropdown_values')
+            .insert(newEntries);
+
+          if (error) throw error;
 
           toast.success(`${validTags.length} value(s) added successfully.`);
           setBulkInput('');
@@ -198,7 +347,6 @@ export default function MasterData() {
         } catch (err) {
           toast.error('Failed to save entries.');
         } finally {
-          setSaving(true); // Temporary to close modal
           setSaving(false);
           setConfirmModal(null);
         }
@@ -230,12 +378,17 @@ export default function MasterData() {
     }
     try {
       setSaving(true);
-      await updateDoc(doc(db, 'masterData', editingRecord.id), {
-        value: editForm.value.trim(),
-        displayOrder: parseInt(editForm.displayOrder) || 0,
-        accessLevel: editForm.accessLevel,
-        updatedAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('master_dropdown_values')
+        .update({
+          value: editForm.value.trim(),
+          display_order: parseInt(editForm.displayOrder) || 0,
+          access_level: editForm.accessLevel,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', editingRecord.id);
+
+      if (error) throw error;
       toast.success('Record updated.');
       setEditingRecord(null);
       loadRecords();
@@ -255,10 +408,15 @@ export default function MasterData() {
       onConfirm: async () => {
         try {
           setSaving(true);
-          await updateDoc(doc(db, 'masterData', record.id), {
-            isActive: !record.isActive,
-            updatedAt: serverTimestamp(),
-          });
+          const { error } = await supabase
+            .from('master_dropdown_values')
+            .update({
+              is_active: !record.isActive,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', record.id);
+
+          if (error) throw error;
           toast.success(`${record.value} ${record.isActive ? 'deactivated' : 'activated'}.`);
           loadRecords();
         } catch (err) {
@@ -280,13 +438,13 @@ export default function MasterData() {
     if (!masterField?.personnelFieldName) return false;
 
     try {
-      const q = query(
-        collection(db, 'personnel'),
-        where(masterField.personnelFieldName, '==', value),
-        limit(1)
-      );
-      const snap = await getDocs(q);
-      return !snap.empty;
+      const { count, error } = await supabase
+        .from('personnel')
+        .select('*', { count: 'exact', head: true })
+        .eq(masterField.personnelFieldName, value);
+      
+      if (error) throw error;
+      return count > 0;
     } catch (err) {
       console.error('Usage check failed:', err);
       return true; // Fail safe
@@ -311,7 +469,12 @@ export default function MasterData() {
       onConfirm: async () => {
         try {
           setSaving(true);
-          await deleteDoc(doc(db, 'masterData', record.id));
+          const { error } = await supabase
+            .from('master_dropdown_values')
+            .delete()
+            .eq('id', record.id);
+
+          if (error) throw error;
           toast.success('Record deleted.');
           loadRecords();
         } catch (err) {
@@ -349,13 +512,31 @@ export default function MasterData() {
       onConfirm: async () => {
         try {
           setSaving(true);
-          const docId = isEdit ? editingFieldType.id : `${user.stateId}_${newFieldType.fieldName}`;
-          await setDoc(doc(db, 'masterDataFields', docId), {
-            ...newFieldType,
-            stateId: user.stateId,
-            updatedAt: serverTimestamp(),
-            ...(isEdit ? {} : { createdAt: serverTimestamp() })
-          }, { merge: true });
+          
+          const payload = {
+            state_id: user.stateId,
+            field_name: newFieldType.fieldName,
+            display_name: newFieldType.displayName,
+            personnel_field_name: newFieldType.personnelFieldName || null,
+            helper_example: newFieldType.helperExample || 'Value1, Value2, Value3',
+            description: newFieldType.description || '',
+            is_active: newFieldType.isActive !== false,
+            updated_at: new Date().toISOString()
+          };
+
+          let result;
+          if (isEdit) {
+            result = await supabase
+              .from('master_field_types')
+              .update(payload)
+              .eq('id', editingFieldType.id);
+          } else {
+            result = await supabase
+              .from('master_field_types')
+              .insert([payload]);
+          }
+
+          if (result.error) throw result.error;
 
           toast.success(isEdit ? 'Category updated.' : 'Field type added.');
           setShowFieldTypeModal(false);
@@ -379,10 +560,15 @@ export default function MasterData() {
         onConfirm: async () => {
           try {
             setSaving(true);
-            await updateDoc(doc(db, 'masterDataFields', field.id), {
-              isActive: nextState,
-              updatedAt: serverTimestamp()
-            });
+            const { error } = await supabase
+              .from('master_field_types')
+              .update({
+                is_active: nextState,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', field.id);
+
+            if (error) throw error;
             toast.success('Category updated.');
             loadFields();
           } catch (err) {
@@ -416,13 +602,22 @@ export default function MasterData() {
   }
 
   async function deleteFieldType(field) {
-    // Check if any masterData records exist for this type
-    const q = query(collection(db, 'masterData'), where('fieldType', '==', field.fieldName), where('stateId', '==', user.stateId));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
+    // Check if any dropdown values exist for this type
+    const { count, error } = await supabase
+      .from('master_dropdown_values')
+      .select('*', { count: 'exact', head: true })
+      .eq('field_type_id', field.id)
+      .eq('state_id', user.stateId);
+
+    if (error) {
+      toast.error('Failed to check usage.');
+      return;
+    }
+
+    if (count > 0) {
       setConfirmModal({
         title: 'Cannot Delete Tab',
-        message: `The "${field.displayName}" category contains values and cannot be deleted. Remove all values first.`,
+        message: `The "${field.displayName}" category contains ${count} values and cannot be deleted. Remove all values first.`,
         type: 'error',
         onConfirm: () => setConfirmModal(null)
       });
@@ -435,13 +630,13 @@ export default function MasterData() {
       onConfirm: async () => {
         try {
           setSaving(true);
-          // In production, we'd delete the doc.id we know
-          const docId = `${user.stateId}_${field.fieldName}`;
-          // Since we might not be sure of the ID (if it was generated), let's find it.
-          const fDoc = masterFields.find(f => f.fieldName === field.fieldName);
-          if (fDoc) {
-             await deleteDoc(doc(db, 'masterDataFields', fDoc.id));
-          }
+          const { error: delError } = await supabase
+            .from('master_field_types')
+            .delete()
+            .eq('id', field.id);
+
+          if (delError) throw delError;
+
           toast.success('Tab removed.');
           setActiveTab(masterFields[0]?.fieldName || '');
           loadFields();
@@ -471,7 +666,7 @@ export default function MasterData() {
           <Database size={24} className="text-primary" />
           <h2>Dropdown Master Management</h2>
         </div>
-        <p className="text-sm text-gray-500" style={{marginTop: 4}}>
+        <p className="text-sm text-gray-500" style={{margin: 0}}>
           Centralized dropdown values for the entire portal
         </p>
       </div>
@@ -560,6 +755,20 @@ export default function MasterData() {
               </div>
             ))}
             {canEdit && (
+              <button
+                className={`btn btn-sm ${activeTab === 'PERSONNEL_LAYOUT' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setActiveTab('PERSONNEL_LAYOUT')}
+                style={{ 
+                  borderRadius: '20px', padding: '6px 16px', 
+                  fontWeight: activeTab === 'PERSONNEL_LAYOUT' ? 700 : 400,
+                  display: 'flex', alignItems: 'center', gap: '8px'
+                }}
+              >
+                <Layout size={14} /> Personnel Layout
+              </button>
+            )}
+
+            {canEdit && (
               <button 
                 className="btn btn-ghost btn-sm" 
                 onClick={() => setShowFieldTypeModal(true)}
@@ -571,9 +780,85 @@ export default function MasterData() {
           </div>
         </div>
       </div>
+      {activeTab === 'PERSONNEL_LAYOUT' ? (
+        <div className="layout-manager-container">
+          <div className="panel mb-4" style={{ borderLeft: '4px solid var(--primary-500)' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--primary-50)' }}>
+              <div>
+                <h3 style={{ margin: 0, color: 'var(--primary-700)' }}>
+                  <Layout size={18} style={{ display: 'inline', marginRight: 8 }} />
+                  Personnel Form Layout
+                </h3>
+                <p className="text-secondary" style={{ fontSize: '0.85rem', marginTop: '4px' }}>
+                  Manage sections and shuffle fields to customize the Personnel Add/View screens.
+                </p>
+              </div>
+              <button className="btn btn-primary" onClick={savePersonnelLayout} disabled={layoutSaving}>
+                {layoutSaving ? 'Saving...' : 'Save Configuration'}
+              </button>
+            </div>
 
-      {/* Stats + Actions Bar */}
-      <div className="panel mb-4">
+            <div className="panel-body" style={{ background: 'var(--gray-50)', padding: 'var(--space-4)' }}>
+              {layoutLoading ? (
+                <div className="empty-state"><div className="spinner"></div></div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {personnelLayout.map((section, sIdx) => (
+                    <div key={section.id} className="panel" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                      <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white' }}>
+                        <h4 style={{ margin: 0, color: 'var(--gray-700)' }}>{section.title}</h4>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button className="btn btn-ghost btn-sm btn-icon" onClick={() => moveSection(sIdx, 'up')} disabled={sIdx === 0}><ChevronUp size={14} /></button>
+                          <button className="btn btn-ghost btn-sm btn-icon" onClick={() => moveSection(sIdx, 'down')} disabled={sIdx === personnelLayout.length - 1}><ChevronDown size={14} /></button>
+                        </div>
+                      </div>
+                      <div className="panel-body" style={{ padding: '16px', background: 'white' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '12px' }}>
+                          {section.fields.map((fid, fIdx) => (
+                            <div key={fid} style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'space-between',
+                              padding: '10px 14px', 
+                              background: 'var(--gray-50)', 
+                              border: '1px solid var(--gray-200)',
+                              borderRadius: 'var(--radius-md)',
+                              fontSize: '0.85rem'
+                            }}>
+                              <span style={{ fontWeight: 600, color: 'var(--gray-600)' }}>{fid}</span>
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <button className="btn btn-ghost btn-xs btn-icon" onClick={() => moveField(sIdx, fIdx, 'up')} disabled={fIdx === 0}><ChevronUp size={12} /></button>
+                                <button className="btn btn-ghost btn-xs btn-icon" onClick={() => moveField(sIdx, fIdx, 'down')} disabled={fIdx === section.fields.length - 1}><ChevronDown size={12} /></button>
+                                
+                                {/* Section Shifter (Except for core posting fields) */}
+                                {!['stateId', 'rangeId', 'districtId', 'unitType', 'currentUnitId', 'currentSubUnitId'].includes(fid) && (
+                                  <select 
+                                    className="form-select"
+                                    style={{ fontSize: '0.7rem', padding: '2px 4px', width: 'auto', height: 'auto', border: '1px solid var(--gray-300)' }}
+                                    onChange={(e) => shiftFieldToSection(sIdx, fIdx, e.target.value)}
+                                    value={section.id}
+                                  >
+                                    {personnelLayout.map(target => (
+                                      <option key={target.id} value={target.id}>{target.id === section.id ? 'Move To...' : target.title}</option>
+                                    ))}
+                                  </select>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Stats + Actions Bar */}
+          <div className="panel mb-4">
         <div className="panel-body" style={{
           display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 16px'
         }}>
@@ -744,6 +1029,9 @@ export default function MasterData() {
           )}
         </div>
       </div>
+
+        </>
+      )}
 
       {/* Edit Modal */}
       {editingRecord && (

@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db, storage } from '../../firebase';
-import {
-  collection, doc, setDoc, query, where, getDocs, serverTimestamp, orderBy
-} from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
 import { Send, UploadCloud, ArrowLeft, Calendar, UserCheck } from 'lucide-react';
 
@@ -37,18 +33,40 @@ export default function TransferApply() {
     try {
       setLoading(true);
       // Load personnel from this unit
-      const pQuery = query(
-        collection(db, 'personnel'),
-        where('currentUnitId', '==', user.unitId || ''),
-        where('serviceStatus', '==', 'Active')
-      );
-      const pSnap = await getDocs(pQuery);
-      setPersonnel(pSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const { data: pData, error: pError } = await supabase
+        .from('personnel')
+        .select('*')
+        .eq('current_unit_id', user.unitId || '')
+        .eq('service_status', 'Active')
+        .eq('is_deleted', false);
+      
+      if (pError) throw pError;
+      setPersonnel(pData.map(p => ({
+        id: p.id,
+        fullName: p.full_name,
+        rank: p.rank,
+        beltNumber: p.belt_number,
+        currentUnitId: p.current_unit_id,
+        currentSubUnitId: p.current_sub_unit_id,
+        stateId: p.state_id,
+        rangeId: p.range_id,
+        districtId: p.district_id
+      })));
 
       // Load all destination units
-      const uQuery = query(collection(db, 'units'), orderBy('unitName'));
-      const uSnap = await getDocs(uQuery);
-      setUnits(uSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const { data: uData, error: uError } = await supabase
+        .from('units')
+        .select('*')
+        .order('name');
+      
+      if (uError) throw uError;
+      setUnits(uData.map(u => ({
+        id: u.id,
+        unitName: u.name,
+        districtId: u.district_id,
+        rangeId: u.range_id,
+        stateId: u.state_id
+      })));
     } catch (err) {
       console.error('Load data error:', err);
       toast.error('Failed to load required data.');
@@ -74,46 +92,47 @@ export default function TransferApply() {
     try {
       const selectedPerson = personnel.find(p => p.id === formData.personnelId);
       const destUnit = units.find(u => u.id === formData.toUnitId);
-      const fromUnit = units.find(u => u.id === selectedPerson.currentUnitId);
       
       let documentUrl = '';
       if (documentFile) {
-        const fileRef = ref(storage, `transfer_orders/${Date.now()}_${documentFile.name}`);
-        const uploadResult = await uploadBytes(fileRef, documentFile);
-        documentUrl = await getDownloadURL(uploadResult.ref);
+        const fileExt = documentFile.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `transfer_orders/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('personnel-docs')
+          .upload(filePath, documentFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from('personnel-docs')
+          .getPublicUrl(filePath);
+        
+        documentUrl = publicUrlData.publicUrl;
       }
 
-      const transferRef = doc(collection(db, 'transferRegister'));
-      await setDoc(transferRef, {
-        transferId: transferRef.id,
-        personnelId: selectedPerson.id,
-        personnelName: selectedPerson.fullName || '',
-        beltNumber: selectedPerson.beltNumber || '',
-        rank: selectedPerson.rank || '',
-        stateId: selectedPerson.stateId || '',
-        rangeId: selectedPerson.rangeId || '',
-        districtId: selectedPerson.districtId || '',
+      const payload = {
+        personnel_id: selectedPerson.id,
+        state_id: selectedPerson.stateId || '',
+        range_id: selectedPerson.rangeId || '',
+        district_id: selectedPerson.districtId || '',
         
-        fromUnitId: selectedPerson.currentUnitId || '',
-        fromSubUnitId: selectedPerson.currentSubUnitId || '',
-        fromUnitName: fromUnit ? fromUnit.unitName : 'Unknown Unit',
+        from_unit_id: selectedPerson.currentUnitId || '',
+        to_unit_id: destUnit.id,
         
-        toUnitId: destUnit.id,
-        toSubUnitId: formData.toSubUnitId,
-        toUnitName: destUnit.unitName,
-        toDistrictId: destUnit.districtId || '',
-        toRangeId: destUnit.rangeId || '',
-        toStateId: destUnit.stateId || '',
+        order_number: formData.orderNumber,
+        order_date: formData.transferDate,
+        status: 'Ordered',
+        remarks: documentUrl ? `Order Link: ${documentUrl}` : '',
         
-        transferDate: formData.transferDate,
-        effectiveDate: formData.effectiveDate || formData.transferDate,
-        orderNumber: formData.orderNumber,
-        status: 'Pending',
-        documentUrl,
-        
-        initiatedByUserId: user.uid || user.userId,
-        createdAt: serverTimestamp(),
-      });
+        created_by_user_id: user.id || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('transfers').insert([payload]);
+      if (error) throw error;
 
       toast.success('Transfer order initiated.');
       navigate('/transfer');

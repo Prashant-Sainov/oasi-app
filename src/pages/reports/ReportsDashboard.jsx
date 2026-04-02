@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, query, getDocs, orderBy, where } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
 import { FileText, FileDown, Plus, Search, Filter, BarChart3 } from 'lucide-react';
 
@@ -33,21 +32,37 @@ export default function ReportsDashboard() {
   async function loadReports() {
     try {
       setLoading(true);
-      const q = query(collection(db, 'firReports'), orderBy('createdAt', 'desc'));
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      let queryBuilder = supabase
+        .from('fir_reports')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       // Role-based filtering
-      let filtered = data;
       if (isUnitAdmin && user.unitId) {
-        filtered = data.filter(r => r.unitId === user.unitId);
+        queryBuilder = queryBuilder.eq('unit_id', user.unitId);
       } else if (isDistrictAdmin && user.districtId) {
-        filtered = data.filter(r => r.districtId === user.districtId);
+        queryBuilder = queryBuilder.eq('district_id', user.districtId);
       } else if (isRangeAdmin && user.rangeId) {
-        filtered = data.filter(r => r.rangeId === user.rangeId);
+        queryBuilder = queryBuilder.eq('range_id', user.rangeId);
       }
-      
-      setReports(filtered);
+
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+
+      setReports(data.map(r => ({
+        id: r.id,
+        year: r.year,
+        quarter: r.quarter,
+        policeStation: r.police_station,
+        firCount: r.fir_count,
+        chargeSheetFiled: r.charge_sheet_filed,
+        conviction: r.conviction,
+        pending: r.pending,
+        cognizable: r.cognizable,
+        nonCognizable: r.non_cognizable,
+        ...r
+      })));
     } catch (err) {
       console.error('Load reports error:', err);
       toast.error('Failed to load FIR reports.');

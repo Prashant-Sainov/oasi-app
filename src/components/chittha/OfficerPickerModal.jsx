@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Search, Check, User } from 'lucide-react';
-import { db } from '../../firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 
 export default function OfficerPickerModal({ isOpen, onClose, onAdd, unitId }) {
   const [loading, setLoading] = useState(false);
@@ -20,11 +19,25 @@ export default function OfficerPickerModal({ isOpen, onClose, onAdd, unitId }) {
   async function fetchOfficers() {
     try {
       setLoading(true);
-      const q = query(collection(db, 'personnel'), where('currentUnitId', '==', unitId));
-      const snap = await getDocs(q);
-      setOfficers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const { data, error } = await supabase
+        .from('personnel')
+        .select('*')
+        .eq('current_unit_id', unitId)
+        .eq('is_deleted', false)
+        .eq('service_status', 'Active');
+      
+      if (error) throw error;
+      
+      setOfficers(data.map(o => ({
+        id: o.id,
+        fullName: o.full_name,
+        rank: o.rank,
+        beltNumber: o.belt_number,
+        mobileNumber: o.mobile_number,
+        ...o
+      })));
     } catch (err) {
-      console.error(err);
+      console.error('Fetch officers error:', err);
     } finally {
       setLoading(false);
     }

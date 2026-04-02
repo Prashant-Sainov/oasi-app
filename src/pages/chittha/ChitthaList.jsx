@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, ClipboardList, Trash2, Edit2, Eye, Copy, ChevronRight, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 
 export default function ChitthaList() {
   const { user, isDistrictAdmin, isStateAdmin } = useAuth();
@@ -24,16 +23,33 @@ export default function ChitthaList() {
   async function fetchChitthas() {
     try {
       setLoading(true);
-      const chitthaRef = collection(db, 'naukriChittha');
-      let q = query(chitthaRef, orderBy('chitthaDate', 'desc'));
       
+      let queryBuilder = supabase
+        .from('chitthas')
+        .select(`
+          *,
+          units:unit_id (name)
+        `)
+        .order('chittha_date', { ascending: false });
+
       if (!isStateAdmin) {
-        if (user.unitId) q = query(chitthaRef, where('unitId', '==', user.unitId), orderBy('chitthaDate', 'desc'));
-        else if (isDistrictAdmin) q = query(chitthaRef, where('districtId', '==', user.districtId), orderBy('chitthaDate', 'desc'));
+        if (user.unitId) {
+          queryBuilder = queryBuilder.eq('unit_id', user.unitId);
+        } else if (isDistrictAdmin && user.districtId) {
+          queryBuilder = queryBuilder.eq('district_id', user.districtId);
+        }
       }
 
-      const snap = await getDocs(q);
-      setChitthas(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+
+      setChitthas(data.map(c => ({
+        id: c.id,
+        ...c,
+        chitthaDate: c.chittha_date, // Map snake_case to camelCase used in UI
+        unitName: c.units?.name || 'Unknown Unit',
+        sectionCount: 12 // Default/Placeholder as in original
+      })));
     } catch (err) {
       console.error(err);
       toast.error('Failed to load chitthas');

@@ -1,9 +1,8 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, doc, setDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import * as XLSX from 'xlsx';
 import {
   Upload, FileSpreadsheet, ArrowLeft, ArrowRight, Check,
@@ -37,21 +36,27 @@ const SYSTEM_FIELDS = [
   { key: 'aadharNumber', label: 'Aadhar Number', required: false },
   { key: 'pan', label: 'PAN', required: false },
   { key: 'serviceStatus', label: 'Service Status', required: false },
-  { key: 'role1', label: 'Role 1', required: false },
-  { key: 'role2', label: 'Role 2', required: false },
   { key: 'ioStatus', label: 'IO Status', required: false },
   { key: 'ioCategory', label: 'IO Category', required: false },
   { key: 'paradeGroup', label: 'Parade Group', required: false },
   { key: 'spoTrade', label: 'SPO Trade', required: false },
+  { key: 'psDutyType', label: 'PS Duty Type (Role 2)', required: false },
+  { key: 'homeDistrictPS', label: 'Home District PS', required: false },
   { key: 'promotionType', label: 'Promotion Type', required: false },
   { key: 'specialCourse', label: 'Special Course', required: false },
   { key: 'company', label: 'Company', required: false },
-  { key: 'stateId', label: 'State ID', required: false },
-  { key: 'rangeId', label: 'Range ID', required: false },
-  { key: 'districtId', label: 'District ID', required: false },
+  { key: 'stateId', label: 'State Name', required: false },
+  { key: 'rangeId', label: 'Range Name', required: false },
+  { key: 'districtId', label: 'District Name', required: false },
   { key: 'unitType', label: 'Unit Category', required: false },
-  { key: 'currentUnitId', label: 'Unit ID', required: false },
-  { key: 'currentSubUnitId', label: 'Sub-Unit ID', required: false },
+  { key: 'currentUnitId', label: 'Unit Name', required: false },
+  { key: 'currentSubUnitId', label: 'Sub-Unit Name', required: false },
+  { key: 'subjectGraduation', label: 'Subject (Graduation)', required: false },
+  { key: 'subjectPostGraduation', label: 'Subject (Post Graduation)', required: false },
+  { key: 'swatAwtCourse', label: 'SWAT/AWT Course', required: false },
+  { key: 'rBatch', label: 'R/BATCH', required: false },
+  { key: 'tDutyOrder', label: 'T/DUTY ORDER', required: false },
+  { key: 'dateOfPosting', label: 'Date of Posting', required: false },
   { key: 'remarks', label: 'Remarks', required: false },
 ];
 
@@ -85,16 +90,23 @@ function autoMap(fileColumns) {
     bloodGroup: ['bloodgroup', 'blood'],
     alternateContact: ['alternatecontact', 'altcontact'],
     aadharNumber: ['aadhar', 'aadharnumber', 'uid'],
-    role1: ['role1', 'role', 'duty'],
     ioStatus: ['iostatus', 'io'],
+    psDutyType: ['psdutytype', 'role2', 'dutytype'],
+    homeDistrictPS: ['homedistrictps', 'pshomedistrict'],
     company: ['company', 'coy'],
     remarks: ['remarks', 'remark', 'note', 'notes'],
-    stateId: ['stateid', 'state'],
-    rangeId: ['rangeid', 'range'],
-    districtId: ['districtid', 'currentdistrict'],
-    unitType: ['unittype', 'unitcategory', 'category'],
-    currentUnitId: ['unitid', 'currentunit'],
-    currentSubUnitId: ['subunitid', 'currentsubunit'],
+    stateId: ['state', 'statename'],
+    rangeId: ['range', 'rangename'],
+    districtId: ['district', 'districtname', 'currentdistrict'],
+    unitType: ['unittype', 'unitcategory'],
+    currentUnitId: ['unit', 'unitname', 'currentunit'],
+    currentSubUnitId: ['subunit', 'subunitname', 'currentsubunit'],
+    subjectGraduation: ['graduation', 'gradsubject', 'subjectgraduation'],
+    subjectPostGraduation: ['postgraduation', 'pgsubject', 'subjectpostgraduation'],
+    swatAwtCourse: ['swat', 'awt', 'swatawtcourse'],
+    rBatch: ['rbatch', 'batch'],
+    tDutyOrder: ['tdutyorder', 'dutyorder'],
+    dateOfPosting: ['postingdate', 'dateofposting'],
   };
 
   fileColumns.forEach(col => {
@@ -126,6 +138,79 @@ export default function ExcelImport() {
   const [validationResults, setValidationResults] = useState(null);
   const [importing, setImporting] = useState(false);
   const [importResults, setImportResults] = useState(null);
+  const [customMasterFields, setCustomMasterFields] = useState([]);
+  const [hierarchyMaps, setHierarchyMaps] = useState({
+    states: {}, ranges: {}, districts: {}, categories: [], units: {}, subUnits: {}
+  });
+
+  const normalizeName = (s) => String(s || '').toLowerCase().trim().replace(/\s+/g, ' ');
+
+  // Fetch all hierarchy data for mapping names to IDs
+  useEffect(() => {
+    async function fetchHierarchy() {
+      try {
+        const [sRes, rRes, dRes, cRes, uRes, suRes] = await Promise.all([
+          supabase.from('states').select('*'),
+          supabase.from('ranges').select('*'),
+          supabase.from('districts').select('*'),
+          supabase.from('unit_categories').select('*'),
+          supabase.from('units').select('*'),
+          supabase.from('sub_units').select('*')
+        ]);
+
+        const maps = {
+          states: {}, ranges: {}, districts: {}, categories: [], units: {}, subUnits: {}
+        };
+
+        sRes.data?.forEach(d => { maps.states[normalizeName(d.name)] = d.id; });
+        rRes.data?.forEach(d => { maps.ranges[normalizeName(d.name)] = d.id; });
+        dRes.data?.forEach(d => { maps.districts[normalizeName(d.name)] = d.id; });
+        maps.categories = cRes.data?.map(d => normalizeName(d.name)) || [];
+        uRes.data?.forEach(d => { maps.units[normalizeName(d.name)] = d.id; });
+        suRes.data?.forEach(d => { maps.subUnits[normalizeName(d.name)] = d.id; });
+
+        setHierarchyMaps(maps);
+      } catch (err) {
+        if (import.meta.env.DEV) console.error('Failed to fetch hierarchy for mapping:', err);
+      }
+    }
+    fetchHierarchy();
+  }, []);
+
+  // Load custom master data fields to extend the importable field list
+  useEffect(() => {
+    if (!user?.stateId) return;
+    async function loadMasterFields() {
+      try {
+        const { data, error } = await supabase
+          .from('dropdown_master_fields')
+          .select('*')
+          .eq('state_id', user.stateId)
+          .eq('is_active', true);
+        
+        if (error) throw error;
+        
+        const fields = data.filter(f => f.personnel_field_name);
+        setCustomMasterFields(fields.map(f => ({
+          ...f,
+          personnelFieldName: f.personnel_field_name,
+          displayName: f.display_name
+        })));
+      } catch (err) {
+        if (import.meta.env.DEV) console.error('Failed to load dropdown master fields for import:', err);
+      }
+    }
+    loadMasterFields();
+  }, [user]);
+
+  // Effective fields = standard system fields + any custom master data fields not already listed
+  const effectiveFields = useMemo(() => {
+    const standardKeys = new Set(SYSTEM_FIELDS.map(f => f.key));
+    const dynamicExtras = customMasterFields
+      .filter(mf => !standardKeys.has(mf.personnelFieldName))
+      .map(mf => ({ key: mf.personnelFieldName, label: mf.displayName, required: false, isDynamic: true }));
+    return [...SYSTEM_FIELDS, ...dynamicExtras];
+  }, [customMasterFields]);
 
   // Step 1: File Upload
   const handleFileUpload = useCallback((e) => {
@@ -148,10 +233,13 @@ export default function ExcelImport() {
     reader.onload = (evt) => {
       try {
         const data = new Uint8Array(evt.target.result);
-        const wb = XLSX.read(data, { type: 'array' });
+        const wb = XLSX.read(data, { type: 'array', cellDates: true, dateNF: 'yyyy-mm-dd' });
         const sheetName = wb.SheetNames[0];
         const ws = wb.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        
+        // Convert to JSON, but ensure dates from cells are usable
+        // raw: false will use the dateNF format specified above for date cells
+        const json = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
 
         if (json.length === 0) {
           toast.error('The file is empty or has no data rows.');
@@ -214,7 +302,7 @@ export default function ExcelImport() {
     const warnings = [];
     const validRows = [];
 
-    const requiredFields = SYSTEM_FIELDS.filter(f => f.required).map(f => f.key);
+    const requiredFields = effectiveFields.filter(f => f.required).map(f => f.key);
     const mappedFields = Object.entries(mapping);
 
     rawData.forEach((row, idx) => {
@@ -223,13 +311,42 @@ export default function ExcelImport() {
       let rowErrors = [];
 
       mappedFields.forEach(([fileCol, sysKey]) => {
-        mapped[sysKey] = String(row[fileCol] || '').trim();
+        const value = String(row[fileCol] || '').trim();
+        
+        // Hierarchy Mapping Logic
+        const hKey = normalizeName(value);
+        if (sysKey === 'stateId' && value) {
+          const id = hierarchyMaps.states[hKey];
+          if (id) mapped[sysKey] = id;
+          else rowErrors.push(`Row ${rowNum}: State '${value}' not found`);
+        } else if (sysKey === 'rangeId' && value) {
+          const id = hierarchyMaps.ranges[hKey];
+          if (id) mapped[sysKey] = id;
+          else rowErrors.push(`Row ${rowNum}: Range '${value}' not found`);
+        } else if (sysKey === 'districtId' && value) {
+          const id = hierarchyMaps.districts[hKey];
+          if (id) mapped[sysKey] = id;
+          else rowErrors.push(`Row ${rowNum}: District '${value}' not found`);
+        } else if (sysKey === 'unitType' && value) {
+          if (hierarchyMaps.categories.includes(hKey)) mapped[sysKey] = value; // Store the name for unitType
+          else rowErrors.push(`Row ${rowNum}: Unit Category '${value}' not found`);
+        } else if (sysKey === 'currentUnitId' && value) {
+          const id = hierarchyMaps.units[hKey];
+          if (id) mapped[sysKey] = id;
+          else rowErrors.push(`Row ${rowNum}: Unit '${value}' not found`);
+        } else if (sysKey === 'currentSubUnitId' && value) {
+          const id = hierarchyMaps.subUnits[hKey];
+          if (id) mapped[sysKey] = id;
+          else rowErrors.push(`Row ${rowNum}: Sub-Unit '${value}' not found`);
+        } else {
+          mapped[sysKey] = value;
+        }
       });
 
       // Check required fields
       requiredFields.forEach(reqKey => {
         if (!mapped[reqKey]) {
-          rowErrors.push(`Row ${rowNum}: Missing required field "${SYSTEM_FIELDS.find(f => f.key === reqKey)?.label}"`);
+          rowErrors.push(`Row ${rowNum}: Missing required field "${effectiveFields.find(f => f.key === reqKey)?.label}"`);
         }
       });
 
@@ -252,11 +369,26 @@ export default function ExcelImport() {
       warnings.push(`${duplicates.length} duplicate mobile numbers found. They will still be imported.`);
     }
 
-    setValidationResults({ errors, warnings, validRows, totalRows: rawData.length });
+    // Create a display-friendly version of valid rows for the preview table
+    const displayRows = validRows.slice(0, 10).map(row => {
+      const display = { ...row };
+      // Helper to find name by ID (reverse lookup for display)
+      const findName = (map, id) => Object.entries(map).find(([name, mid]) => mid === id)?.[0] || id;
+      
+      if (row.stateId) display.stateId = findName(hierarchyMaps.states, row.stateId);
+      if (row.rangeId) display.rangeId = findName(hierarchyMaps.ranges, row.rangeId);
+      if (row.districtId) display.districtId = findName(hierarchyMaps.districts, row.districtId);
+      if (row.currentUnitId) display.currentUnitId = findName(hierarchyMaps.units, row.currentUnitId);
+      if (row.currentSubUnitId) display.currentSubUnitId = findName(hierarchyMaps.subUnits, row.currentSubUnitId);
+      
+      return display;
+    });
+
+    setValidationResults({ errors, warnings, validRows, displayRows, totalRows: rawData.length });
     setStep(2);
   }
 
-  // Step 4: Import to Firestore using writeBatch for performance and atomicity
+  // Step 4: Import to Supabase using bulk insert
   async function startImport() {
     if (!validationResults?.validRows?.length) return;
 
@@ -269,44 +401,75 @@ export default function ExcelImport() {
     const BATCH_LIMIT = 500;
     const rows = validationResults.validRows;
 
+    // Helper to map UI camelCase to DB snake_case
+    const mapToPayload = (row) => ({
+      belt_number: row.beltNumber || '',
+      pay_code: row.payCode || '',
+      full_name: row.fullName || '',
+      father_name: row.fatherName || '',
+      rank: row.rank || '',
+      gender: row.gender || '',
+      date_of_birth: row.dateOfBirth || null,
+      religion: row.religion || '',
+      caste: row.caste || '',
+      category: row.category || '',
+      cadre: row.cadre || '',
+      service_type: row.serviceType || '',
+      service_book_number: row.serviceBookNumber || '',
+      date_of_enlistment: row.dateOfEnlistment || null,
+      date_of_last_promotion: row.dateOfLastPromotion || null,
+      retirement_date: row.retirementDate || null,
+      village: row.village || '',
+      police_station: row.policeStation || '',
+      home_district: row.homeDistrict || '',
+      blood_group: row.bloodGroup || '',
+      mobile_number: row.mobileNumber || '',
+      alternate_contact: row.alternateContact || '',
+      aadhar_number: row.aadharNumber || '',
+      pan: row.pan || '',
+      service_status: row.serviceStatus || 'Active',
+      io_status: row.ioStatus || '',
+      io_category: row.ioCategory || '',
+      parade_group: row.paradeGroup || '',
+      spo_trade: row.spoTrade || '',
+      ps_duty_type: row.psDutyType || '',
+      home_district_ps: row.homeDistrictPS || '',
+      promotion_type: row.promotionType || '',
+      special_course: row.specialCourse || '',
+      company: row.company || '',
+      
+      state_id: !isSuperAdmin ? (user.stateId || '') : (row.stateId || ''),
+      range_id: (!isSuperAdmin && !isStateAdmin) ? (user.rangeId || '') : (row.rangeId || user.rangeId || ''),
+      district_id: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) ? (user.districtId || '') : (row.districtId || user.districtId || ''),
+      current_unit_id: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) ? (user.unitId || '') : (row.currentUnitId || user.unitId || ''),
+      current_sub_unit_id: row.currentSubUnitId || user.subUnitId || '',
+      
+      subject_graduation: row.subjectGraduation || '',
+      subject_post_graduation: row.subjectPostGraduation || '',
+      swat_awt_course: row.swatAwtCourse || '',
+      r_batch: row.rBatch || '',
+      t_duty_order: row.tDutyOrder || '',
+      date_of_posting: row.dateOfPosting || null,
+      remarks: row.remarks || '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      created_by_user_id: user.id || null
+    });
+
     for (let batchStart = 0; batchStart < rows.length; batchStart += BATCH_LIMIT) {
-      const chunk = rows.slice(batchStart, batchStart + BATCH_LIMIT);
-      const batch = writeBatch(db);
-
-      chunk.forEach((row) => {
-        try {
-          const docRef = doc(collection(db, 'personnel'));
-          const data = {
-            ...row,
-            personnelId: docRef.id,
-            serviceStatus: row.serviceStatus || 'Active',
-            stateId: !isSuperAdmin ? (user.stateId || '') : (row.stateId || ''),
-            rangeId: (!isSuperAdmin && !isStateAdmin) ? (user.rangeId || '') : (row.rangeId || ''),
-            districtId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin) ? (user.districtId || '') : (row.districtId || ''),
-            unitType: row.unitType || '',
-            currentUnitId: (!isSuperAdmin && !isStateAdmin && !isRangeAdmin && !isDistrictAdmin) ? (user.unitId || '') : (row.currentUnitId || ''),
-            currentSubUnitId: row.currentSubUnitId || user.subUnitId || '',
-            createdAt: serverTimestamp(),
-            createdByUserId: user.uid,
-            updatedAt: serverTimestamp(),
-            updatedByUserId: user.uid,
-          };
-          batch.set(docRef, data);
-          successCount++;
-        } catch (err) {
-          errorCount++;
-          errorRows.push({ row: batchStart + chunk.indexOf(row) + 1, error: err.message });
-        }
-      });
-
+      const chunk = rows.slice(batchStart, batchStart + BATCH_LIMIT).map(mapToPayload);
+      
       try {
-        await batch.commit();
+        const { error: insertError } = await supabase
+          .from('personnel')
+          .insert(chunk);
+
+        if (insertError) throw insertError;
+        successCount += chunk.length;
       } catch (err) {
-        // If the entire batch fails, count all rows in it as errors
-        errorCount += chunk.length - errorRows.filter(e => e.row >= batchStart + 1 && e.row <= batchStart + chunk.length).length;
-        successCount = Math.max(0, successCount - chunk.length);
-        errorRows.push({ row: batchStart + 1, error: `Batch commit failed: ${err.message}` });
-        if (import.meta.env.DEV) console.error('Batch import error:', err);
+        errorCount += chunk.length;
+        errorRows.push({ row: batchStart + 1, error: `Batch import failed: ${err.message}` });
+        if (import.meta.env.DEV) console.error('Bulk import error:', err);
       }
     }
 
@@ -418,7 +581,7 @@ export default function ExcelImport() {
                             style={{ minWidth: 200 }}
                           >
                             <option value="">— Skip this column —</option>
-                            {SYSTEM_FIELDS.map(sf => {
+                            {effectiveFields.map(sf => {
                               const alreadyMapped = Object.values(mapping).includes(sf.key) && mapping[col] !== sf.key;
                               return (
                                 <option key={sf.key} value={sf.key} disabled={alreadyMapped}>
@@ -481,6 +644,41 @@ export default function ExcelImport() {
             {validationResults.warnings.length > 0 && (
               <div style={{ background: 'var(--warning-50)', padding: 12, borderRadius: 8, marginBottom: 16, fontSize: '0.85rem', color: 'var(--warning-600)' }}>
                 {validationResults.warnings.map((w, i) => <p key={i}>⚠️ {w}</p>)}
+              </div>
+            )}
+
+            {/* NEW: Data Preview Table */}
+            {validationResults.displayRows?.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ marginBottom: 12, fontSize: '0.9rem', color: 'var(--gray-700)' }}>Data Preview (First 10 Rows)</h4>
+                <div className="table-container" style={{ maxHeight: 300, border: '1px solid var(--gray-200)', borderRadius: 8 }}>
+                  <table className="data-table" style={{ fontSize: '0.85rem' }}>
+                    <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--gray-50)', zIndex: 1 }}>
+                      <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Rank</th>
+                        <th>District</th>
+                        <th>Unit</th>
+                        <th>Sub-Unit</th>
+                        <th>Pay Code</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {validationResults.displayRows.map((row, i) => (
+                        <tr key={i}>
+                          <td>{i + 1}</td>
+                          <td style={{ fontWeight: 600 }}>{row.fullName}</td>
+                          <td>{row.rank}</td>
+                          <td>{row.districtId || '-'}</td>
+                          <td>{row.currentUnitId || '-'}</td>
+                          <td>{row.currentSubUnitId || '-'}</td>
+                          <td>{row.payCode}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 

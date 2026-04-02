@@ -28,14 +28,14 @@ async function seedAll() {
   console.log('✅ State: Haryana');
 
   // 2. Range
-  await setDoc(doc(db, 'ranges', 'range_hisar'), {
-    rangeId: 'range_hisar', stateId: 'haryana', rangeName: 'Hisar Range', createdAt: serverTimestamp(),
+  await setDoc(doc(db, 'ranges', 'haryana_hisar_range'), {
+    rangeId: 'haryana_hisar_range', stateId: 'haryana', rangeName: 'Hisar Range', createdAt: serverTimestamp(),
   });
   console.log('✅ Range: Hisar Range');
 
   // 3. District
-  await setDoc(doc(db, 'districts', 'district_hisar'), {
-    districtId: 'district_hisar', rangeId: 'range_hisar', districtName: 'Hisar', createdAt: serverTimestamp(),
+  await setDoc(doc(db, 'districts', 'haryana_hisar_range_hisar'), {
+    districtId: 'haryana_hisar_range_hisar', rangeId: 'haryana_hisar_range', districtName: 'Hisar', createdAt: serverTimestamp(),
   });
   console.log('✅ District: Hisar');
 
@@ -56,7 +56,7 @@ async function seedAll() {
   await setDoc(doc(db, 'users', 'user_sp_hisar'), {
     userId: 'user_sp_hisar', name: 'SP Hisar', beltNumber: 'ADMIN',
     password: 'oasi@2026', role: 'state_admin', roleLabel: 'State Admin',
-    stateId: 'haryana', rangeId: 'range_hisar', districtId: 'district_hisar',
+    stateId: 'haryana', rangeId: 'haryana_hisar_range', districtId: 'haryana_hisar_range_hisar',
     unitId: '', subUnitId: '', isActive: true, mobileNumber: '', personnelId: '',
     createdAt: serverTimestamp(),
   });

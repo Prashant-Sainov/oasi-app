@@ -8,7 +8,7 @@ import PersonnelList from './pages/personnel/PersonnelList';
 import PersonnelForm from './pages/personnel/PersonnelForm';
 import ExcelImport from './pages/personnel/ExcelImport';
 import UnitSetup from './pages/admin/UnitSetup';
-import MasterData from './pages/admin/MasterData';
+import DropdownMaster from './pages/admin/DropdownMaster';
 import AttendanceRegister from './pages/attendance/AttendanceRegister';
 import ChitthaList from './pages/chittha/ChitthaList';
 import ChitthaEditor from './pages/chittha/ChitthaEditor';
@@ -42,11 +42,11 @@ function PublicRoute({ children }) {
   return children;
 }
 
-// StateAdminRoute remains internal for now as it's simple
-function StateAdminRoute({ children }) {
-  const { user, loading, isStateAdmin } = useAuth();
+// AdminRoute allows both State and Super Admins
+function AdminRoute({ children }) {
+  const { user, loading, isStateAdmin, isSuperAdmin } = useAuth();
   if (loading) return null;
-  if (!user || !isStateAdmin) {
+  if (!user || (!isStateAdmin && !isSuperAdmin)) {
     return <Navigate to="/dashboard" replace />;
   }
   return children;
@@ -73,8 +73,8 @@ export default function App() {
               <Route path="/personnel/:id/edit" element={<PersonnelForm />} />
 
               {/* Unit Setup - Restricted to State Admin/Super Admin */}
-              <Route path="/units" element={<StateAdminRoute><UnitSetup /></StateAdminRoute>} />
-              <Route path="/master-data" element={<StateAdminRoute><MasterData /></StateAdminRoute>} />
+              <Route path="/units" element={<AdminRoute><UnitSetup /></AdminRoute>} />
+              <Route path="/dropdown-master" element={<AdminRoute><DropdownMaster /></AdminRoute>} />
 
               {/* Phase 2: Attendance & Chittha */}
               <Route path="/attendance" element={<AttendanceRegister />} />

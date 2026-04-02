@@ -1,11 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import {
-  collection, query, where, getDocs, doc, updateDoc,
-  serverTimestamp, orderBy, getDoc
-} from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import {
   RefreshCw, Plus, Search, CheckCircle, XCircle,
   Clock, MapPin, ArrowRight
@@ -36,27 +32,51 @@ export default function TransferRegister() {
   async function loadTransfers() {
     try {
       setLoading(true);
-      const ref = collection(db, 'transferRegister');
-      let q = query(ref, orderBy('createdAt', 'desc'));
-
-      // If unit admin, only see transfers originating from or coming to this unit
-      // Since Firestore doesn't support OR queries well in this context, we fetch all for district and filter locally
-      // For a real app with many records, we'd need a better index strategy
-      if (user.role === 'district_admin' || user.role === 'unit_admin') {
-         // Simplify: just fetch all and filter in memory for now based on role
-      }
-
-      const snap = await getDocs(q);
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
-      setTransfers(data);
-      if (user.role === 'unit_admin' && user.unitId) {
-        setTransfers(data.filter(t => t.fromUnitId === user.unitId || t.toUnitId === user.unitId));
-      } else if (user.role === 'district_admin' && user.districtId) {
-        setTransfers(data.filter(t => t.districtId === user.districtId));
-      } else if (user.role === 'range_admin' && user.rangeId) {
-        setTransfers(data.filter(t => t.rangeId === user.rangeId));
+      let queryBuilder = supabase
+        .from('transfers')
+        .select(`
+          *,
+          personnel:personnel_id (
+            full_name,
+            rank,
+            belt_number
+          ),
+          from_unit:from_unit_id (
+            name
+          ),
+          to_unit:to_unit_id (
+            name
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      // Role-based filtering
+      if (isUnitAdmin && user.unitId) {
+        // Source OR Destination is current unit
+        queryBuilder = queryBuilder.or(`from_unit_id.eq.${user.unitId},to_unit_id.eq.${user.unitId}`);
+      } else if (isDistrictAdmin && user.districtId) {
+        queryBuilder = queryBuilder.eq('district_id', user.districtId);
+      } else if (isRangeAdmin && user.rangeId) {
+        queryBuilder = queryBuilder.eq('range_id', user.rangeId);
       }
+
+      const { data, error } = await queryBuilder;
+      if (error) throw error;
+
+      setTransfers(data.map(t => ({
+        id: t.id,
+        personnelName: t.personnel?.full_name || 'Unknown',
+        beltNumber: t.personnel?.belt_number || '—',
+        rank: t.personnel?.rank || '—',
+        fromUnitName: t.from_unit?.name || 'Unknown',
+        toUnitName: t.to_unit?.name || 'Unknown',
+        orderNumber: t.order_number,
+        transferDate: t.order_date,
+        status: t.status === 'Ordered' ? 'Pending' : (t.status === 'Joined' ? 'Transferred' : t.status),
+        documentUrl: t.remarks?.includes('Order Link: ') ? t.remarks.split('Order Link: ')[1] : null,
+        ...t
+      })));
     } catch (err) {
       console.error('Load transfers error:', err);
       toast.error('Failed to load transfers.');
@@ -82,26 +102,31 @@ export default function TransferRegister() {
 
   async function updateStatus(transferId, newStatus) {
     try {
-      const tDoc = doc(db, 'transferRegister', transferId);
       const transferData = transfers.find(t => t.id === transferId);
 
-      // If marking as Transferred (Completed), we need to update the personnel record
+      // If marking as Transferred (Mapped to 'Joined' in my schema), update personnel record
       if (newStatus === 'Transferred') {
-        const pRef = doc(db, 'personnel', transferData.personnelId);
-        await updateDoc(pRef, {
-          currentUnitId: transferData.toUnitId,
-          currentSubUnitId: transferData.toSubUnitId || '',
-          updatedAt: serverTimestamp(),
-          updatedByUserId: user.uid || user.userId
-        });
+        const { error: pError } = await supabase
+          .from('personnel')
+          .update({
+            current_unit_id: transferData.to_unit_id,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', transferData.personnel_id);
+        
+        if (pError) throw pError;
       }
 
-      await updateDoc(tDoc, {
-        status: newStatus,
-        updatedAt: serverTimestamp(),
-        approvedByUserId: user.uid || user.userId,
-        approvedAt: newStatus === 'Approved' ? serverTimestamp() : null,
-      });
+      const dbStatus = newStatus === 'Transferred' ? 'Joined' : newStatus;
+      const { error } = await supabase
+        .from('transfers')
+        .update({
+          status: dbStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', transferId);
+      
+      if (error) throw error;
 
       setTransfers(prev => prev.map(t => t.id === transferId ? { ...t, status: newStatus } : t));
       toast.success(`Transfer marked as ${newStatus}.`);

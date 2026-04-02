@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { db } from '../../firebase';
-import { collection, doc, setDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
 import { Send, ArrowLeft, Calendar, FileType } from 'lucide-react';
 
@@ -43,39 +42,44 @@ export default function FIRForm() {
     setLoading(true);
     try {
       // Check if entry already exists for this PS + Quarter + Year
-      const q = query(
-        collection(db, 'firReports'),
-        where('policeStation', '==', formData.policeStation),
-        where('quarter', '==', formData.quarter),
-        where('year', '==', formData.year)
-      );
-      const snap = await getDocs(q);
-      if (!snap.empty) {
+      const { data: existing, error: checkError } = await supabase
+        .from('fir_reports')
+        .select('id')
+        .eq('police_station', formData.policeStation)
+        .eq('quarter', formData.quarter)
+        .eq('year', formData.year);
+      
+      if (checkError) throw checkError;
+
+      if (existing && existing.length > 0) {
         toast.warning(`Report for ${formData.policeStation} in ${formData.quarter} ${formData.year} already exists.`);
         setLoading(false);
         return;
       }
 
-      const ref = doc(collection(db, 'firReports'));
-      await setDoc(ref, {
-        reportId: ref.id,
-        stateId: user.stateId || '',
-        rangeId: user.rangeId || '',
-        districtId: user.districtId || '',
-        createdByUserId: user.uid || user.userId,
-        createdAt: serverTimestamp(),
+      const payload = {
+        state_id: user.stateId || '',
+        range_id: user.rangeId || '',
+        district_id: user.districtId || '',
+        unit_id: user.unitId || '',
+        created_by_user_id: user.id || null, // Assuming user.id from AuthContext
         
         quarter: formData.quarter,
         year: formData.year,
-        policeStation: formData.policeStation,
+        police_station: formData.policeStation,
         
-        firCount: parseInt(formData.firCount) || 0,
-        chargeSheetFiled: parseInt(formData.chargeSheetFiled) || 0,
+        fir_count: parseInt(formData.firCount) || 0,
+        charge_sheet_filed: parseInt(formData.chargeSheetFiled) || 0,
         conviction: parseInt(formData.conviction) || 0,
         pending: parseInt(formData.pending) || 0,
         cognizable: parseInt(formData.cognizable) || 0,
-        nonCognizable: parseInt(formData.nonCognizable) || 0,
-      });
+        non_cognizable: parseInt(formData.non_cognizable) || 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('fir_reports').insert([payload]);
+      if (error) throw error;
 
       toast.success('FIR data submitted successfully.');
       navigate('/reports/fir');

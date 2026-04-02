@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Printer, ArrowLeft, Edit2, ClipboardList, Clock, MapPin } from 'lucide-react';
-import { db } from '../../firebase';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../../supabase';
 import { useToast } from '../../contexts/ToastContext';
 
 export default function ChitthaPrintView() {
@@ -20,11 +19,52 @@ export default function ChitthaPrintView() {
   async function fetchData() {
     try {
       setLoading(true);
-      const chSnap = await getDoc(doc(db, 'naukriChittha', id));
-      if (chSnap.exists()) {
-        setChittha(chSnap.data());
-        const asSnap = await getDocs(query(collection(db, 'chitthaAssignments'), where('chitthaId', '==', id)));
-        setAssignments(asSnap.docs.map(d => d.data()));
+      
+      const { data: chData, error: chError } = await supabase
+        .from('chitthas')
+        .select(`
+          *,
+          unit:unit_id (
+            name,
+            district:district_id (
+              name
+            )
+          )
+        `)
+        .eq('id', id)
+        .single();
+      
+      if (chError) throw chError;
+
+      if (chData) {
+        setChittha({
+          id: chData.id,
+          chitthaDate: chData.chittha_date,
+          dateLabel: chData.date_label,
+          headSummary: chData.head_summary,
+          sectionConfigs: chData.section_configs,
+          unitName: chData.unit?.name || 'Unknown Unit',
+          districtName: chData.unit?.district?.name || 'Unknown District',
+          ...chData
+        });
+
+        const { data: asData, error: asError } = await supabase
+          .from('chittha_assignments')
+          .select('*')
+          .eq('chittha_id', id);
+        
+        if (asError) throw asError;
+
+        setAssignments(asData.map(a => ({
+          personnelName: a.personnel_name,
+          personnelRank: a.personnel_rank,
+          personnelBelt: a.personnel_belt,
+          personnelMobile: a.personnel_mobile,
+          sectionId: a.section_id,
+          dutyPoint: a.duty_point,
+          remarks: a.remarks,
+          ...a
+        })));
       } else {
         toast.error('Roster not found');
       }
